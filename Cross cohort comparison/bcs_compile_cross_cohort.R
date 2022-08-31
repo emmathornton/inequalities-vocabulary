@@ -1,0 +1,884 @@
+#compile data for SES analysis: cross cohort comparison. BCS data. 
+
+
+#load in required packages####
+library(haven)
+require(swfscMisc)
+require(sjmisc)
+require(Hmisc)
+require(psych)
+library(tidyverse)
+library(dplyr)
+library(glue)
+library(lubridate)
+#load in data####
+bcs7072a <- read_sav("bcs7072a.sav")
+bcs7072b <- read_sav("bcs7072b.sav")
+f699a <- read_sav("f699a.sav")
+f699b <- read_sav("f699b.sav")
+f699c <- read_sav("f699c.sav")
+f699c_new <- read_sav("NEWf699c.sav")
+age10 <- read_sav("NEWsn3723.sav")
+age10_derived <- read_sav("bcs3derived.sav")
+age16 <- read_sav("NEWbcs7016x.sav")
+age16_derived <- read_sav("bcs4derived.sav")
+#convert data names to lowercase####
+names(bcs7072a ) <- tolower(names(bcs7072a ))
+names(bcs7072b ) <- tolower(names(bcs7072b ))
+names(f699a ) <- tolower(names(f699a ))
+names(f699b ) <- tolower(names(f699b))
+names(f699c ) <- tolower(names(f699c))
+names(f699c_new ) <- tolower(names(f699c_new))
+names(age10 ) <- tolower(names(age10))
+names(age16 ) <- tolower(names(age16))
+names(age10_derived ) <- tolower(names(age10_derived))
+names(age16_derived ) <- tolower(names(age16_derived))
+#getting single cohort members, first twin and first triplet. so have a cohort member from each family####
+CM_code <- c("bcsid", "a0002")
+CM_code <- bcs7072a[CM_code ]
+first_CM <- CM_code[CM_code$a0002 == 0 | CM_code$a0002 == 1 | CM_code$a0002 == 3 ,]
+
+#creating vocabulary variables ####
+#vocabulary score age 5. compiled from code in Parsons documentation on cognition measures, done in SPSS. 
+# https://cls.ucl.ac.uk/wp-content/uploads/2017/07/BCS70-Childhood-cognition-in-the-1970-British-Cohort-Study-Nov-2014-final.pdf
+vocab5 <- c("bcsid", "b5epvt")
+vocab5 <- f699c_new[vocab5]
+#age of CM at time of vocab test age5
+age_days5 <- c("bcsid", "f112")
+age_days5 <- f699c_new[age_days5]
+age_days5$f112[age_days5$f112==-3] <- NA
+age_days5$age5_days = days(age_days5$f112)
+age_days5$age5_years = as.period(age_days5$age5_days,unit="days")/years(1)
+CM_age5 <- c("bcsid", "age5_years")
+CM_age5 <- age_days5[CM_age5]
+CM_age5$age5_years = round(CM_age5$age5_years,2)
+
+#vocab age 10.
+#compiled from code in Parsons documentation on cognition measures, done in SPSS. 
+# https://cls.ucl.ac.uk/wp-content/uploads/2017/07/BCS70-Childhood-cognition-in-the-1970-British-Cohort-Study-Nov-2014-final.pdf
+vocab10 <- c("bcsid", "b10bass")
+vocab10 <- age10[vocab10]
+#age at time of test
+age10_derived1 <- na.omit(age10_derived)
+age_vocab10 <- c("bcsid", "bd3age")
+age_vocab10 <- age10_derived1[age_vocab10]
+age_vocab10$bd3age[age_vocab10$bd3age== -1] <- NA
+age_vocab10$bd3age[age_vocab10$bd3age== -3] <- NA
+
+#vocab age 16.
+#compiled from code in Parsons documentation on cognition measures, done in SPSS. 
+# https://cls.ucl.ac.uk/wp-content/uploads/2017/07/BCS70-Childhood-cognition-in-the-1970-British-Cohort-Study-Nov-2014-final.pdf
+vocab16 <- c("bcsid", "b16vocab")
+vocab16 <- age16[vocab16]
+#age at time of test
+age_vocab16 <- c("bcsid", "bd4age")
+age_vocab16 <- age16_derived[age_vocab16]
+age_vocab16$bd4age[age_vocab16$bd4age== -1] <- NA
+age_vocab16$bd4age[age_vocab16$bd4age== -9] <- NA
+age_vocab16$bd4age[age_vocab16$bd4age== -7] <- NA
+age_vocab16$bd4age[age_vocab16$bd4age== -8] <- NA
+
+#potential confounders####
+#gender####
+gender <- c("bcsid", "a0255")
+gender <- bcs7072a[gender]
+gender$a0255[gender$a0255== -1] <- NA
+gender$a0255[gender$a0255== -2] <- NA
+gender$a0255[gender$a0255== -3] <- NA
+
+#language used in home. collapse into 0=english, 1 = other language present####
+language_in_home <- c("bcsid", "e248")
+language_in_home <- f699b[language_in_home]
+language_in_home$e248[language_in_home$e248== -1] <- NA
+language_in_home$e248[language_in_home$e248== -2] <- NA
+language_in_home$e248[language_in_home$e248== -3] <- NA
+language_in_home$e248[language_in_home$e248== -4] <- NA
+language_in_home$e248[language_in_home$e248== 1] <- 0
+language_in_home$e248[language_in_home$e248== 2] <- 1
+language_in_home$e248[language_in_home$e248== 3] <- 1
+language_in_home$e248[language_in_home$e248== 4] <- 1
+language_in_home$e248[language_in_home$e248== 5] <- 1
+language_in_home$e248[language_in_home$e248== 6] <- 1
+language_in_home$e248[language_in_home$e248== 7] <- 1
+#ethnicity. collapse into 0=white, 1=minority. ####
+ethnicity <- c("bcsid", "e245")
+ethnicity <- f699b[ethnicity]
+ethnicity$e245[ethnicity$e245== -1] <- NA
+ethnicity$e245[ethnicity$e245== -2] <- NA
+ethnicity$e245[ethnicity$e245== -3] <- NA
+ethnicity$e245[ethnicity$e245== -4] <- NA
+ethnicity$e245[ethnicity$e245== 1] <- 0
+ethnicity$e245[ethnicity$e245== 2] <- 1
+ethnicity$e245[ethnicity$e245== 3] <- 1
+ethnicity$e245[ethnicity$e245== 4] <- 1
+ethnicity$e245[ethnicity$e245== 5] <- 1
+ethnicity$e245[ethnicity$e245== 6] <- 1
+ethnicity$e245[ethnicity$e245== 7] <- 1
+ethnicity$e245 = as.character(ethnicity$e245)
+#SES variables ####
+#highest household educational status at age 5####
+householdEd <- c("bcsid", "e190")
+householdEd <- f699b[householdEd]
+householdEd$e190[householdEd$e190==-4] <- NA 
+householdEd$e190[householdEd$e190==-3] <- NA 
+householdEd$e190[householdEd$e190==-2] <- NA 
+householdEd$e190[householdEd$e190==-1] <- NA 
+householdEd$e190[householdEd$e190==-8] <- NA 
+householdEd$recoded =  rec(householdEd$e190,  rec = "1=7; 2=6; 3=5; 4=4; 5=3; 6=2; 7=1", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
+#collapse into 4 category measure 
+householdEd$highestHouseholdEd = rec(householdEd$recoded,  rec = "1,2,3=4;  4=3; 5=2; 6,7=1", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
+HighestEd = c("bcsid", "highestHouseholdEd")
+HighestEd = householdEd[HighestEd]
+#own derived variable 
+mother_ed <- c("bcsid", "e189a")
+mother_ed <- f699b[mother_ed]
+mother_ed$e189a[ mother_ed$e189a== -1] <-8
+mother_ed$e189a[ mother_ed$e189a== -2] <-8
+mother_ed$e189a[ mother_ed$e189a== -3] <-8
+mother_ed$e189a[ mother_ed$e189a== -4] <-8
+mother_ed$e189a[ mother_ed$e189a== 8] <-8
+mumed_recode <- rec(mother_ed, e189a,  rec = "1=7; 2=6; 3=5; 4=4; 5=3; 6=2; 7=1; 8=8", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
+new_mumed <- data.frame(mumed_recode, mother_ed)
+mum_education <- c("bcsid", "e189a_r")
+mum_education <- new_mumed[mum_education]
+father_ed <- c("bcsid", "e189b")
+father_ed <- f699b[father_ed]
+father_ed$e189b[ father_ed$e189b== -1] <-8
+father_ed$e189b[ father_ed$e189b== -2] <-8
+father_ed$e189b[ father_ed$e189b== -3] <-8
+father_ed$e189b[ father_ed$e189b== -4] <-8
+father_ed$e189b[ father_ed$e189b== 8] <-8
+daded_recode <- rec(father_ed, e189b,  rec = "1=7; 2=6; 3=5; 4=4; 5=3; 6=2; 7=1; 8=8", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
+new_daded <- data.frame(daded_recode, father_ed)
+dad_education <- c("bcsid", "e189b_r")
+dad_education <- new_daded[dad_education]
+parental_education <- merge(all=TRUE, dad_education, mum_education, by="bcsid")
+highest_ed <- transform(parental_education, highested = pmin(e189a_r, e189b_r, na.rm=FALSE))
+highest_parental_ed <- c("bcsid", "highested")
+highest_parental_ed <- highest_ed[highest_parental_ed]
+highest_parental_ed[ highest_parental_ed== 8] <- NA
+#collapse into 4 category measure for cross cohort comparison
+#1 =no quals/low level quals. 2 = o levels/gcses grades a*-c. 3= post 16 education. 4=university level qualifications
+highest_parental_ed$parent_education <- rec(highest_parental_ed$highested,  rec = "1,2,3=4;  4=3; 5=2; 6,7=1", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
+parent_academic_quals <- c("bcsid", "parent_education")
+parent_academic_quals <- highest_parental_ed[parent_academic_quals]
+
+
+#occupational status ####
+#highest household level at age 5. students/volunteers (7) categorised as unemployed.
+
+fathers_social_class_age5 <- c("bcsid", "e197")
+fathers_social_class_age5<-f699b[fathers_social_class_age5]
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== -1] <- 8
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== -2] <- 8
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== -3] <- 8
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== -4] <- 8
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== 1] <- 1
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== 2] <- 1
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== 3] <- 2
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== 4] <- 2
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== 5] <- 3
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== 6] <- 3
+fathers_social_class_age5$e197[fathers_social_class_age5$e197== 7] <- 4
+
+mothers_social_class_age5 <- c("bcsid", "e206")
+mothers_social_class_age5<-f699b[mothers_social_class_age5]
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== -1] <- 8
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== -2] <- 8
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== -3] <- 8
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== -4] <- 8
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== 1] <- 1
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== 2] <- 1
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== 3] <- 2
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== 4] <- 2
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== 5] <- 3
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== 6] <- 3
+mothers_social_class_age5$e206[mothers_social_class_age5$e206== 7] <- 4
+
+social_class_age5 <- merge(all=TRUE, fathers_social_class_age5, mothers_social_class_age5,by="bcsid")
+highestsec_age5 <- transform(social_class_age5, highest_sec5 = pmin(e197, e206, na.rm=FALSE))
+highestsec_age5[highestsec_age5== 8] <- NA
+sec_age5 <- c("bcsid", "highest_sec5")
+sec_age5 <- highestsec_age5[sec_age5]
+
+#occupational status - highest household level at birth. 4th category for unemployed. 
+fathers_social_class <- c("bcsid", "a0014")
+fathers_social_class <- bcs7072a[fathers_social_class]
+fathers_social_class$a0014[fathers_social_class$a0014== -2] <- 8
+fathers_social_class$a0014[fathers_social_class$a0014== 7] <- 8
+fathers_social_class$a0014[fathers_social_class$a0014== 8] <- 8
+fathers_social_class$a0014[fathers_social_class$a0014== 1] <- 1
+fathers_social_class$a0014[fathers_social_class$a0014== 2] <- 1
+fathers_social_class$a0014[fathers_social_class$a0014== 3] <- 2
+fathers_social_class$a0014[fathers_social_class$a0014== 4] <- 2
+fathers_social_class$a0014[fathers_social_class$a0014== 5] <- 3
+fathers_social_class$a0014[fathers_social_class$a0014== 6] <- 3
+father_emp <- c("bcsid", "a0015")
+father_emp<- bcs7072a[father_emp]
+
+
+mothers_social_class <- c("bcsid", "a0018")
+mothers_social_class <- bcs7072a[mothers_social_class]
+mothers_social_class$a0018[mothers_social_class$a0018== -2] <- 8
+mothers_social_class$a0018[mothers_social_class$a0018== 7] <- 8
+mothers_social_class$a0018[mothers_social_class$a0018== 6] <- 8
+mothers_social_class$a0018[mothers_social_class$a0018== 1] <- 1
+mothers_social_class$a0018[mothers_social_class$a0018== 2] <- 2
+mothers_social_class$a0018[mothers_social_class$a0018== 3] <- 2
+mothers_social_class$a0018[mothers_social_class$a0018== 4] <- 3
+mothers_social_class$a0018[mothers_social_class$a0018== 5] <- 3
+
+mother_emp <- c("bcsid", "a0019")
+mother_emp<- bcs7072a[mother_emp]
+
+sec3 <- merge(all=TRUE, merge(all=TRUE, merge(all=TRUE, father_emp, fathers_social_class,by="bcsid"),  mother_emp,by="bcsid"), mothers_social_class,by="bcsid")
+highestsec <- transform(sec3, highest_sec = pmin(a0014, a0018, na.rm=FALSE))
+highestsec[highestsec== 8] <- NA
+highestsec[is.na(highestsec$highest_sec) & highestsec$a0015 %in% c(2),]$highest_sec = 4
+highestsec[is.na(highestsec$highest_sec) & highestsec$a0019 %in% c(2),]$highest_sec = 4
+sec4 <- c("bcsid", "highest_sec")
+sec4 <- highestsec[sec4]
+
+#age 5 then replace NA with birth
+occupational_status <- merge(all=TRUE, sec_age5, sec4,by="bcsid")
+occupational_status$highest_ses <-  ifelse(!is.na(occupational_status$highest_sec5), occupational_status$highest_sec5,occupational_status$highest_sec)
+highest_household_ses <- c("bcsid", "highest_ses")
+highest_household_ses<-occupational_status[highest_household_ses]
+
+highest_household_ses$highest_occupation <- rec(highest_household_ses$highest_ses,  rec = "1=4; 2=3; 3=2; 4=1", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
+highest_occupation<- c("bcsid", "highest_occupation")
+highest_occupation <- highest_household_ses[highest_occupation]
+
+#auxiliary imputation variables. ####
+#accommodation type####
+accom_type <- c("bcsid","b0008", "b0009")
+accom_type <- bcs7072b[accom_type]
+accom_type[accom_type== -1] <- NA
+accom_type[accom_type== -2] <- NA
+accom_type[accom_type== -3] <- NA
+accom_type[accom_type== -4] <- NA
+accom_type[accom_type== -5] <- NA
+accom_type[accom_type== -6] <- NA
+new_accomodate<- ifelse(!(accom_type$b0008==4),accom_type$b0008, accom_type$b0009)
+new_accomodation <- data.frame(accom_type, new_accomodate)
+accommodation_type <-  c("bcsid", "new_accomodate" )
+accommodation_type<- new_accomodation[accommodation_type]
+
+#mother's age at birth of CM####
+mother_age_delivery <- c("bcsid", "a0005a")
+mother_age_delivery <- bcs7072a[mother_age_delivery]
+mother_age_delivery[ mother_age_delivery == -2] <- NA
+
+
+
+
+#create analysis data ####
+
+analysis_data <- merge(all=TRUE, gender, ethnicity,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, language_in_home,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data,mother_age_delivery,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, accommodation_type,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, HighestEd,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, mother_ed,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, father_ed,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, highest_occupation, by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, vocab5, by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, CM_age5, by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, vocab10, by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, age_vocab10, by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, vocab16, by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, age_vocab16, by="bcsid")
+nrow(analysis_data)
+bcs_cm1 <- analysis_data[analysis_data$bcsid %in% first_CM$bcsid,]
+#select those with a response on any language measure ####
+bcs_analysis <- bcs_cm1[!is.na(bcs_cm1$b5epvt) | !is.na(bcs_cm1$b10bass) |!is.na(bcs_cm1$b16vocab) ,]
+
+
+#create an attrition weight####
+#creating the weight for age 5 
+
+#FROM BIRTH SWEEP for response at age 5####
+#CM BORN TO TEENAGE MOTHER: 
+#mother's age at birth of CM####
+mother_age_delivery <- c("bcsid", "a0005a")
+mother_age_delivery <- bcs7072a[mother_age_delivery]
+mother_age_delivery[ mother_age_delivery == -2] <- NA
+teenage_mother = mother_age_delivery %>% mutate(teen_mum = a0005a <=19)
+teenage_mother$teen_mum = as.numeric(teenage_mother$teen_mum)
+teen_mum = c("bcsid", "teen_mum")
+teen_mum=teenage_mother[teen_mum]
+
+#parity
+parity <- c("bcsid", "a0166")
+parity <- bcs7072a[parity]
+parity[ parity== -2] <-NA
+high_parity = parity %>% mutate (high_parity = a0166 >=4)
+high_parity$high_parity = as.numeric(high_parity$high_parity)
+highParity=c("bcsid", "high_parity")
+highParity=high_parity[highParity]
+
+#heavy smokers
+smoker <- c("bcsid", "a0043b")
+smoker <- bcs7072a[smoker]
+smoker[smoker==-3] <-NA
+heavy_smoker = smoker %>% mutate (heavy_smoker= a0043b == 6)
+heavy_smoker$heavy_smoker= as.numeric(heavy_smoker$heavy_smoker)
+heavySmoker = c("bcsid", "heavy_smoker")
+heavySmoker=heavy_smoker[heavySmoker]
+
+#marital status at birth
+marital_status <- c("bcsid", "a0012")
+marital_status <- bcs7072a[marital_status]
+#ignoring missing values
+marital_status$a0012[ marital_status$a0012== -2] <-NA
+marital_status$a0012[ marital_status$a0012== 1] <- 1
+marital_status$a0012[ marital_status$a0012== 2] <- 0
+marital_status$a0012[ marital_status$a0012== 3] <- 1
+marital_status$a0012[ marital_status$a0012== 4] <- 1
+marital_status$a0012[ marital_status$a0012== 5] <- 1
+
+combined_data = bcs_analysis
+#generate response variable (this will be the outcome variable in the logistic regression)
+combined_data$complete <- as.integer(complete.cases(combined_data$b5epvt))
+
+#add birth variables to predict missingness
+combined_data <- merge(all=TRUE, combined_data, teen_mum,by="bcsid")
+combined_data <- merge(all=TRUE, combined_data, fathers_social_class,  by="bcsid")
+combined_data <- merge(all=TRUE, combined_data, mothers_social_class,by="bcsid")
+#combined_data <- merge(all=TRUE, combined_data, gender, by="bcsid")
+combined_data <- merge(all=TRUE, combined_data, highParity, by="bcsid")
+combined_data <- merge(all=TRUE, combined_data, heavySmoker, by="bcsid")
+combined_data <- merge(all=TRUE, combined_data, marital_status, by="bcsid")
+
+combined_data=combined_data[!is.na(combined_data$complete), ]
+
+#single imputation for missing birth variables - use random imputation.
+#in random imputation, impute random values sampled from the nonmissing values of the variable
+#missing for mother's age at birth and for gender. 
+#function for random imputation: 
+rand.impute <- function(a) {
+  missing <- is.na(a)
+  n.missing <- sum(missing)
+  a.obs <- a[!missing]
+  imputed <- a
+  imputed[missing] <- sample (a.obs, n.missing, replace=TRUE)
+  return (imputed)
+}
+
+random.impute.data.frame <- function(dat, cols) {
+  nms <- names(dat)
+  for(col in cols) {
+    name <- paste(nms[col],".imputed", sep = "")
+    dat[name] <- rand.impute(dat[,col])
+  }
+  dat
+}
+
+combined_data <- random.impute.data.frame(combined_data, c(2,18, 21, 22, 23))
+#combined_data<- merge(all=TRUE, bcs_analysis, new_birth_variables,by="bcsid")
+#generate response variable (this will be the outcome variable in the logistic regression)
+#combined_data$complete <- as.integer(complete.cases( combined_data$b5epvt))
+#logistic regression to predict response. use: parent education, SES, mothers age at birth, gender, ethnicity etc
+#then get predicted probabilities
+#then weight=1/pr if complete==1 (weight is 1 divided by probability.)
+#need to make sure there are no missing values in predictors in the logistic regression.
+#need to create single imputation for ethnicity and parent education. 
+
+combined_data$complete=as.factor(combined_data$complete)
+combined_data$a0255.imputed=as.factor(combined_data$a0255.imputed)
+combined_data$a0014=as.factor(combined_data$a0014)
+combined_data$a0018=as.factor(combined_data$a0018)
+combined_data$teen_mum.imputed=as.factor(combined_data$teen_mum.imputed)
+combined_data$high_parity.imputed =as.factor(combined_data$high_parity.imputed)
+combined_data$heavy_smoker.imputed=as.factor(combined_data$heavy_smoker.imputed)
+combined_data$a0012.imputed=as.factor(combined_data$a0012.imputed)
+#logistic regression to predict response at age 5
+missing <- glm(complete ~  a0255.imputed +  a0014 + a0018  + teen_mum.imputed + high_parity.imputed + heavy_smoker.imputed +a0012.imputed  , family=binomial(link='logit'), data=combined_data)
+predicted <- plogis(predict(missing)) 
+#new_predicted <- 1 / (1 + exp(-predicted)) - maybe?
+predicted[combined_data$complete==0] <- NA
+
+combined_data$predicted_age5 <- predicted
+#to get bcsid
+predicted_age5_1 <- c("bcsid", "predicted_age5")
+predicted_age5_1<-combined_data[predicted_age5_1]
+
+#new_predicted<-na.omit(predicted_age5_1)
+
+predicted_age5_1$weight=1/predicted_age5_1$predicted
+
+#attrition weight for age 10 sweep####
+#age 10 ses variables to predict response
+
+father_ed_10 <- c("bcsid", "c1.1", "c1.2", "c1.3", "c1.4", "c1.5", "c1.6", "c1.7", "c1.8", "c1.9")
+father_ed_10 <- age10[father_ed_10]
+father_ed_10$c1.1[father_ed_10$c1.1==1] <- 1
+father_ed_10$c1.2[father_ed_10$c1.2==1] <- 2
+father_ed_10$c1.3[father_ed_10$c1.3==1] <- 3
+father_ed_10$c1.4[father_ed_10$c1.4==1] <- 4
+father_ed_10$c1.5[father_ed_10$c1.5==1] <- 5
+father_ed_10$c1.6[father_ed_10$c1.6==1] <- 6
+father_ed_10$c1.7[father_ed_10$c1.7==1] <- 7
+father_ed_10$c1.8[father_ed_10$c1.7==8] <- 8
+father_ed_10$c1.9[father_ed_10$c1.9==1] <- 9
+
+father_ed_10$c1.1 = as.character(father_ed_10$c1.1)
+father_ed_10$c1.2 = as.character(father_ed_10$c1.2)
+father_ed_10$c1.3 = as.character(father_ed_10$c1.3)
+father_ed_10$c1.4 = as.character(father_ed_10$c1.4)
+father_ed_10$c1.5 = as.character(father_ed_10$c1.5)
+father_ed_10$c1.6 = as.character(father_ed_10$c1.6)
+father_ed_10$c1.7 = as.character(father_ed_10$c1.7)
+father_ed_10$c1.8 = as.character(father_ed_10$c1.8)
+father_ed_10$c1.9 = as.character(father_ed_10$c1.9)
+father_ed_10 <- transform(father_ed_10, dad_ed10 = pmax(c1.1, c1.2, c1.3, c1.4, c1.5, c1.6, c1.7,c1.8, c1.9,  na.rm = TRUE))
+
+dad_education10 <- c("bcsid", "dad_ed10")
+dad_education10 <- father_ed_10[dad_education10]
+dad_education10$dad_ed10[dad_education10$dad_ed10==-8] <- NA
+dad_education10$dad_ed10[dad_education10$dad_ed10==-3] <- NA
+
+mother_ed_10 <- c("bcsid", "c1.12", "c1.13", "c1.14", "c1.15", "c1.16", "c1.17", "c1.18", "c1.19", "c1.20")
+mother_ed_10 <- age10[mother_ed_10]
+mother_ed_10$c1.12[mother_ed_10$c1.12==1] <- 1
+mother_ed_10$c1.13[mother_ed_10$c1.13==1] <- 2
+mother_ed_10$c1.14[mother_ed_10$c1.14==1] <- 3
+mother_ed_10$c1.15[mother_ed_10$c1.15==1] <- 4
+mother_ed_10$c1.16[mother_ed_10$c1.16==1] <- 5
+mother_ed_10$c1.17[mother_ed_10$c1.17==1] <- 6
+mother_ed_10$c1.18[mother_ed_10$c1.18==1] <- 7
+mother_ed_10$c1.20[mother_ed_10$c1.20==1] <- 9
+
+mother_ed_10$c1.12=as.character(mother_ed_10$c1.12)
+mother_ed_10$c1.13=as.character(mother_ed_10$c1.13)
+mother_ed_10$c1.14=as.character(mother_ed_10$c1.14)
+mother_ed_10$c1.15=as.character(mother_ed_10$c1.15)
+mother_ed_10$c1.16=as.character(mother_ed_10$c1.16)
+mother_ed_10$c1.17=as.character(mother_ed_10$c1.17)
+mother_ed_10$c1.18=as.character(mother_ed_10$c1.18)
+mother_ed_10$c1.19=as.character(mother_ed_10$c1.19)
+mother_ed_10$c1.20=as.character(mother_ed_10$c1.20)
+
+mother_ed_10 <- transform(mother_ed_10, mum_ed10 = pmax(c1.12, c1.13, c1.14, c1.15, c1.16, c1.17, c1.18,c1.19, c1.20,  na.rm = TRUE))
+
+mum_education10 <- c("bcsid", "mum_ed10")
+mum_education10 <- mother_ed_10[mum_education10]
+mum_education10$mum_ed10[mum_education10$mum_ed10==-8] <- NA
+mum_education10$mum_ed10[mum_education10$mum_ed10==-3] <- NA
+
+
+age10_ses <- c("bcsid", "c3.4", "c3.11")
+age10_ses <- age10[age10_ses]
+age10_ses$c3.4[age10_ses$c3.4==-8] <- NA
+age10_ses$c3.4[age10_ses$c3.4==-9] <- NA
+age10_ses$c3.11[age10_ses$c3.11==-8] <- NA
+age10_ses$c3.11[age10_ses$c3.11==-9] <- NA
+
+age10_gender <- c("bcsid", "sex10")
+age10_gender <- age10[age10_gender]
+age10_gender$sex10[age10_gender$sex10==3] <- NA
+
+bcsid_age10 <- c("bcsid")
+bcsid_age10 <- age10[bcsid_age10]
+names(bcsid_age10) <- c("bcsid10")
+age10_data <- data.frame(age10,bcsid_age10)
+age10_bcsid <- c("bcsid", "bcsid10")
+age10_bcsid <- age10_data[age10_bcsid]
+
+#response at age 10####
+#region of parents
+#mother
+mother_region <- c("bcsid", "a0006a")
+mother_region <- bcs7072a[mother_region]
+mother_region[mother_region==-3] <- NA
+mother_region[mother_region==-2] <- NA
+mother_regionNotBritain = mother_region %>% mutate (mother_notBritain= a0006a >=14)
+mother_regionNotBritain$mother_notBritain = as.numeric(mother_regionNotBritain$mother_notBritain)
+mother_notBritain = c("bcsid", "mother_notBritain")
+mother_notBritain=mother_regionNotBritain[mother_notBritain]
+
+#father
+father_region <- c("bcsid", "a0007a")
+father_region <- bcs7072a[father_region]
+father_region[father_region==-3] <- NA
+father_region[father_region==-2] <- NA
+father_regionNotBritain = father_region %>% mutate (father_notBritain= a0007a >=14)
+father_regionNotBritain$father_notBritain = as.numeric(father_regionNotBritain$father_notBritain)
+
+father_notBritain = c("bcsid", "father_notBritain")
+father_notBritain=father_regionNotBritain[father_notBritain]
+
+#age parents left full time education
+#mother
+leaving_ageMother= c("bcsid", "a0009")
+leaving_ageMother=bcs7072a[leaving_ageMother]
+leaving_ageMother[leaving_ageMother==-3] <- NA
+leaving_ageMother[leaving_ageMother==-2] <- NA
+leaving_ageMother[leaving_ageMother==-0] <- NA
+leaving_age15Mother = leaving_ageMother %>% mutate (leaving_age15Mother = a0009 <=15)
+leaving_age15Mother$leaving_age15Mother = as.numeric(leaving_age15Mother$leaving_age15Mother)
+
+mother_left_school15 =c("bcsid", "leaving_age15Mother")
+mother_left_school15=leaving_age15Mother[mother_left_school15]
+
+#father
+leaving_ageFather= c("bcsid", "a0010")
+leaving_ageFather=bcs7072a[leaving_ageFather]
+leaving_ageFather[leaving_ageFather==-3] <- NA
+leaving_ageFather[leaving_ageFather==-2] <- NA
+leaving_ageFather[leaving_ageFather==-0] <- NA
+leaving_age15Father = leaving_ageFather %>% mutate (leaving_age15Father = a0010 <=15)
+leaving_age15Father$leaving_age15Father = as.numeric(leaving_age15Father$leaving_age15Father)
+
+father_left_school15 =c("bcsid", "leaving_age15Father")
+father_left_school15=leaving_age15Father[father_left_school15]
+
+#father unemployed
+father_employment <- c("bcsid", "a0015")
+father_employment<- bcs7072a[father_employment]
+father_employment[father_employment==-3] <- NA
+father_employment[father_employment==-2] <- NA
+father_employment[father_employment==-1] <- NA
+father_unemployed = father_employment %>% mutate (father_unemployed = a0015 == 2)
+father_unemployed$father_unemployed = as.numeric(father_unemployed$father_unemployed)
+
+fatherUnemployed=c("bcsid", "father_unemployed")
+fatherUnemployed = father_unemployed[fatherUnemployed]
+
+#twins
+cm_code <- c("bcsid", "a0002")
+cm_code <- bcs7072a[cm_code ]
+twin = cm_code %>% mutate(twin = a0002 >0 & a0002 <3)
+twin$twin=as.numeric(twin$twin)
+twins = c("bcsid", "twin")
+twins=twin[twins]
+
+#from age 5 sweep
+#parents with no quals
+#highest household variable
+householdEducation <- c("bcsid", "e190")
+householdEducation <- f699b[householdEducation]
+householdEducation$e190[householdEducation$e190==-4] <- NA 
+householdEducation$e190[householdEducation$e190==-3] <- NA 
+householdEducation$e190[householdEducation$e190==-2] <- NA 
+householdEducation$e190[householdEducation$e190==-1] <- NA 
+householdEducation$e190[householdEducation$e190==-8] <- NA 
+noQuals = householdEducation %>% mutate(noQuals = e190 == 1)
+noQuals$noQuals=as.numeric(noQuals$noQuals)
+no_qualifications = c("bcsid", "noQuals")
+no_qualifications=noQuals[no_qualifications]
+#mother aged over 40 at birth of child
+aged40 = mother_age_delivery %>% mutate(aged40 = a0005a >=40)
+aged40$aged40 = as.numeric(aged40$aged40)
+mother_over40 = c("bcsid", "aged40")
+mother_over40= aged40[mother_over40]
+#separation of mother and baby for over a month
+separation=c("bcsid", "e019")
+separation=f699b[separation]
+separation[separation==-1] <- 0
+separation[separation==-2] <- NA
+separation[separation==-3] <- NA
+separation[separation==-4] <- NA
+separated_oneMonthPlus = separation %>% mutate(oneMonthPlus= e019 >=30)
+separated_oneMonthPlus$oneMonthPlus=as.numeric(separated_oneMonthPlus$oneMonthPlus)
+month_separated= c("bcsid", "oneMonthPlus")
+month_separated=separated_oneMonthPlus[month_separated]
+# low birthweight
+birthweight <- c("bcsid", "a0278")
+birthweight <- bcs7072a [birthweight]
+#ignore missing
+birthweight[ birthweight== -1] <-NA
+birthweight[ birthweight== -2] <-NA
+birthweight[ birthweight== -3] <-NA
+birthweight[ birthweight== -4] <-NA
+birthweight[ birthweight== 0] <-NA
+low_birthweight = birthweight %>% mutate(low_birthweight = a0278 <=2267.96)
+low_birthweight$low_birthweight=as.numeric(low_birthweight$low_birthweight)
+lowBirthweight=c("bcsid", "low_birthweight")
+lowBirthweight=low_birthweight[lowBirthweight]
+#geographical mobility - moved more than 3 times = high.
+family_moved = c("bcsid", "e249")
+family_moved=f699b[family_moved]
+family_moved[family_moved==-1]<-NA
+family_moved[family_moved==-2]<-NA
+family_moved[family_moved==-3]<-NA
+family_moved[family_moved==-4]<-NA
+highMobility= family_moved %>% mutate (high_mobility = e249 >= 3)
+highMobility$high_mobility = as.numeric(highMobility$high_mobility )
+mobile_family= c("bcsid", "high_mobility")
+mobile_family=highMobility[mobile_family]
+#crowded accommodation
+#>1 person per room = crowded
+person_roomRatio = c("bcsid", "e228b")
+person_roomRatio=f699b[person_roomRatio]
+person_roomRatio[person_roomRatio==-1] <- NA
+person_roomRatio[person_roomRatio==-2] <- NA
+person_roomRatio[person_roomRatio==-3] <- NA
+person_roomRatio[person_roomRatio==-4] <- NA
+crowded= person_roomRatio %>% mutate(crowded = e228b >1)
+crowded$crowded=as.numeric(crowded$crowded)
+crowded_room = c("bcsid", "crowded")
+crowded_room = crowded[crowded_room]
+#private rented accommodation
+tenure_type = c("bcsid", "e220")
+tenure_type=f699b[tenure_type]
+tenure_type[tenure_type==-1] <- NA
+tenure_type[tenure_type==-2] <- NA
+tenure_type[tenure_type==-3] <- NA
+tenure_type[tenure_type==-4] <- NA
+privateRented= tenure_type %>% mutate (privateRented = e220 >3 & e220 <6 )
+privateRented$privateRented=as.numeric(privateRented$privateRented)
+private_rented= c("bcsid", "privateRented")
+private_rented= privateRented[private_rented]
+#poor neighborhood
+poor_neighborhood = c("bcsid", "e267a")
+poor_neighborhood = f699b[poor_neighborhood]
+poor_neighborhood[poor_neighborhood==-1] <- NA
+poor_neighborhood[poor_neighborhood==-2] <- NA
+poor_neighborhood[poor_neighborhood==-3] <- NA
+poor_neighborhood[poor_neighborhood==-4] <- NA
+poorArea = poor_neighborhood %>% mutate(poorNeighborhood = e267a==1)
+poorArea$poorNeighborhood = as.numeric(poorArea$poorNeighborhood)
+poor_area =c("bcsid", "poorNeighborhood")
+poor_area=poorArea[poor_area]
+
+#age10_variables <- merge(all=TRUE, age10_bcsid, vocab10, by="bcsid")
+#age10_variables <- merge(all=TRUE, age10_variables, dad_education10,by="bcsid")
+#age10_variables <- merge(all=TRUE, age10_variables, mum_education10,by="bcsid")
+#age10_variables <- merge(all=TRUE, age10_variables,age10_ses,by="bcsid")
+#age10_variables <- merge(all=TRUE, age10_variables,vocab10,by="bcsid")
+
+#names(age10_variables) <- c("bcsid", "bcsid10",  "vocab10")
+
+
+
+#combined_data_age10<- merge(all=TRUE, age10_variables, bcs_analysis,by="bcsid")
+
+
+combined_data_age10=bcs_analysis 
+
+#generate response variable (this will be the outcome variable in the logistic regression)
+combined_data_age10$complete10 <- as.integer(complete.cases(combined_data_age10$b10bass))
+
+#combined_data_age10 <- merge(all=TRUE, combined_data_age10, gender, by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,private_rented,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,poor_area,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,crowded_room,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,twins,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,father_notBritain,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,mother_notBritain,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,mother_left_school15,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,father_left_school15,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,teen_mum,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,mother_over40,by="bcsid")
+#combined_data_age10 <- merge(all=TRUE, combined_data_age10,ethnicity,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10, mobile_family,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,lowBirthweight,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,month_separated,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,no_qualifications,by="bcsid")
+combined_data_age10 <- merge(all=TRUE, combined_data_age10,fatherUnemployed,by="bcsid")
+#remove na for complete 10 so have those who responded at age 10 and who didnt from own sample
+combined_data_age10=combined_data_age10[!is.na(combined_data_age10$complete10), ]
+
+#need to make sure there are no missing values in predictors in the logistic regression.
+combined_data_age10 <- random.impute.data.frame(combined_data_age10, c(2,3, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,28,29,30,31,32))
+
+#combined_data_age10$complete10 <- rec(combined_data_age10, complete10,  rec = "0=1;1=2", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
+combined_data_age10$complete10=as.factor(combined_data_age10$complete10)
+combined_data_age10$a0255.imputed=as.factor(combined_data_age10$a0255.imputed)
+combined_data_age10$e245.imputed=as.factor(combined_data_age10$e245.imputed)
+combined_data_age10$privatedRented.imputed=as.factor(combined_data_age10$privateRented.imputed)
+combined_data_age10$poorNeighborhood.imputed=as.factor(combined_data_age10$poorNeighborhood.imputed)
+combined_data_age10$crowded.imputed=as.factor(combined_data_age10$crowded.imputed)
+combined_data_age10$twin.imputed=as.factor(combined_data_age10$twin.imputed)
+combined_data_age10$father_notBritain.imputed=as.factor(combined_data_age10$father_notBritain.imputed)
+combined_data_age10$mother_notBritain.imputed=as.factor(combined_data_age10$mother_notBritain.imputed)
+combined_data_age10$leaving_age15Mother.imputed=as.factor(combined_data_age10$leaving_age15Mother.imputed)
+combined_data_age10$leaving_age15Father.imputed=as.factor(combined_data_age10$leaving_age15Father.imputed)
+combined_data_age10$teen_mum.imputed=as.factor(combined_data_age10$teen_mum.imputed)
+combined_data_age10$aged40.imputed=as.factor(combined_data_age10$aged40.imputed)
+combined_data_age10$high_mobility.imputed=as.factor(combined_data_age10$high_mobility.imputed)
+combined_data_age10$low_birthweight.imputed=as.factor(combined_data_age10$low_birthweight.imputed)
+combined_data_age10$oneMonthPlus.imputed=as.factor(combined_data_age10$oneMonthPlus.imputed)
+combined_data_age10$noQuals.imputed=as.factor(combined_data_age10$noQuals.imputed)
+combined_data_age10$father_unemployed.imputed=as.factor(combined_data_age10$father_unemployed.imputed)
+#logistic regression to predict response. use: parent education, SES, mothers age at birth, gender, ethnicity etc
+#then get predicted probabilities
+#then weight=1/pr if complete==1 (weight is 1 divided by probability.)
+missing_age10 <- glm(complete10 ~ a0255.imputed + e245.imputed + teen_mum.imputed +aged40.imputed + noQuals.imputed +father_unemployed.imputed +
+                       leaving_age15Father.imputed +leaving_age15Mother.imputed +mother_notBritain.imputed +father_notBritain.imputed +
+                       twin.imputed + low_birthweight.imputed + privatedRented.imputed + poorNeighborhood.imputed + crowded.imputed +
+                   high_mobility.imputed + oneMonthPlus.imputed  , family=binomial(link='logit'), data=combined_data_age10)
+predicted_age10 <- plogis(predict(missing_age10)) 
+#new_predicted <- 1 / (1 + exp(-predicted)) - maybe?
+predicted_age10[combined_data_age10$complete10==0] <- NA
+combined_data_age10$predicted_age10 <- predicted_age10
+
+predicted_age10_1 <- c("bcsid", "predicted_age10")
+predicted_age10_1<-combined_data_age10[predicted_age10_1]
+
+#predicted_age10_2 <- na.omit(predicted_age10_1)
+
+
+predicted_age10_1$weight_age10=1/predicted_age10_1$predicted_age10
+
+#combine with age 5 weight - if age 5 weight is missing, use age 10 weight
+#weight_vars <- merge(all=TRUE, predicted_age10_1,predicted_age5_1,by="bcsid")
+
+#weight_vars$combined_weight <- ifelse(!is.na(weight_vars$weight), weight_vars$weight, weight_vars$weight_age10)
+#weight <- c("bcsid", "combined_weight")
+#weight <- weight_vars[weight]
+
+#attrition weight for age 16 ####
+#age 16 ses variables 
+#age16_gender <- c("bcsid", "sex86")
+#age16_gender <- age16[age16_gender]
+#age16_gender$sex86[age16_gender$sex86==-2] <- NA
+#age16_gender$sex86[age16_gender$sex86==-1] <- NA
+
+#education
+#parent_quals16 <- c("bcsid", "t6.1", "t6.2", "t6.3", "t6.4", "t6.5", "t6.6", "t6.9")
+#parent_quals16 <- age16[parent_quals16]
+#parent_quals16[parent_quals16==4] <- NA
+
+#parent_quals16$t6.1[parent_quals16$t6.1==1] <- 1
+#parent_quals16$t6.1[parent_quals16$t6.1==2] <- 1
+#parent_quals16$t6.1[parent_quals16$t6.1==3] <- 1
+
+#parent_quals16$t6.2[parent_quals16$t6.2==1] <- 2
+#parent_quals16$t6.2[parent_quals16$t6.2==2] <- 2
+#parent_quals16$t6.2[parent_quals16$t6.2==3] <- 2
+
+#parent_quals16$t6.3[parent_quals16$t6.3==1] <- 3
+#parent_quals16$t6.3[parent_quals16$t6.3==2] <- 3
+#parent_quals16$t6.3[parent_quals16$t6.3==3] <- 3
+
+#parent_quals16$t6.4[parent_quals16$t6.4==1] <- 4
+#parent_quals16$t6.4[parent_quals16$t6.4==2] <- 4
+#parent_quals16$t6.4[parent_quals16$t6.4==3] <- 4
+
+#parent_quals16$t6.5[parent_quals16$t6.5==1] <- 5
+#parent_quals16$t6.5[parent_quals16$t6.5==2] <- 5
+#parent_quals16$t6.5[parent_quals16$t6.5==3] <- 5
+
+#parent_quals16$t6.6[parent_quals16$t6.6==1] <- 6
+#parent_quals16$t6.6[parent_quals16$t6.6==2] <- 6
+#parent_quals16$t6.6[parent_quals16$t6.6==3] <- 6
+
+#parent_quals16$t6.9[parent_quals16$t6.9==1] <- 0
+#parent_quals16$t6.9[parent_quals16$t6.9==2] <- 0
+#parent_quals16$t6.9[parent_quals16$t6.9==3] <- 0
+
+#parent_quals16$t6.1=as.character(parent_quals16$t6.1)
+#parent_quals16$t6.2=as.character(parent_quals16$t6.2)
+#parent_quals16$t6.3=as.character(parent_quals16$t6.3)
+#parent_quals16$t6.4=as.character(parent_quals16$t6.4)
+#parent_quals16$t6.5=as.character(parent_quals16$t6.5)
+#parent_quals16$t6.6=as.character(parent_quals16$t6.6)
+
+#parent_quals16$t6.9=as.character(parent_quals16$t6.9)
+#parent_quals16<- transform(parent_quals16, parent_ed16 = pmax(t6.1, t6.2, t6.3, t6.4, t6.5, t6.6, t6.9,  na.rm = TRUE))
+
+#age_left_ed <- c("bcsid", "t7.1", "t7.2")
+#age_left_ed <- age16[age_left_ed]
+#age_left_ed[age_left_ed==-4] <-NA
+#age_left_ed[age_left_ed==-2] <-NA
+#age_left_ed[age_left_ed==-1] <-NA
+
+#age16_ses <- c("bcsid", "t11.2", "t11.9")
+#age16_ses <- age16[age16_ses]
+#age16_ses[age16_ses==-1] <-NA
+#age16_ses[age16_ses==-2] <-NA
+#age16_ses[age16_ses==-4] <-NA
+#age16_ses[age16_ses==7] <-NA
+#age16_ses[age16_ses==8] <-NA
+
+#for age 16 responses####
+#region of parents
+region80 = c("bcsid", "bd3regn")
+region80=age10_derived1[region80]
+region80[region80==-1] <- NA
+region80[region80==-2] <- NA
+
+#age16_variables <- merge(all=TRUE,  gender,age_left_ed,  by="bcsid")
+#age16_variables <- merge(all=TRUE, age16_variables, parent_quals16,by="bcsid")
+#age16_variables <- merge(all=TRUE, age16_variables,age16_ses,by="bcsid")
+#age16_variables <- merge(all=TRUE, age16_variables,region80,by="bcsid")
+
+#new_age16_variables <- random.impute.data.frame(age16_variables, c(2,3,4, 12, 13, 14))
+
+combined_data_age16=bcs_analysis
+combined_data_age16$complete16 <- as.integer(complete.cases(combined_data_age16$b16vocab))
+#combined_data_age16<- merge(all=TRUE, age16_variables, bcs_analysis,by="bcsid")
+
+combined_data_age16 =merge(all=TRUE, combined_data_age16, dad_education10,by="bcsid")
+combined_data_age16=merge(all=TRUE, combined_data_age16, mum_education10,by="bcsid")
+combined_data_age16=merge(all=TRUE, combined_data_age16, age10_ses,by="bcsid")
+combined_data_age16=merge(all=TRUE,combined_data_age16, region80,by="bcsid")
+#remove na for complete 16 so have those who responded at age 16and who didnt from own sample
+combined_data_age16=combined_data_age16[!is.na(combined_data_age16$complete16), ]
+
+combined_data_age16<- random.impute.data.frame(combined_data_age16, c(2,18,19,20,21,22))
+
+
+combined_data_age16$complete16=as.factor(combined_data_age16$complete16)
+combined_data_age16$a0255.imputed=as.factor(combined_data_age16$a0255.imputed)
+combined_data_age16$dad_ed10.imputed=as.factor(combined_data_age16$dad_ed10.imputed)
+combined_data_age16$mum_ed10.imputed=as.factor(combined_data_age16$mum_ed10.imputed)
+combined_data_age16$c3.4.imputed=as.factor(combined_data_age16$c3.4.imputed)
+combined_data_age16$c3.11.imputed=as.factor(combined_data_age16$c3.11.imputed)
+combined_data_age16$bd3regn.imputed=as.factor(combined_data_age16$bd3regn.imputed)
+#logistic regression to predict missingness 
+missing_age16 <- glm(complete16 ~ a0255.imputed + dad_ed10.imputed +mum_ed10.imputed +c3.4.imputed +c3.11.imputed + bd3regn.imputed , family=binomial(link='logit'), data=combined_data_age16)
+
+predicted_age16 <- plogis(predict(missing_age16)) 
+#new_predicted <- 1 / (1 + exp(-predicted)) - maybe?
+predicted_age16[combined_data_age16$complete16==0] <- NA
+combined_data_age16$predicted_age16 <- predicted_age16
+
+predicted_age16_1 <- c("bcsid", "predicted_age16")
+predicted_age16_1<-combined_data_age16[predicted_age16_1]
+
+#predicted_age16_2 <- na.omit(predicted_age16_1)
+
+predicted_age16_1$weight_age16=1/predicted_age16_1$predicted_age16
+
+#weight16_2 <- predicted_age16_2$weight_age16/1.38
+
+#combine with combined ages 5 and 10 weight to replace missing with age 16 weight
+weight_vars2 <- merge(all=TRUE, predicted_age5_1, predicted_age10_1,by="bcsid")
+weight_vars2= merge(all=TRUE, weight_vars2, predicted_age16_1)
+
+weight_vars2$combined_weight2 <- ifelse(!is.na(weight_vars2$weight), weight_vars2$weight, weight_vars2$weight_age10)
+weight_vars2$combined_weight3 <- ifelse(!is.na(weight_vars2$combined_weight2), weight_vars2$combined_weight2, weight_vars2$weight_age16)
+weight2 <- c("bcsid", "combined_weight3")
+weight2 <- weight_vars2[weight2]
+
+#add weight variable to the bcs analysis data and apply a constant####
+bcs_analysis$weight <- weight2$combined_weight3/1.38
+
+
+
+#dummy variable for cohort membership. for BCS membership this will = 0. ####
+bcs_analysis$cohort <- rep(0, nrow(bcs_analysis))
+
+
+white_sensitivity <- bcs_analysis[which(bcs_analysis$e245 == "0"),] #binary variable where 0=white, 1=minority 
+write.csv(white_sensitivity, file = "bcs_crossCohort_whiteSample.csv")
+
+#write csv####
+write.csv(bcs_analysis, "bcs_ses_comparison_data.csv")
+#write.csv(bcs_analysis, file = glue ("{today()}_bcs_ses_comparison_data.csv"))
