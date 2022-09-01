@@ -1,0 +1,406 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+libraries and custom functions
+
+```{r}
+library(mice)
+library(pander)
+library(xtable)
+library(dplyr)
+library(gt)
+library(glue)
+library(tidyverse)
+library(flextable)
+library(miceadds)
+library(swfscMisc)
+library(imputools)
+library(haven)
+library(sjmisc)
+library(Hmisc)
+library(psych)
+library(lavaan)
+
+#this will take a float (e.g. a p value) and return a string with 3 digits and no leading 0
+
+bv <- function(val) {
+  return(sub("^(-?)0.", "\\1.", sprintf("%.2f", val)))
+}
+
+#if the number is less than .001, it will give <.001. 
+pv1 <- function(val) {
+  return(paste("=", sub("^(-?)0.", "\\1.", sprintf("%.3f", val))))
+}
+
+
+
+```
+
+
+
+#load in datasets for each cohort 
+
+```{r}
+load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/2021-03-03_mcs_ses_comparison_WHITE/2021-03-03_mcs_ses_comparison_WHITE.Rdata")
+mcs_imputation = mi.res
+
+load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/2021-03-03_bcs_ses_WHITEsample/2021-03-03_bcs_ses_WHITEsample.Rdata")
+bcs_imputation = mi.res
+```
+
+
+regression models. want one for each age (early childhood, late childhood, adolescence) for occupational status and for education, in both cohorts. 
+confounders only models for R2 table later. we are not controlling for ethnicity in these models because we are only looking at white ethnicity. 
+
+```{r}
+#regression models####
+
+#MCS2001 regressions 
+
+#age 5
+mcs_age5_occupation <- with(mcs_imputation, lm(standardised_vocab5 ~ gender +  EAL + standardised_age5+  occupational_status, weights = weight)) 
+mcs_age5_education <- with(mcs_imputation, lm(standardised_vocab5 ~ gender +  EAL + standardised_age5+ highest_household_education, weights = weight))
+mcs_age5_confounders<- with(mcs_imputation, lm(standardised_vocab5 ~ gender +  EAL + standardised_age5, weights = weight))
+#age 11
+mcs_age11_occupation <- with(mcs_imputation, lm(standardised_vocab11 ~ gender +  EAL + standardised_age11+  occupational_status, weights = weight)) 
+mcs_age11_education <- with(mcs_imputation, lm(standardised_vocab11 ~ gender +  EAL + standardised_age11+ highest_household_education, weights = weight))
+mcs_age11_confounders<- with(mcs_imputation, lm(standardised_vocab11 ~ gender +  EAL + standardised_age11,weights = weight))
+#age 14
+mcs_age14_occupation <- with(mcs_imputation, lm(standardised_vocab14 ~ gender +  EAL + standardised_age14+  occupational_status,weights = weight)) 
+mcs_age14_education <- with(mcs_imputation, lm(standardised_vocab14 ~ gender +  EAL + standardised_age14+ highest_household_education,weights = weight))
+mcs_age14_confounders<- with(mcs_imputation, lm(standardised_vocab14 ~ gender +  EAL + standardised_age14,weights = weight))
+
+#BCS1970 regressions 
+bcs_age5_occupation <- with(bcs_imputation, lm(standardised_vocab5 ~ gender +  EAL + standardised_age5+  occupational_status,weights = weight)) 
+bcs_age5_education <- with(bcs_imputation, lm(standardised_vocab5 ~ gender +  EAL + standardised_age5+ highest_household_education,weights = weight))
+bcs_age5_confounders<- with(bcs_imputation, lm(standardised_vocab5 ~ gender +  EAL + standardised_age5, weights = weight))
+#age 10
+bcs_age10_occupation <- with(bcs_imputation, lm(standardised_vocab10 ~ gender +  EAL + standardised_age10+  occupational_status, weights = weight)) 
+bcs_age10_education <- with(bcs_imputation, lm(standardised_vocab10 ~ gender +  EAL + standardised_age10+ highest_household_education, weights = weight))
+bcs_age10_confounders<- with(bcs_imputation, lm(standardised_vocab10 ~ gender +  EAL + standardised_age10, weights = weight))
+#age 16
+bcs_age16_occupation <- with(bcs_imputation, lm(standardised_vocab16 ~ gender +  EAL + standardised_age16+  occupational_status, weights = weight)) 
+bcs_age16_education <- with(bcs_imputation, lm(standardised_vocab16 ~ gender +  EAL + standardised_age16+ highest_household_education, weights = weight))
+bcs_age16_confounders<- with(bcs_imputation, lm(standardised_vocab16 ~ gender +  EAL + standardised_age16, weights = weight))
+
+```
+
+get the coefficients for the SES measures. 
+
+
+```{r}
+mcs_age5_occupation_results = round(summary(pool(mcs_age5_occupation), conf.int =TRUE),2)
+mcs_age5_education_results = round(summary(pool(mcs_age5_education), conf.int =TRUE),2)
+mcs_age11_occupation_results = round(summary(pool(mcs_age11_occupation), conf.int =TRUE),2)
+mcs_age11_education_results = round(summary(pool(mcs_age11_education), conf.int =TRUE),2)
+mcs_age14_occupation_results = round(summary(pool(mcs_age14_occupation), conf.int =TRUE),2)
+mcs_age14_education_results = round(summary(pool(mcs_age14_education), conf.int =TRUE),2)
+
+
+bcs_age5_occupation_results = round(summary(pool(bcs_age5_occupation), conf.int =TRUE),2)
+bcs_age5_education_results = round(summary(pool(bcs_age5_education), conf.int =TRUE),2)
+bcs_age10_occupation_results = round(summary(pool(bcs_age10_occupation), conf.int =TRUE),2)
+bcs_age10_education_results = round(summary(pool(bcs_age10_education), conf.int =TRUE),2)
+bcs_age16_occupation_results = round(summary(pool(bcs_age16_occupation), conf.int =TRUE),2)
+bcs_age16_education_results = round(summary(pool(bcs_age16_education), conf.int =TRUE),2)
+
+
+#pull out SES coefficients for table
+
+MCS_age5_occupation_results = mcs_age5_occupation_results[5:7,]
+MCS_age5_education_results = mcs_age5_education_results[5:7,]
+MCS_age11_occupation_results = mcs_age11_occupation_results[5:7,]
+MCS_age11_education_results = mcs_age11_education_results[5:7,]
+MCS_age14_occupation_results = mcs_age14_occupation_results[5:7,]
+MCS_age14_education_results = mcs_age14_education_results[5:7,]
+
+BCS_age5_occupation_results = bcs_age5_occupation_results[5:7,]
+BCS_age5_education_results = bcs_age5_education_results[5:7,]
+BCS_age10_occupation_results = bcs_age10_occupation_results[5:7,]
+BCS_age10_education_results = bcs_age10_education_results[5:7,]
+BCS_age16_occupation_results = bcs_age16_occupation_results[5:7,]
+BCS_age16_education_results = bcs_age16_education_results[5:7,]
+
+MCS_age5_results = rbind(MCS_age5_occupation_results, MCS_age5_education_results)
+MCS_age11_results = rbind(MCS_age11_occupation_results, MCS_age11_education_results)
+MCS_age14_results = rbind(MCS_age14_occupation_results, MCS_age14_education_results)
+BCS_age5_results = rbind(BCS_age5_occupation_results, BCS_age5_education_results)
+BCS_age10_results = rbind(BCS_age10_occupation_results, BCS_age10_education_results)
+BCS_age16_results = rbind(BCS_age16_occupation_results, BCS_age16_education_results)
+
+
+
+
+```
+
+prepare data for tables
+```{r}
+
+MCS_age5_results$estimate = bv(MCS_age5_results$estimate) #no leading 0 
+#MCS_age5_results$estimate = round(MCS_age5_results$estimate,2)
+MCS_age5_results$`2.5 %` = bv(MCS_age5_results$`2.5 %`)
+MCS_age5_results$`97.5 %` = bv(MCS_age5_results$`97.5 %`)
+MCS_age5_results$p.value1= ifelse(MCS_age5_results$p.value< .001, "<.001" , pv1(MCS_age5_results$p.value))
+#MCS_age5_results$p.value = round(MCS_age5_results$p.value, 3)
+MCS_age5_results$coefficient = paste0(MCS_age5_results$estimate, "[", MCS_age5_results$`2.5 %`, ";", MCS_age5_results$`97.5 %`, "]")
+#MCS_age5_results$p.value [MCS_age5_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+MCS_age5_results$stars = add.significance.stars(MCS_age5_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+MCS_age5_results$p1 = paste0(MCS_age5_results$p.value1, "")
+MCS_age5_results$p = paste0("p", MCS_age5_results$p1)
+MCS_age5_results$new_coef = paste0(MCS_age5_results$coefficient, MCS_age5_results$stars)  #combine coefficients and stars into column.
+
+
+MCS_age11_results$estimate = bv(MCS_age11_results$estimate) #no leading 0 
+#MCS_age11_results$estimate = round(MCS_age11_results$estimate,2)
+MCS_age11_results$`2.5 %` = bv(MCS_age11_results$`2.5 %`)
+MCS_age11_results$`97.5 %` = bv(MCS_age11_results$`97.5 %`)
+MCS_age11_results$p.value1= ifelse(MCS_age11_results$p.value< .001, "<.001" , pv1(MCS_age11_results$p.value))
+#MCS_age11_results$p.value = round(MCS_age11_results$p.value, 3)
+MCS_age11_results$coefficient = paste0(MCS_age11_results$estimate, "[", MCS_age11_results$`2.5 %`, ";", MCS_age11_results$`97.5 %`, "]")
+#MCS_age11_results$p.value [MCS_age11_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+MCS_age11_results$stars = add.significance.stars(MCS_age11_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+MCS_age11_results$p1 = paste0(MCS_age11_results$p.value1, "")
+MCS_age11_results$p = paste0("p", MCS_age11_results$p1)
+MCS_age11_results$new_coef = paste0(MCS_age11_results$coefficient, MCS_age11_results$stars)  #combine coefficients and stars into column.
+
+
+MCS_age14_results$estimate = bv(MCS_age14_results$estimate) #no leading 0 
+#MCS_age14_results$estimate = round(MCS_age14_results$estimate,2)
+MCS_age14_results$`2.5 %` = bv(MCS_age14_results$`2.5 %`)
+MCS_age14_results$`97.5 %` = bv(MCS_age14_results$`97.5 %`)
+MCS_age14_results$p.value1= ifelse(MCS_age14_results$p.value< .001, "<.001" , pv1(MCS_age14_results$p.value))
+#MCS_age14_results$p.value = round(MCS_age14_results$p.value, 3)
+MCS_age14_results$coefficient = paste0(MCS_age14_results$estimate, "[", MCS_age14_results$`2.5 %`, ";", MCS_age14_results$`97.5 %`, "]")
+#MCS_age14_results$p.value [MCS_age14_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+MCS_age14_results$stars = add.significance.stars(MCS_age14_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+MCS_age14_results$p1 = paste0(MCS_age14_results$p.value1, "")
+MCS_age14_results$p = paste0("p", MCS_age14_results$p1)
+MCS_age14_results$new_coef = paste0(MCS_age14_results$coefficient, MCS_age14_results$stars)  #combine coefficients and stars into column.
+
+BCS_age5_results$estimate = bv(BCS_age5_results$estimate) #no leading 0 
+#BCS_age5_results$estimate = round(BCS_age5_results$estimate,2)
+BCS_age5_results$`2.5 %` = bv(BCS_age5_results$`2.5 %`)
+BCS_age5_results$`97.5 %` = bv(BCS_age5_results$`97.5 %`)
+BCS_age5_results$p.value1= ifelse(BCS_age5_results$p.value< .001, "<.001" , pv1(BCS_age5_results$p.value))
+#BCS_age5_results$p.value = round(BCS_age5_results$p.value, 3)
+BCS_age5_results$coefficient = paste0(BCS_age5_results$estimate, "[", BCS_age5_results$`2.5 %`, ";", BCS_age5_results$`97.5 %`, "]")
+#BCS_age5_results$p.value [BCS_age5_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+BCS_age5_results$stars = add.significance.stars(BCS_age5_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+BCS_age5_results$p1 = paste0(BCS_age5_results$p.value1, "")
+BCS_age5_results$p = paste0("p", BCS_age5_results$p1)
+BCS_age5_results$new_coef = paste0(BCS_age5_results$coefficient, BCS_age5_results$stars)  #combine coefficients and stars into column.
+
+
+BCS_age10_results$estimate = bv(BCS_age10_results$estimate) #no leading 0 
+#BCS_age10_results$estimate = round(BCS_age10_results$estimate,2)
+BCS_age10_results$`2.5 %` = bv(BCS_age10_results$`2.5 %`)
+BCS_age10_results$`97.5 %` = bv(BCS_age10_results$`97.5 %`)
+BCS_age10_results$p.value1= ifelse(BCS_age10_results$p.value< .001, "<.001" , pv1(BCS_age10_results$p.value))
+#BCS_age10_results$p.value = round(BCS_age10_results$p.value, 3)
+BCS_age10_results$coefficient = paste0(BCS_age10_results$estimate, "[", BCS_age10_results$`2.5 %`, ";", BCS_age10_results$`97.5 %`, "]")
+#BCS_age10_results$p.value [BCS_age10_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+BCS_age10_results$stars = add.significance.stars(BCS_age10_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+BCS_age10_results$p1 = paste0(BCS_age10_results$p.value1, "")
+BCS_age10_results$p = paste0("p", BCS_age10_results$p1)
+BCS_age10_results$new_coef = paste0(BCS_age10_results$coefficient, BCS_age10_results$stars)  #combine coefficients and stars into column.
+
+BCS_age16_results$estimate = bv(BCS_age16_results$estimate) #no leading 0 
+#BCS_age16_results$estimate = round(BCS_age16_results$estimate,2)
+BCS_age16_results$`2.5 %` = bv(BCS_age16_results$`2.5 %`)
+BCS_age16_results$`97.5 %` = bv(BCS_age16_results$`97.5 %`)
+BCS_age16_results$p.value1= ifelse(BCS_age16_results$p.value< .001, "<.001" , pv1(BCS_age16_results$p.value))
+#BCS_age16_results$p.value = round(BCS_age16_results$p.value, 3)
+BCS_age16_results$coefficient = paste0(BCS_age16_results$estimate, "[", BCS_age16_results$`2.5 %`, ";", BCS_age16_results$`97.5 %`, "]")
+#BCS_age16_results$p.value [BCS_age16_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+BCS_age16_results$stars = add.significance.stars(BCS_age16_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+BCS_age16_results$p1 = paste0(BCS_age16_results$p.value1, "")
+BCS_age16_results$p = paste0("p", BCS_age16_results$p1)
+BCS_age16_results$new_coef = paste0(BCS_age16_results$coefficient, BCS_age16_results$stars)  #combine coefficients and stars into column.
+
+MCS_age5_tableData <- MCS_age5_results %>% 
+  select(term, new_coef, p) 
+  names(MCS_age5_tableData) =c("term", "MCS_coef5", "MCS_p5")
+
+MCS_age11_tableData <- MCS_age11_results %>% 
+  select(term, new_coef, p)
+names(MCS_age11_tableData) =c("term", "MCS_coef11", "MCS_p11")
+
+MCS_age14_tableData <- MCS_age14_results %>% 
+  select(term, new_coef, p)
+names(MCS_age14_tableData) =c("term", "MCS_coef14", "MCS_p14")
+
+BCS_age5_tableData <- BCS_age5_results %>% 
+  select(term, new_coef, p)
+names(BCS_age5_tableData) =c("term", "BCS_coef5", "BCS_p5")
+
+BCS_age10_tableData <- BCS_age10_results %>% 
+  select(term, new_coef, p)
+names(BCS_age10_tableData) =c("term", "BCS_coef10", "BCS_p10")
+
+BCS_age16_tableData <- BCS_age16_results %>% 
+  select(term, new_coef, p)
+names(BCS_age16_tableData) =c("term", "BCS_coef16", "BCS_p16")
+
+
+BCS_data <- merge(all=TRUE, BCS_age5_tableData, BCS_age10_tableData, by="term")
+BCS_data <- merge(all=TRUE, BCS_data, BCS_age16_tableData, by="term")
+
+MCS_data <- merge(all=TRUE, MCS_age5_tableData, MCS_age11_tableData, by="term")
+MCS_data <- merge(all=TRUE, MCS_data,MCS_age14_tableData, by="term")
+
+
+BCS_data$early_childhood_bcs = paste0(BCS_data$BCS_coef5,"\n", BCS_data$BCS_p5)
+BCS_data$late_childhood_bcs = paste0(BCS_data$BCS_coef10,"\n", BCS_data$BCS_p10)
+BCS_data$adolescence_bcs = paste0(BCS_data$BCS_coef16,"\n", BCS_data$BCS_p16)
+
+MCS_data$early_childhood_mcs = paste0(MCS_data$MCS_coef5,"\n", MCS_data$MCS_p5)
+MCS_data$late_childhood_mcs = paste0(MCS_data$MCS_coef11,"\n", MCS_data$MCS_p11)
+MCS_data$adolescence_mcs = paste0(MCS_data$MCS_coef14,"\n", MCS_data$MCS_p14)
+
+
+
+BCS = BCS_data %>% 
+  select (term, early_childhood_bcs, late_childhood_bcs, adolescence_bcs)
+
+MCS = MCS_data %>% 
+  select (term, early_childhood_mcs, late_childhood_mcs, adolescence_mcs)
+
+
+
+
+cross_cohort_data = cbind(BCS, MCS)
+
+names(cross_cohort_data) = c("Indicator","early_childhood_bcs" ,"late_childhood_bcs","adolescent_bcs","term" ,"early_childhood_mcs",  "late_childhood_mcs", "adolescent_mcs")
+
+
+cross_cohort_data <- cross_cohort_data %>% 
+  select(Indicator, early_childhood_bcs,  late_childhood_bcs, adolescent_bcs, early_childhood_mcs, late_childhood_mcs, adolescent_mcs)
+
+#add in reference categories 
+cross_cohort_data = cross_cohort_data  %>% add_row(Indicator= "highest_household_education1",  .before=1) %>% 
+  add_row(Indicator= "occupational_status2",  .before=5) 
+cross_cohort_data[is.na(cross_cohort_data)] <- "REFERENCE"
+
+#add indicator labels for vertical column in table. space for most of these as will merge cells later. 
+cross_cohort_data = cross_cohort_data %>%  add_column(z= c("Parent Education", "  ", "  ", "  ", 
+                                                     
+                                                     "Occupational Status",  "  ", "  ", "  "
+                                                    ),.before = 1)
+
+
+#rename SES variables
+cross_cohort_data$Indicator <- c("No/low level \n qualifications", "O levels/ GCSEs  \n grades A*-C", "Post 16 education", "University level \n qualifications", 
+                            "Routine", "Unemployed", "Intermediate", "Higher managerial ")
+
+cross_cohort_data[is.na(cross_cohort_data)] <- "   "
+```
+
+
+#create table with flextable package, which can be exported to word 
+
+```{r}
+library(officer)
+
+#define border
+my_border = border= fp_border(color="black", width=1)
+cross_cohort_flex <- cross_cohort_data %>% 
+  flextable() %>% 
+  font(fontname = "Times New Roman", part="all") %>% 
+  fontsize(size=9, part = "all") %>% 
+  align(j=2, align="left", part="all") %>% 
+  align(j=3:8, align="center", part="all") %>% 
+  color(j=1:8, color="black", part="all") %>% 
+  width(j=1, width=0.3) %>% 
+  width(j=2, width=0.8) %>% 
+  width(j=3:8, width=1.1) %>% 
+  line_spacing(j=3:8, space=1.5) %>% 
+  line_spacing(j=1, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:8, part="all", border=my_border) %>% 
+  hline_bottom(j=1:8,part="body",  border=my_border) %>% 
+  set_header_labels(z= " ", Inidcator= "Indicator",early_childhood_bcs= "Early Childhood Vocabulary (BCS)", late_childhood_bcs="Late Childhood Vocabulary (BCS)",
+                    adolescent_bcs = "Adolescent Vocabulary (BCS)",
+                    early_childhood_mcs ="Early Childhood Vocabulary (MCS)", late_childhood_mcs="Late Childhood Vocabulary (MCS)", 
+                    adolescent_mcs = "Adolescent Vocabulary (MCS)") %>% 
+  merge_at(j=1, i = 1:4) %>% 
+  merge_at(j=1, i=5:8) %>% 
+  rotate(i=1:4, j=1, rotation="btlr", align="center") %>% 
+  rotate(i=5:8, j=1, rotation="btlr", align="center") %>% 
+ print( preview = "docx") 
+
+
+
+ 
+```
+
+
+
+r squared values
+
+```{r}
+#MCS2001
+mcs_age5_occupation_r2 = round(pool.r.squared(mcs_age5_occupation),4)*100
+mcs_age11_occupation_r2 = round(pool.r.squared(mcs_age11_occupation),4)*100
+mcs_age14_occupation_r2 = round(pool.r.squared(mcs_age14_occupation),4)*100
+
+mcs_age5_education_r2 = round(pool.r.squared(mcs_age5_education),4)*100
+mcs_age11_education_r2= round(pool.r.squared(mcs_age11_education),4)*100
+mcs_age14_education_r2 = round(pool.r.squared(mcs_age14_education),4)*100
+
+mcs_age5_confounders_r2 = round(pool.r.squared(mcs_age5_confounders), 4)*100
+mcs_age11_confounders_r2= round(pool.r.squared(mcs_age11_confounders), 4)*100
+mcs_age14_confounders_r2= round(pool.r.squared(mcs_age14_confounders), 4)*100
+
+#partial r squared
+mcs_age5_occupation_partial = mcs_age5_occupation_r2 - mcs_age5_confounders_r2
+mcs_age5_education_partial = mcs_age5_education_r2 - mcs_age5_confounders_r2
+mcs_age11_occupation_partial = mcs_age11_occupation_r2 - mcs_age11_confounders_r2
+mcs_age11_education_partial = mcs_age11_education_r2 - mcs_age11_confounders_r2
+mcs_age14_occupation_partial = mcs_age14_occupation_r2 - mcs_age14_confounders_r2
+mcs_age14_education_partial = mcs_age14_education_r2 - mcs_age14_confounders_r2
+
+#BCS1970
+bcs_age5_occupation_r2 = round(pool.r.squared(bcs_age5_occupation),4)*100
+bcs_age10_occupation_r2 = round(pool.r.squared(bcs_age10_occupation),4)*100
+bcs_age16_occupation_r2 = round(pool.r.squared(bcs_age16_occupation),4)*100
+
+bcs_age5_education_r2 = round(pool.r.squared(bcs_age5_education),4)*100
+bcs_age10_education_r2= round(pool.r.squared(bcs_age10_education),4)*100
+bcs_age16_education_r2 = round(pool.r.squared(bcs_age16_education),4)*100
+
+bcs_age5_confounders_r2 = round(pool.r.squared(bcs_age5_confounders), 4)*100
+bcs_age10_confounders_r2= round(pool.r.squared(bcs_age10_confounders), 4)*100
+bcs_age16_confounders_r2= round(pool.r.squared(bcs_age16_confounders), 4)*100
+
+#partial r squared
+bcs_age5_occupation_partial = bcs_age5_occupation_r2 - bcs_age5_confounders_r2
+bcs_age5_education_partial= bcs_age5_education_r2 - bcs_age5_confounders_r2
+bcs_age10_occupation_partial = bcs_age10_occupation_r2 - bcs_age10_confounders_r2
+bcs_age10_education_partial = bcs_age10_education_r2 - bcs_age10_confounders_r2
+bcs_age16_occupation_partial= bcs_age16_occupation_r2 - bcs_age16_confounders_r2
+bcs_age16_education_partial= bcs_age16_education_r2 - bcs_age16_confounders_r2
+
+
+bcs_partial = as.data.frame(rbind(bcs_age5_education_partial,  bcs_age10_education_partial, bcs_age16_education_partial, bcs_age5_occupation_partial, bcs_age10_occupation_partial, bcs_age16_occupation_partial))
+mcs_partial = as.data.frame(rbind(mcs_age5_education_partial,  mcs_age11_education_partial, mcs_age14_education_partial, mcs_age5_occupation_partial, mcs_age11_occupation_partial, mcs_age14_occupation_partial))
+
+
+bcs_partial = bcs_partial %>%  add_column(indicator= c("Parent Education (early bcs)", "Parent education(late bcs)", "parent education (adolescent bcs)", "Occupation (early bcs)", "occupation (late bcs)", "occupation(adolescent bcs)"), .before = 1)
+mcs_partial = mcs_partial %>%  add_column(indicator= c("Parent Education (early mcs)", "Parent education(late mcs)", "parent education (adolescent mcs)", "Occupation (early mcs)", "occupation (late mcs)", "occupation(adolescent mcs)"), .before = 1)
+
+bcs_partial = bcs_partial[,1:2]
+mcs_partial = mcs_partial[,1:2]
+
+partial_r2_values = cbind(bcs_partial, mcs_partial)
+rownames(partial_r2_values) <- NULL
+
+
+```
+
