@@ -11,6 +11,7 @@ library(tidyverse)
 library(dplyr)
 library(glue)
 library(lubridate)
+library(gtools)
 #load in data####
 bcs7072a <- read_sav("bcs7072a.sav")
 bcs7072b <- read_sav("bcs7072b.sav")
@@ -248,6 +249,341 @@ highest_household_ses<-occupational_status[highest_household_ses]
 highest_household_ses$highest_occupation <- rec(highest_household_ses$highest_ses,  rec = "1=4; 2=3; 3=2; 4=1", as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r")
 highest_occupation<- c("bcsid", "highest_occupation")
 highest_occupation <- highest_household_ses[highest_occupation]
+
+#### Income ####
+
+income = age10 %>% 
+  select(bcsid,c9.1, c9.2, c9.3, c9.4, c9.5, c9.6, c9.7, c9.8) %>% 
+  mutate(weekly_income = case_when(
+    c9.1 == 1 ~ "under £35 pw", 
+    c9.2 == 1 ~ "£35-£49 pw",
+    c9.3 == 1 ~ "£50-£99 pw",
+    c9.4 == 1 ~ "£100-£149 pw",
+    c9.5 == 1 ~ "£150-£199 pw", 
+    c9.6 == 1 ~ "£200-£249 pw", 
+    c9.7 == 1 ~ ">£250 pw"
+  ), .after= 1) %>% 
+  mutate(weekly_incomeMedian = case_when(
+    weekly_income == "under £35 pw" ~ 17,
+    weekly_income == "£35-£49 pw" ~ 42,
+    weekly_income == "£50-£99 pw" ~ 74.5,
+    weekly_income == "£100-£149 pw" ~ 124.5,
+    weekly_income == "£150-£199 pw" ~ 174.5,
+    weekly_income == "£200-£249 pw" ~ 224.5,
+    weekly_income == ">£250 pw" ~ 275, 
+  ), .after = 2)
+
+
+#people in household to get OECD equivalisation score
+household_grid = age10 %>% select(
+  bcsid,back4ap, back4bp, back4cp,a4a.5, a4a.41, a4a.42, a8.1, a4a.3, a4a.4, a4a.7, a4a.8, a4a.11, a4a.12, a4a.15, a4a.16, a4a.19, a4a.20, a4a.23, a4a.24, 
+  a4a.27, a4a.28, a4a.31, a4a.32, a4a.35, a4a.36, a4a.39, a4a.40,
+  a4a.5, a4a.9, a4a.13, a4a.17, a4a.21,a4a.25, a4a.29, a4a.33, a4a.37
+)
+#convert interview date into lubridate 
+household_grid$back4ap = as.numeric(household_grid$back4ap)
+#household_grid$back4ap = day(household_grid$back4ap)
+household_grid$back4bp = as.numeric(household_grid$back4bp)
+household_grid$back4bp = month(household_grid$back4bp)
+household_grid$back4cp = as.numeric(household_grid$back4cp)
+#household_grid$back4cp[is.na(household_grid$back4cp)] = 80
+household_grid$back4cp = paste0("19",household_grid$back4cp)
+household_grid$back4cp[household_grid$back4cp == "19NA"] <- NA
+household_grid$back4cp = as.numeric(household_grid$back4cp)
+household_grid = household_grid %>% unite("interview_date", c(back4ap, back4bp, back4cp), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$interview_date[household_grid$interview_date == ""] <- NA
+#household_grid = household_grid %>% filter(!is.na(interview_date))
+household_grid$interview_date = dmy(household_grid$interview_date)
+#household_grid$interview_date = format_ISO8601(household_grid$interview_date, precision = "ym")
+
+#convert cm dob into lubridate to get age in years
+household_grid$a4a.3 = month(household_grid$a4a.3)
+household_grid$a4a.4 = paste0("19",household_grid$a4a.4)
+household_grid$a4a.4[household_grid$a4a.4 == "19NA"] <- NA
+household_grid$a4a.4 = as.numeric(household_grid$a4a.4)
+household_grid = household_grid %>% unite("cm_dob", c(a4a.3, a4a.4), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$cm_dob[household_grid$cm_dob == ""] <- NA
+household_grid$cm_dob = my(household_grid$cm_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(cm_age = as.period(interval(start = cm_dob, end = interview_date))$year, .after = "cm_dob")
+
+#age for person 2
+household_grid$a4a.7 = as.numeric(household_grid$a4a.7)
+household_grid$a4a.7 = month(household_grid$a4a.7)
+household_grid$a4a.8 = paste0("19",household_grid$a4a.8)
+household_grid$a4a.8[household_grid$a4a.8 == "19NA"] <- NA
+household_grid$a4a.8 = as.numeric(household_grid$a4a.8)
+household_grid = household_grid %>% unite("p2_dob", c(a4a.7, a4a.8), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p2_dob[household_grid$p2_dob == ""] <- NA
+household_grid$p2_dob = my(household_grid$p2_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p2_age = as.period(interval(start = p2_dob, end = interview_date))$year, .after = "p2_dob")
+
+#age for person 3
+household_grid$a4a.11 = as.numeric(household_grid$a4a.11)
+household_grid$a4a.11 = month(household_grid$a4a.11)
+household_grid$a4a.12 = paste0("19",household_grid$a4a.12)
+household_grid$a4a.12[household_grid$a4a.12 == "19NA"] <- NA
+household_grid$a4a.12 = as.numeric(household_grid$a4a.12)
+household_grid = household_grid %>% unite("p3_dob", c(a4a.11, a4a.12), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p3_dob[household_grid$p3_dob == ""] <- NA
+household_grid$p3_dob = my(household_grid$p3_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p3_age = as.period(interval(start = p3_dob, end = interview_date))$year, .after = "p3_dob")
+
+#age for person 4
+household_grid$a4a.15 = as.numeric(household_grid$a4a.15)
+household_grid$a4a.15 = month(household_grid$a4a.15)
+household_grid$a4a.16 = paste0("19",household_grid$a4a.16)
+household_grid$a4a.16[household_grid$a4a.16 == "19NA"] <- NA
+household_grid$a4a.16 = as.numeric(household_grid$a4a.16)
+household_grid = household_grid %>% unite("p4_dob", c(a4a.15, a4a.16), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p4_dob[household_grid$p4_dob == ""] <- NA
+household_grid$p4_dob = my(household_grid$p4_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p4_age = as.period(interval(start = p4_dob, end = interview_date))$year, .after = "p4_dob")
+
+#age for person 5
+household_grid$a4a.19 = as.numeric(household_grid$a4a.19)
+household_grid$a4a.19 = month(household_grid$a4a.19)
+household_grid$a4a.20 = paste0("19",household_grid$a4a.20)
+household_grid$a4a.20[household_grid$a4a.20 == "19NA"] <- NA
+household_grid$a4a.20 = as.numeric(household_grid$a4a.20)
+household_grid = household_grid %>% unite("p5_dob", c(a4a.19, a4a.20), sep=" ", remove =FALSE, na.rm = TRUE)
+household_grid$p5_dob[household_grid$p5_dob == ""] <- NA
+household_grid$p5_dob = my(household_grid$p5_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p5_age = as.period(interval(start = p5_dob, end = interview_date))$year, .after = "p5_dob")
+
+#age for person 6
+household_grid$a4a.23 = as.numeric(household_grid$a4a.23)
+household_grid$a4a.23 = month(household_grid$a4a.23)
+household_grid$a4a.24 = paste0("19",household_grid$a4a.24)
+household_grid$a4a.24[household_grid$a4a.24 == "19NA"] <- NA
+household_grid$a4a.24 = as.numeric(household_grid$a4a.24)
+household_grid = household_grid %>% unite("p6_dob", c(a4a.23, a4a.24), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p6_dob[household_grid$p6_dob == ""] <- NA
+household_grid$p6_dob = my(household_grid$p6_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p6_age = as.period(interval(start = p6_dob, end = interview_date))$year, .after = "p6_dob")
+
+#age for person 7
+household_grid$a4a.27 = as.numeric(household_grid$a4a.27)
+household_grid$a4a.27 = month(household_grid$a4a.27)
+household_grid$a4a.28 = paste0("19",household_grid$a4a.28)
+household_grid$a4a.28[household_grid$a4a.28 == "19NA"] <- NA
+household_grid$a4a.28 = as.numeric(household_grid$a4a.28)
+household_grid = household_grid %>% unite("p7_dob", c(a4a.27, a4a.28), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p7_dob[household_grid$p7_dob == ""] <- NA
+household_grid$p7_dob = my(household_grid$p7_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p7_age = as.period(interval(start = p7_dob, end = interview_date))$year, .after = "p7_dob")
+
+#age for person 8 
+household_grid$a4a.31 = as.numeric(household_grid$a4a.31)
+household_grid$a4a.31 = month(household_grid$a4a.31)
+household_grid$a4a.32 = paste0("19",household_grid$a4a.32)
+household_grid$a4a.32[household_grid$a4a.32 == "19NA"] <- NA
+household_grid$a4a.32 = as.numeric(household_grid$a4a.32)
+household_grid = household_grid %>% unite("p8_dob", c(a4a.31, a4a.32), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p8_dob[household_grid$p8_dob == ""] <- NA
+household_grid$p8_dob = my(household_grid$p8_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p8_age = as.period(interval(start = p8_dob, end = interview_date))$year, .after = "p8_dob")
+
+#age for person 9
+household_grid$a4a.35 = as.numeric(household_grid$a4a.35)
+household_grid$a4a.35 = month(household_grid$a4a.35)
+household_grid$a4a.36 = paste0("19",household_grid$a4a.36)
+household_grid$a4a.36[household_grid$a4a.36 == "19NA"] <- NA
+household_grid$a4a.36 = as.numeric(household_grid$a4a.36)
+household_grid = household_grid %>% unite("p9_dob", c(a4a.35, a4a.36), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p9_dob[household_grid$p9_dob == ""] <- NA
+household_grid$p9_dob = my(household_grid$p9_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p9_age = as.period(interval(start = p9_dob, end = interview_date))$year, .after = "p9_dob")
+
+#age for person 10
+household_grid$a4a.39 = as.numeric(household_grid$a4a.39)
+household_grid$a4a.39 = month(household_grid$a4a.39)
+household_grid$a4a.40 = paste0("19",household_grid$a4a.40)
+household_grid$a4a.40[household_grid$a4a.40 == "19NA"] <- NA
+household_grid$a4a.40 = as.numeric(household_grid$a4a.40)
+household_grid = household_grid %>% unite("p10_dob", c(a4a.39, a4a.40), sep=" ", remove = FALSE, na.rm = TRUE)
+household_grid$p10_dob[household_grid$p10_dob == ""] <- NA
+household_grid$p10_dob = my(household_grid$p10_dob)
+#household_grid$cm_dob = format_ISO8601(household_grid$cm_dob, precision = "ym")
+household_grid = household_grid %>% mutate(p10_age = as.period(interval(start = p10_dob, end = interview_date))$year, .after = "p10_dob")
+
+#sort household grid by number of people in the household
+household_grid = household_grid %>% arrange(a4a.41)
+
+people_in_hh = household_grid %>% select(bcsid, a4a.41, a4a.42, a8.1, contains('age'), 
+                                         a4a.5, a4a.9, a4a.13, a4a.17, a4a.21,a4a.25, a4a.29, a4a.33, a4a.37)
+
+people_in_hh = people_in_hh %>% 
+  mutate(p2_isChild = case_when(p2_age <= 13 & 
+                                  (a4a.5 == 11 | a4a.5 ==12 | a4a.5 == 13 | 
+                                     a4a.5==14 | a4a.5 ==15 |a4a.5 ==16 |
+                                     a4a.5 == 17 | a4a.5 == 18 |a4a.5 == 21 |
+                                     a4a.5 ==29 | a4a.5 ==30) ~ 1,
+                                is.na(p2_age) & is.na(a4a.5) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.5) %>% 
+  mutate(p2_isAdult = case_when(p2_age <= 13 & 
+                                  (a4a.5 == 11 | a4a.5 ==12 | a4a.5 == 13 | 
+                                     a4a.5==14 | a4a.5 ==15 |a4a.5 ==16 |
+                                     a4a.5 == 17 | a4a.5 == 18 |a4a.5 == 21 |
+                                     a4a.5 ==29 | a4a.5 ==30) ~ 0,
+                                is.na(p2_age) & is.na(a4a.5) ~ NA_real_,
+                                TRUE ~ 1), .after = "p2_isChild") %>% 
+  mutate(p3_isChild = case_when(p3_age <= 13 & 
+                                  (a4a.9 == 11 | a4a.9 ==12 | a4a.9 == 13 | 
+                                     a4a.9==14 | a4a.9 ==15 |a4a.9 ==16 |
+                                     a4a.9 == 17 | a4a.9 == 18 |a4a.9 == 21 |
+                                     a4a.9 ==29 | a4a.9 ==30) ~ 1,
+                                is.na(p3_age) & is.na(a4a.9) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.9) %>% 
+  mutate(p3_isAdult = case_when(p3_age <= 13 & 
+                                  (a4a.9 == 11 | a4a.9 ==12 | a4a.9 == 13 | 
+                                     a4a.9==14 | a4a.9 ==15 |a4a.9 ==16 |
+                                     a4a.9 == 17 | a4a.9 == 18 |a4a.9 == 21 |
+                                     a4a.9 ==29 | a4a.9 ==30) ~ 0,
+                                is.na(p3_age) & is.na(a4a.9) ~ NA_real_,
+                                TRUE ~ 1), .after = "p3_isChild") %>% 
+  mutate(p4_isChild = case_when(p4_age <= 13 & 
+                                  (a4a.13 == 11 | a4a.13 ==12 | a4a.13 == 13 | 
+                                     a4a.13==14 | a4a.13 ==15 |a4a.13 ==16 |
+                                     a4a.13 == 17 | a4a.13 == 18 |a4a.13 == 21 |
+                                     a4a.13 ==29 | a4a.13 ==30) ~ 1,
+                                is.na(p4_age) & is.na(a4a.13) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.13) %>% 
+  mutate(p4_isAdult = case_when(p4_age <= 13 & 
+                                  (a4a.13 == 11 | a4a.13 ==12 | a4a.13 == 13 | 
+                                     a4a.13==14 | a4a.13 ==15 |a4a.13 ==16 |
+                                     a4a.13 == 17 | a4a.13 == 18 |a4a.13 == 21 |
+                                     a4a.13 ==29 | a4a.13 ==30) ~ 0,
+                                is.na(p4_age) & is.na(a4a.13) ~ NA_real_,
+                                TRUE ~ 1), .after = "p4_isChild") %>% 
+  mutate(p5_isChild = case_when(p5_age <= 13 & 
+                                  (a4a.17 == 11 | a4a.17 ==12 | a4a.17 == 13 | 
+                                     a4a.17==14 | a4a.17 ==15 |a4a.17 ==16 |
+                                     a4a.17 == 17 | a4a.17 == 18 |a4a.17 == 21 |
+                                     a4a.17 ==29 | a4a.17 ==30) ~ 1,
+                                is.na(p5_age) & is.na(a4a.17) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.17) %>% 
+  mutate(p5_isAdult = case_when(p5_age <= 13 & 
+                                  (a4a.17 == 11 | a4a.17 ==12 | a4a.17 == 13 | 
+                                     a4a.17==14 | a4a.17 ==15 |a4a.17 ==16 |
+                                     a4a.17 == 17 | a4a.17 == 18 |a4a.17 == 21 |
+                                     a4a.17 ==29 | a4a.17 ==30) ~ 0,
+                                is.na(p5_age) & is.na(a4a.17) ~ NA_real_,
+                                TRUE ~ 1), .after = "p5_isChild") %>% 
+  mutate(p6_isChild = case_when(p6_age <= 13 & 
+                                  (a4a.21 == 11 | a4a.21 ==12 | a4a.21 == 13 | 
+                                     a4a.21==14 | a4a.21 ==15 |a4a.21 ==16 |
+                                     a4a.21 == 17 | a4a.21 == 18 |a4a.21 == 21 |
+                                     a4a.21 ==29 | a4a.21 ==30) ~ 1,
+                                is.na(p6_age) & is.na(a4a.21) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.21) %>% 
+  mutate(p6_isAdult = case_when(p6_age <= 13 & 
+                                  (a4a.21 == 11 | a4a.21 ==12 | a4a.21 == 13 | 
+                                     a4a.21==14 | a4a.21 ==15 |a4a.21 ==16 |
+                                     a4a.21 == 17 | a4a.21 == 18 |a4a.21 == 21 |
+                                     a4a.21 ==29 | a4a.21 ==30) ~ 0,
+                                is.na(p6_age) & is.na(a4a.21) ~ NA_real_,
+                                TRUE ~ 1), .after = "p6_isChild") %>% 
+  mutate(p7_isChild = case_when(p7_age <= 13 & 
+                                  (a4a.25 == 11 | a4a.25 ==12 | a4a.25 == 13 | 
+                                     a4a.25==14 | a4a.25 ==15 |a4a.25 ==16 |
+                                     a4a.25 == 17 | a4a.25 == 18 |a4a.25 == 21 |
+                                     a4a.25 ==29 | a4a.25 ==30) ~ 1,
+                                is.na(p7_age) & is.na(a4a.25) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.25) %>% 
+  mutate(p7_isAdult = case_when(p7_age <= 13 & 
+                                  (a4a.25 == 11 | a4a.25 ==12 | a4a.25 == 13 | 
+                                     a4a.25==14 | a4a.25 ==15 |a4a.25 ==16 |
+                                     a4a.25 == 17 | a4a.25 == 18 |a4a.25 == 21 |
+                                     a4a.25 ==29 | a4a.25 ==30) ~ 0,
+                                is.na(p7_age) & is.na(a4a.25) ~ NA_real_,
+                                TRUE ~ 1), .after = "p7_isChild") %>% 
+  mutate(p8_isChild = case_when(p8_age <= 13 & 
+                                  (a4a.29 == 11 | a4a.29 ==12 | a4a.29 == 13 | 
+                                     a4a.29==14 | a4a.29 ==15 |a4a.29 ==16 |
+                                     a4a.29 == 17 | a4a.29 == 18 |a4a.29 == 21 |
+                                     a4a.29 ==29 | a4a.29 ==30) ~ 1,
+                                is.na(p8_age) & is.na(a4a.29) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.29) %>% 
+  mutate(p8_isAdult = case_when(p8_age <= 13 & 
+                                  (a4a.29 == 11 | a4a.29 ==12 | a4a.29 == 13 | 
+                                     a4a.29==14 | a4a.29 ==15 |a4a.29 ==16 |
+                                     a4a.29 == 17 | a4a.29 == 18 |a4a.29 == 21 |
+                                     a4a.29 ==29 | a4a.29 ==30) ~ 0,
+                                is.na(p8_age) & is.na(a4a.29) ~ NA_real_,
+                                TRUE ~ 1), .after = "p8_isChild") %>% 
+  mutate(p9_isChild = case_when(p9_age <= 13 & 
+                                  (a4a.33 == 11 | a4a.33 ==12 | a4a.33 == 13 | 
+                                     a4a.33==14 | a4a.33 ==15 |a4a.33 ==16 |
+                                     a4a.33 == 17 | a4a.33 == 18 |a4a.33 == 21 |
+                                     a4a.33 ==29 | a4a.33 ==30) ~ 1,
+                                is.na(p9_age) & is.na(a4a.33) ~ NA_real_,
+                                TRUE ~ 0), .after = a4a.33) %>% 
+  mutate(p9_isAdult = case_when(p9_age <= 13 & 
+                                  (a4a.33 == 11 | a4a.33 ==12 | a4a.33 == 13 | 
+                                     a4a.33==14 | a4a.33 ==15 |a4a.33 ==16 |
+                                     a4a.33 == 17 | a4a.33 == 18 |a4a.33 == 21 |
+                                     a4a.33 ==29 | a4a.33 ==30) ~ 0,
+                                is.na(p9_age) & is.na(a4a.33) ~ NA_real_,
+                                TRUE ~ 1), .after = "p9_isChild") %>% 
+  mutate(p10_isChild = case_when(p10_age <= 13 & 
+                                   (a4a.37 == 11 | a4a.37 ==12 | a4a.37 == 13 | 
+                                      a4a.37==14 | a4a.37 ==15 |a4a.37 ==16 |
+                                      a4a.37 == 17 | a4a.37 == 18 |a4a.37 == 21 |
+                                      a4a.37 ==29 | a4a.37 ==30) ~ 1,
+                                 is.na(p10_age) & is.na(a4a.37) ~ NA_real_,
+                                 TRUE ~ 0), .after = a4a.37) %>% 
+  mutate(p10_isAdult = case_when(p10_age <= 13 & 
+                                   (a4a.37 == 11 | a4a.37 ==12 | a4a.37 == 13 | 
+                                      a4a.37==14 | a4a.37 ==15 |a4a.37 ==16 |
+                                      a4a.37 == 17 | a4a.37 == 18 |a4a.37 == 21 |
+                                      a4a.37 ==29 | a4a.37 ==30) ~ 0,
+                                 is.na(p10_age) & is.na(a4a.37) ~ NA_real_,
+                                 TRUE ~ 1), .after = "p10_isChild") %>% 
+  mutate(cm_isChild = 1) %>% 
+  mutate(number_ofChildren =  rowSums(.[c("cm_isChild", "p2_isChild", "p3_isChild", "p4_isChild", "p5_isChild",
+                                          "p6_isChild", "p7_isChild", "p8_isChild", "p9_isChild", "p10_isChild")],
+                                      na.rm = TRUE), .before = "cm_age") %>% 
+  mutate(number_ofAdults =rowSums(.[c("p2_isAdult", "p3_isAdult", "p4_isAdult", "p5_isAdult",
+                                      "p6_isAdult", "p7_isAdult", "p8_isAdult", "p9_isAdult", "p10_isAdult")],
+                                  na.rm = TRUE), .before = "number_ofChildren") %>% 
+  mutate(childrenEquivalence = number_ofChildren*0.3, .after = "number_ofAdults") %>% 
+  mutate(adultEquivalence = case_when(number_ofAdults == 1 ~ 1, 
+                                      number_ofAdults == 2 ~ 1.5, 
+                                      number_ofAdults == 3 ~ 2, 
+                                      number_ofAdults == 4 ~ 2.5,
+                                      number_ofAdults == 5 ~ 3, 
+                                      number_ofAdults == 6 ~ 3.5, 
+                                      number_ofAdults == 7 ~ 4, 
+                                      number_ofAdults == 8 ~ 4.5, 
+                                      number_ofAdults == 9 ~ 5, 
+                                      number_ofAdults == 10 ~ 5.5, 
+                                      is.na(number_ofAdults) ~ NA_real_), .after = "childrenEquivalence") %>% 
+  mutate(total_equivalence =  rowSums(.[c("childrenEquivalence", "adultEquivalence")],
+                                      na.rm = TRUE), .before = "childrenEquivalence") 
+
+
+own_equivalence = people_in_hh %>% select(bcsid, total_equivalence)
+
+oecd_income = merge(all=TRUE, income, own_equivalence, by ="bcsid")
+oecd_income = oecd_income %>% select(bcsid, weekly_income, weekly_incomeMedian, total_equivalence) %>% 
+  mutate(oecd_adjusted = weekly_incomeMedian/total_equivalence) %>% 
+  mutate(oecd_quintiles = quantcut(oecd_adjusted,5))
+
+levels(oecd_income$oecd_quintiles)[1] = "1"
+levels(oecd_income$oecd_quintiles)[2] = "2"
+levels(oecd_income$oecd_quintiles)[3] = "3"
+levels(oecd_income$oecd_quintiles)[4] = "4"
+levels(oecd_income$oecd_quintiles)[5] = "5"
+
 
 #auxiliary imputation variables. ####
 #accommodation type####
