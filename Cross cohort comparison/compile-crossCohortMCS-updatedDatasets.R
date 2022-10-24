@@ -140,6 +140,7 @@ age11_vocab = mcs5_child_derived %>% select(mcsid, evsabil, ecnum00) %>%
   filter(!is.na(evsabil)) %>% 
   rename(age11_vocab = evsabil) %>% 
   left_join(mcs5_child_assessment4thEd) %>% 
+  filter(ecnum00 == 1) %>% 
   select(mcsid,age11_vocab, eccage00,eccdbm00,eccdby00,ecintm00,ecinty00) %>% 
   unite("cm_age_sweep5", c(eccdbm00, eccdby00), sep =" ", remove = TRUE, na.rm = TRUE) %>% 
   unite("interview_date", c(ecintm00, ecinty00), sep =" ", remove = TRUE, na.rm = TRUE) 
@@ -857,7 +858,14 @@ ethnicity_sweep2 = mcs2_cm_derived %>% select(mcsid, bdc06e00, bcnum00) %>%
   mutate(ethnicity = case_when(!is.na(adc06e00) ~ adc06e00, 
                                is.na(adc06e00) ~ bdc06e00))
 ethnicity = ethnicity_sweep2 %>% select(mcsid, ethnicity)
-
+#make binary for cross-cohort comparison 
+ethnicity[ethnicity == 1] <- 0
+ethnicity[ethnicity == 2] <- 1
+ethnicity[ethnicity == 3] <- 1
+ethnicity[ethnicity == 4] <- 1
+ethnicity[ethnicity == 5] <- 1
+ethnicity[ethnicity == 6] <- 1
+ethnicity[ethnicity == 7] <- 1
 
 #3. Sex at birth####
 sex_sweep1 = mcs1_hh %>% select(mcsid, ahcsex00,acnum00) %>% 
@@ -891,31 +899,10 @@ age_atBirth_sweep2_motherPartner = mcs2_derived %>% select(mcsid, bddagb00, bddr
   select(mcsid, bddagb00) %>% 
   rename("partner_birthAge" = bddagb00)
 
-age_atBirth_sweep2_original = merge(all=TRUE, age_atBirth_sweep2_motherMain, age_atBirth_sweep2_motherPartner, by="mcsid") %>% 
+age_atBirth_sweep2 = merge(all=TRUE, age_atBirth_sweep2_motherMain, age_atBirth_sweep2_motherPartner, by="mcsid") %>% 
   mutate(age_atBirth_sweep2 = case_when(!is.na(main_birthAge) ~main_birthAge, 
                                         is.na(main_birthAge) ~ partner_birthAge))
 
-#new families
-age_atBirth_sweep2_motherMain_new = mcs2_derived %>% select(mcsid, bddagb00, bddres00,belig00) %>% 
-  filter(belig00 == 1 & (mcsid %in% mother_respondent_main_sweep2_new$mcsid)) %>% 
-  select(mcsid, bddagb00) %>% 
-  rename("main_birthAge_new" = bddagb00)
-
-
-age_atBirth_sweep2_motherPartner_new = mcs2_derived %>% select(mcsid, bddagb00, bddres00,belig00) %>% 
-  filter((belig00 == 2 |belig00 == 3) & (mcsid %in% mother_respondent_partner_sweep2_new$mcsid)) %>% 
-  select(mcsid, bddagb00) %>% 
-  rename("partner_birthAge_new" = bddagb00)
-
-age_atBirth_sweep2_newFamilies = merge(all=TRUE, age_atBirth_sweep2_motherMain_new, age_atBirth_sweep2_motherPartner_new, by="mcsid") %>% 
-  mutate(age_atBirth_sweep2_new = case_when(!is.na(main_birthAge_new) ~main_birthAge_new, 
-                                            is.na(main_birthAge_new) ~ partner_birthAge_new))
-
-#combine new entry families with original families
-age_atBirth_sweep2 = merge(all=TRUE, age_atBirth_sweep2_original, age_atBirth_sweep2_newFamilies, by="mcsid") %>% 
-  mutate(sweep2_birthAge = case_when(!is.na(age_atBirth_sweep2) ~ age_atBirth_sweep2, 
-                                     is.na(age_atBirth_sweep2) ~age_atBirth_sweep2_new)) %>% 
-  select(mcsid, sweep2_birthAge)
 
 
 
@@ -940,10 +927,11 @@ age_atBirth_sweep1 = merge(all=TRUE, age_atBirth_main_sweep1, age_atBirth_partne
 #combine sweeps
 age_atBirth = merge(all=TRUE, age_atBirth_sweep1, age_atBirth_sweep2, by="mcsid") %>% 
   mutate(age_atBirth = case_when(!is.na(age_atBirth_sweep1) ~ age_atBirth_sweep1,
-                                 is.na(age_atBirth_sweep1) ~ sweep2_birthAge, 
-                                 is.na(sweep2_birthAge) ~ age_atBirth_sweep1, 
+                                 is.na(age_atBirth_sweep1) ~ age_atBirth_sweep2, 
+                                 is.na(age_atBirth_sweep2) ~ age_atBirth_sweep1, 
                                  TRUE ~ NA_real_)) %>% 
   select(mcsid, age_atBirth)
+
 
 
 
@@ -1031,4 +1019,51 @@ carers_in_hh = mcs2_derived_family %>% select(mcsid,bdhtys00) %>%
   mutate(carers_in_hh = case_when(!is.na(bdhtys00)~bdhtys00,
                                   is.na(bdhtys00)~adhtys00)) %>% 
   select(mcsid, carers_in_hh)
+
+#### Combine variables into analysis data ####
+analysis_data <- merge(all=TRUE, sex, ethnicity,by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, EAL,by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, age_atBirth ,by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, accommodation,by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, tenure, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, parentEducation,by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, breastfed, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, carers_in_hh, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, occupational_status, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, income, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, age5_vocab, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, age11_vocab, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, age14_vocab, by="mcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data,mcs_weight2, by="mcsid")
+nrow(analysis_data)
+
+#pull out those with a response to language measure ####
+mcs_analysis <- analysis_data[!is.na(analysis_data$age5_vocab) |
+                                !is.na(analysis_data$age11_vocab)| 
+                                !is.na(analysis_data$age14_vocab),]
+
+
+#save data as csv file####
+write.csv(mcs_analysis, file = "mcs_ses_comparison_data.csv")
+
+
+#sensitivity check with white only ethnicity - to account for the change ####
+#in ethnic composition between cohorts/see if this has affected results. 
+
+white_sensitivity <- mcs_analysis[which(mcs_analysis$ethnicity == "0"),] #binary variable where 0=white, 1=minority 
+write.csv(white_sensitivity, file = "mcs_crossCohort_whiteSample.csv")
+
    
