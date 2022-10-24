@@ -44,6 +44,7 @@ mcs2_cm_parent = read_sav("mcs2_parent_cm_interview.sav")
 mcs3_derived_parent = read_sav("mcs3_parent_derived.sav")
 mcs3_derived_family = read_sav("mcs3_family_derived.sav")
 mcs3_derived_7thEd = read_sav("mcs3_derived_variables-7thEd.sav")
+mcs3_parent <- read_sav("mcs3_parent_interview.sav")
 #### Convert all to lowercase ####
 names(mcs2_child_assessment) <- tolower(names(mcs2_child_assessment))
 names(mcs3_child_assessment) <- tolower(names(mcs3_child_assessment))
@@ -74,6 +75,7 @@ names(mcs5_child_assessment4thEd) <- tolower(names(mcs5_child_assessment4thEd))
 names(mcs3_derived_parent) <- tolower(names(mcs3_derived_parent))
 names(mcs3_derived_family) <- tolower(names(mcs3_derived_family))
 names(mcs3_derived_7thEd) <- tolower(names(mcs3_derived_7thEd))
+names(mcs3_parent) <- tolower(names(mcs3_parent))
 
 #### Create weight variable ####
 
@@ -536,7 +538,287 @@ income = age5_income %>% left_join(age3_income) %>%
   select(mcsid, income_quintiles)
 
 # Parent Education ####
- # COME BACK TO THIS VARIABLE #
+
+#RESPONDENT VARIABLE
+#parent education variable 
+#first need to identify mother and father figures from main and partner respondents
+#do this separately for each sweep 2 as can change between sweeps
+
+#sweep 1 respondent identity
+respondent_identity_sweep1 = mcs1_derived %>% select(mcsid, addres00, aelig00) 
+mother_respondent_main = respondent_identity_sweep1 %>% filter(aelig00 == 1 & (addres00 == 1 | addres00 == 3 |addres00 ==5|
+                                                                                 addres00==7 | addres00 == 9 | addres00 == 11 |
+                                                                                 addres00 == 13 |addres00 == 15)) %>% 
+  select(mcsid, addres00) %>% 
+  rename(mother_mainRespondent = "addres00")
+
+mother_respondent_partner = respondent_identity_sweep1 %>% filter((aelig00 == 2 | aelig00 == 3) & (addres00 == 1 | addres00 == 3 |addres00 ==5|
+                                                                                                     addres00==7 | addres00 == 9 | addres00 == 11 |
+                                                                                                     addres00 == 13 |addres00 == 15 | addres00 == 21)) %>% 
+  select(mcsid, addres00) %>% 
+  rename(mother_partnerRespondent = "addres00")
+
+father_respondent_main = respondent_identity_sweep1 %>% filter(aelig00 == 1 & (addres00 == 2 | addres00 == 4 |addres00 ==6|
+                                                                                 addres00==8 | addres00 == 10 | addres00 == 12 |
+                                                                                 addres00 == 14 |addres00 == 16)) %>% 
+  select(mcsid, addres00) %>% 
+  rename(father_mainRespondent = "addres00")
+
+father_respondent_partner = respondent_identity_sweep1 %>% filter((aelig00 == 2 | aelig00 == 3) & (addres00 == 2 | addres00 == 4 |addres00 ==6|
+                                                                                                     addres00==8 | addres00 == 10 | addres00 == 12 |
+                                                                                                     addres00 == 14 |addres00 == 16 | addres00 == 22 | addres00 == 24)) %>% 
+  select(mcsid, addres00) %>% 
+  rename(father_partnerRespondent = "addres00")
+
+
+#sweep 2 respondent identity
+respondent_identity_sweep2 = mcs2_derived %>% select(mcsid, bddres00, belig00) 
+mother_respondent_main_sweep2 = respondent_identity_sweep2 %>% filter(belig00 == 1 & (bddres00 == 1 | bddres00 == 3 |bddres00 ==5|
+                                                                                        bddres00==7 | bddres00 == 9 | bddres00 == 11 |
+                                                                                        bddres00 == 13 |bddres00 == 15)) %>% 
+  select(mcsid, bddres00) %>% 
+  rename(mother_mainRespondent = "bddres00")
+
+mother_respondent_partner_sweep2  = respondent_identity_sweep2 %>% filter((belig00 == 2 | belig00 == 3) & (bddres00 == 1 | bddres00 == 3 |bddres00 ==5|
+                                                                                                             bddres00==7 | bddres00 == 9 | bddres00 == 11 |
+                                                                                                             bddres00 == 13 |bddres00 == 15 | bddres00 == 21)) %>% 
+  select(mcsid, bddres00) %>% 
+  rename(mother_partnerRespondent = "bddres00")
+
+father_respondent_main_sweep2  = respondent_identity_sweep2 %>% filter(belig00 == 1 & (bddres00 == 2 | bddres00 == 4 |bddres00 ==6|
+                                                                                         bddres00==8 | bddres00 == 10 | bddres00 == 12 |
+                                                                                         bddres00 == 14 |bddres00 == 16)) %>% 
+  select(mcsid, bddres00) %>% 
+  rename(father_mainRespondent = "bddres00")
+
+father_respondent_partner_sweep2  = respondent_identity_sweep2 %>% filter((belig00 == 2 | belig00 == 3) & (bddres00 == 2 | bddres00 == 4 |bddres00 ==6|
+                                                                                                             bddres00==8 | bddres00 == 10 | bddres00 == 12 |
+                                                                                                             bddres00 == 14 |bddres00 == 16 | bddres00 == 22 | bddres00 == 24)) %>% 
+  select(mcsid, bddres00) %>% 
+  rename(father_partnerRespondent = "bddres00")
+
+#sweep 3 respondent identity
+respondent_identity_sweep3 = mcs3_derived_parent %>% select(mcsid, cddres00, celig00) 
+mother_respondent_main_sweep3 = respondent_identity_sweep3 %>% filter(celig00 == 1 & (cddres00 == 1 | cddres00 == 3 |cddres00 ==5|
+                                                                                        cddres00==7 | cddres00 == 9 | cddres00 == 11 |
+                                                                                        cddres00 == 13 |cddres00 == 15)) %>% 
+  select(mcsid, cddres00) %>% 
+  rename(mother_mainRespondent = "cddres00")
+
+mother_respondent_partner_sweep3 = respondent_identity_sweep3 %>% filter((celig00 == 2 | celig00 == 3) & (cddres00 == 1 | cddres00 == 3 |cddres00 ==5|
+                                                                                                            cddres00==7 | cddres00 == 9 | cddres00 == 11 |
+                                                                                                            cddres00 == 13 |cddres00 == 15 | cddres00 == 21)) %>% 
+  select(mcsid, cddres00) %>% 
+  rename(mother_partnerRespondent = "cddres00")
+
+father_respondent_main_sweep3 = respondent_identity_sweep3 %>% filter(celig00 == 1 & (cddres00 == 2 | cddres00 == 4 |cddres00 ==6|
+                                                                                        cddres00==8 | cddres00 == 10 | cddres00 == 12 |
+                                                                                        cddres00 == 14 |cddres00 == 16)) %>% 
+  select(mcsid, cddres00) %>% 
+  rename(father_mainRespondent = "cddres00")
+
+father_respondent_partner_sweep3 = respondent_identity_sweep3 %>% filter((celig00 == 2 | celig00 == 3) & (cddres00 == 2 | cddres00 == 4 |cddres00 ==6|
+                                                                                                            cddres00==8 | cddres00 == 10 | cddres00 == 12 |
+                                                                                                            cddres00 == 14 |cddres00 == 16 | cddres00 == 22 | cddres00 == 24)) %>% 
+  select(mcsid, cddres00) %>% 
+  rename(father_partnerRespondent = "cddres00")
+
+parentEducation_sweep1 = mcs1_parent %>% select(mcsid, apacqu00, aelig00)
+parentEducation_sweep1$apacqu00 = as.numeric(parentEducation_sweep1$apacqu00)
+parentEducation_sweep1$apacqu00[parentEducation_sweep1$apacqu00 == 95] <- 7
+parentEducation_sweep1$apacqu00[parentEducation_sweep1$apacqu00 == 96] <- 8
+
+#mother
+mainMotherEducation_sweep1 = parentEducation_sweep1 %>% 
+  filter(aelig00 == 1 & (mcsid %in% mother_respondent_main$mcsid)) %>% 
+  select(mcsid, apacqu00) %>% 
+  rename("main_educationMother" = apacqu00)
+partnerMotherEducation_sweep1 = parentEducation_sweep1 %>% 
+  filter(aelig00 == 2 & (mcsid %in% mother_respondent_partner$mcsid)) %>% 
+  select(mcsid, apacqu00) %>% 
+  rename("partner_educationMother" = apacqu00)
+
+motherEducation_sweep1 = full_join(mainMotherEducation_sweep1, partnerMotherEducation_sweep1) %>% 
+  mutate(maternalEducation = case_when(!is.na(main_educationMother) ~ main_educationMother, 
+                                       is.na(main_educationMother) ~ partner_educationMother)) %>% 
+  select(mcsid, maternalEducation)
+
+#father 
+mainFatherEducation_sweep1 = parentEducation_sweep1 %>% 
+  filter(aelig00 == 1 & (mcsid %in% father_respondent_main$mcsid)) %>% 
+  select(mcsid, apacqu00) %>% 
+  rename("main_educationFather" = apacqu00)
+partnerFatherEducation_sweep1 = parentEducation_sweep1 %>% 
+  filter(aelig00 == 2 & (mcsid %in% father_respondent_partner$mcsid)) %>% 
+  select(mcsid, apacqu00) %>% 
+  rename("partner_educationFather" = apacqu00)
+
+fatherEducation_sweep1 = full_join(mainFatherEducation_sweep1, partnerFatherEducation_sweep1) %>% 
+  mutate(paternalEducation = case_when(!is.na(main_educationFather) ~ main_educationFather, 
+                                       is.na(main_educationFather) ~ partner_educationFather)) %>% 
+  select(mcsid, paternalEducation)
+
+parentEducation_s1 = full_join(motherEducation_sweep1, fatherEducation_sweep1)
+
+#Sweep 2 - Any new qualifications? 
+parentEducation_sweep2 = mcs2_parent %>% select(mcsid, belig00, bpedus00,contains("bpnacq0"), bpacqu00) %>% 
+  mutate(newQuals_sweep2 = case_when(
+    bpedus00 == 1 & bpnacq0a == 1 ~ 1, 
+    bpedus00 == 1 & bpnacq0b == 1 ~ 2, 
+    bpedus00 == 1 & bpnacq0c == 1 ~ 3, 
+    bpedus00 == 1 & bpnacq0d == 1 ~ 4, 
+    bpedus00 == 1 & bpnacq0e == 1 ~ 5, 
+    bpedus00 == 1 & bpnacq0f == 1 ~ 6, 
+    bpedus00 == 1 & bpnacq0g == 1 ~ 7,
+    bpedus00 == 1 & bpnacq0h == 1 ~ 8)) %>% 
+  select(mcsid, bpedus00, newQuals_sweep2, bpacqu00, belig00)
+
+parentEducation_sweep2[,2:4] <- lapply(parentEducation_sweep2[,2:4], as.numeric)
+
+#Mother
+#Main
+mainMotherEducation_sweep2 = parentEducation_sweep2 %>% 
+  filter(belig00 == 1 & (mcsid %in% mother_respondent_main_sweep2$mcsid)) %>% 
+  select(mcsid, bpacqu00, bpedus00, newQuals_sweep2) %>% 
+  rename("bpacqu00_main" = bpacqu00, 
+         "bpedus00_main" = bpedus00,
+         "newQuals_sweep2_main" = newQuals_sweep2)
+#Partner
+partnerMotherEducation_sweep2 = parentEducation_sweep2 %>% 
+  filter(belig00 == 2 & (mcsid %in% mother_respondent_partner_sweep2$mcsid)) %>% 
+  select(mcsid, bpacqu00, bpedus00, newQuals_sweep2) %>% 
+  rename("bpacqu00_partner" = bpacqu00, 
+         "bpedus00_partner" = bpedus00,
+         "newQuals_sweep2_partner" = newQuals_sweep2)
+#Combine
+motherEducation_sweep2 = full_join(mainMotherEducation_sweep2, partnerMotherEducation_sweep2) %>% 
+  mutate(bpacqu00_mother = case_when(
+    !is.na(bpacqu00_main) ~ bpacqu00_main, 
+    is.na(bpacqu00_main) ~ bpacqu00_partner)) %>% 
+  mutate(bpedus00_mother = case_when(
+    !is.na(bpedus00_main) ~ bpedus00_main, 
+    is.na(bpedus00_main) ~ bpedus00_partner)) %>% 
+  mutate(newQuals_sweep2_mother = case_when(
+    !is.na(newQuals_sweep2_main) ~ newQuals_sweep2_main, 
+    is.na(newQuals_sweep2_main) ~ newQuals_sweep2_partner)) %>% 
+  select(mcsid, bpacqu00_mother, bpedus00_mother, newQuals_sweep2_mother)
+#Father
+#Main
+mainFatherEducation_sweep2 = parentEducation_sweep2 %>% 
+  filter(belig00 == 1 & (mcsid %in% father_respondent_main_sweep2$mcsid)) %>% 
+  select(mcsid, bpacqu00, bpedus00, newQuals_sweep2) %>% 
+  rename("bpacqu00_main" = bpacqu00, 
+         "bpedus00_main" = bpedus00,
+         "newQuals_sweep2_main" = newQuals_sweep2)
+#Partner
+partnerFatherEducation_sweep2 = parentEducation_sweep2 %>% 
+  filter(belig00 == 2 & (mcsid %in% father_respondent_partner_sweep2$mcsid)) %>% 
+  select(mcsid, bpacqu00, bpedus00, newQuals_sweep2) %>% 
+  rename("bpacqu00_partner" = bpacqu00, 
+         "bpedus00_partner" = bpedus00,
+         "newQuals_sweep2_partner" = newQuals_sweep2)
+#Combine
+fatherEducation_sweep2 = full_join(mainFatherEducation_sweep2, partnerFatherEducation_sweep2) %>% 
+  mutate(bpacqu00_father = case_when(
+    !is.na(bpacqu00_main) ~ bpacqu00_main, 
+    is.na(bpacqu00_main) ~ bpacqu00_partner)) %>% 
+  mutate(bpedus00_father = case_when(
+    !is.na(bpedus00_main) ~ bpedus00_main, 
+    is.na(bpedus00_main) ~ bpedus00_partner)) %>% 
+  mutate(newQuals_sweep2_father = case_when(
+    !is.na(newQuals_sweep2_main) ~ newQuals_sweep2_main, 
+    is.na(newQuals_sweep2_main) ~ newQuals_sweep2_partner)) %>% 
+  select(mcsid, bpacqu00_father, bpedus00_father, newQuals_sweep2_father)
+
+parentEducation_s2 = full_join(motherEducation_sweep2, fatherEducation_sweep2)
+
+#Age 5 - any new qualifications? 
+parentEducation_sweep3 = mcs3_parent %>% select(mcsid, celig00, cpedus00, contains("cpacqu0")) %>% 
+  mutate(across(c(cpacqu0a, cpacqu0b, cpacqu0c, cpacqu0d, cpacqu0e, cpacqu0f, cpacqu0g), #Recode to match levels at previous sweeps
+                .fns = list(recoded = ~rec(., rec = "
+                                          1, 3 = 1; 
+                                          2 = 2; 
+                                          4,5 = 3;
+                                          6 = 4;
+                                          7 = 5;
+                                          8 = 6;
+                                          95 = 7;
+                                          96 = 8")), 
+                .names = "{fn}_{col}"))
+
+# Select minimum as 1 is the highest possible qualification, to get the highest qualification at age 5. 
+parentEducation_sweep3 <- transform(parentEducation_sweep3,newQuals_sweep3  = 
+                                      pmin(recoded_cpacqu0a, recoded_cpacqu0b, recoded_cpacqu0c, recoded_cpacqu0d, recoded_cpacqu0e, 
+                                           recoded_cpacqu0f, recoded_cpacqu0g,  na.rm = TRUE))
+parentEducation_sweep3 = parentEducation_sweep3 %>% select(mcsid, celig00, cpedus00, newQuals_sweep3)   
+
+parentEducation_sweep3[,3:4] <- lapply(parentEducation_sweep3[,3:4], as.numeric)
+
+#Mother
+#Main
+mainMotherEducation_sweep3 = parentEducation_sweep3 %>% 
+  filter(celig00 == 1 & (mcsid %in% mother_respondent_main_sweep3$mcsid)) %>% 
+  select(mcsid, cpedus00, newQuals_sweep3) %>% 
+  rename("cpedus00_main" = cpedus00,
+         "newQuals_sweep3_main" = newQuals_sweep3)
+#Partner
+partnerMotherEducation_sweep3 = parentEducation_sweep3 %>% 
+  filter(celig00 == 2 & (mcsid %in% mother_respondent_partner_sweep3$mcsid)) %>% 
+  select(mcsid,  cpedus00, newQuals_sweep3) %>% 
+  rename("cpedus00_partner" = cpedus00,
+         "newQuals_sweep3_partner" = newQuals_sweep3)
+#Combine
+motherEducation_sweep3 = full_join(mainMotherEducation_sweep3, partnerMotherEducation_sweep3) %>% 
+  mutate(cpedus00_mother = case_when(
+    !is.na(cpedus00_main) ~ cpedus00_main, 
+    is.na(cpedus00_main) ~ cpedus00_partner)) %>% 
+  mutate(newQuals_sweep3_mother = case_when(
+    !is.na(newQuals_sweep3_main) ~ newQuals_sweep3_main, 
+    is.na(newQuals_sweep3_main) ~ newQuals_sweep3_partner)) %>% 
+  select(mcsid, cpedus00_mother, newQuals_sweep3_mother)
+#Father
+#Main
+mainFatherEducation_sweep3 = parentEducation_sweep3 %>% 
+  filter(celig00 == 1 & (mcsid %in% father_respondent_main_sweep3$mcsid)) %>% 
+  select(mcsid, cpedus00, newQuals_sweep3) %>% 
+  rename("cpedus00_main" = cpedus00,
+         "newQuals_sweep3_main" = newQuals_sweep3)
+#Partner
+partnerFatherEducation_sweep3 = parentEducation_sweep3 %>% 
+  filter(celig00 == 2 & (mcsid %in% father_respondent_partner_sweep3$mcsid)) %>% 
+  select(mcsid, cpedus00, newQuals_sweep3) %>% 
+  rename("cpedus00_partner" = cpedus00,
+         "newQuals_sweep3_partner" = newQuals_sweep3)
+#Combine
+fatherEducation_sweep3 = full_join(mainFatherEducation_sweep3, partnerFatherEducation_sweep3) %>% 
+  mutate(cpedus00_father = case_when(
+    !is.na(cpedus00_main) ~ cpedus00_main, 
+    is.na(cpedus00_main) ~ cpedus00_partner)) %>% 
+  mutate(newQuals_sweep3_father = case_when(
+    !is.na(newQuals_sweep3_main) ~ newQuals_sweep3_main, 
+    is.na(newQuals_sweep3_main) ~ newQuals_sweep3_partner)) %>% 
+  select(mcsid, cpedus00_father, newQuals_sweep3_father)
+
+parentEducation_s3 = full_join(motherEducation_sweep3, fatherEducation_sweep3)
+
+#Create parent education variable, taking into account new qualifications gained at later sweeps. 
+#Will want to have the highest qualification across these three sweeps to represent the highest qualification that parent holds. 
+parentEducation = parentEducation_s1 %>% 
+  full_join(parentEducation_s2) %>% 
+  full_join(parentEducation_s3) %>% 
+  full_join(sweep_entry) %>% 
+  mutate(maternal_education = case_when(
+    sentry == 1 ~ pmin(maternalEducation, newQuals_sweep2_mother, newQuals_sweep3_mother, na.rm = TRUE), 
+    sentry == 2 ~ pmin(bpacqu00_mother, newQuals_sweep3_mother, na.rm = TRUE))) %>% 
+  mutate(paternal_education = case_when(
+    sentry == 1 ~ pmin(paternalEducation, newQuals_sweep2_father, newQuals_sweep3_father, na.rm = TRUE), 
+    sentry == 2 ~ pmin(bpacqu00_father, newQuals_sweep3_father, na.rm = TRUE))) %>% 
+  select(mcsid,maternal_education, paternal_education) %>% 
+  mutate(highest_academic_qual = pmin(maternal_education, paternal_education, na.rm = TRUE)) %>% 
+  mutate(highested1 = rec(highest_academic_qual,  #collapse into 4 category measure for cross cohort comparison
+                          rec = "1, 2=4; 3,4=3;  5=2; 6,7,8=1", #1 =no quals/low level quals. 2 = o levels/gcses grades a*-c. 3= post 16 education. 4=university level qualifications
+                          as.num = TRUE, var.label = NULL, val.labels = NULL, append = FALSE, suffix = "_r" )) %>% 
+  select(mcsid, highested1)
 
 #### Potential Confounders ####
 
@@ -599,13 +881,13 @@ sex = sex_sweep2 %>% select(mcsid, sex)
 #1. Mother's age at birth of CM ####
 #sweep 1 - creating mother respondent variables
 age_atBirth_sweep2_motherMain = mcs2_derived %>% select(mcsid, bddagb00, bddres00,belig00) %>% 
-  filter(belig00 == 1 & (mcsid %in% mother_respondent_main_sweep2_original$mcsid)) %>% 
+  filter(belig00 == 1 & (mcsid %in% mother_respondent_main_sweep2$mcsid)) %>% 
   select(mcsid, bddagb00) %>% 
   rename("main_birthAge" = bddagb00)
 
 
 age_atBirth_sweep2_motherPartner = mcs2_derived %>% select(mcsid, bddagb00, bddres00,belig00) %>% 
-  filter((belig00 == 2 |belig00 == 3) & (mcsid %in% mother_respondent_partner_sweep2_original$mcsid)) %>% 
+  filter((belig00 == 2 |belig00 == 3) & (mcsid %in% mother_respondent_partner_sweep2$mcsid)) %>% 
   select(mcsid, bddagb00) %>% 
   rename("partner_birthAge" = bddagb00)
 
