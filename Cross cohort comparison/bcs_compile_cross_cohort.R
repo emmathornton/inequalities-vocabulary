@@ -576,7 +576,8 @@ own_equivalence = people_in_hh %>% select(bcsid, total_equivalence)
 oecd_income = merge(all=TRUE, income, own_equivalence, by ="bcsid")
 oecd_income = oecd_income %>% select(bcsid, weekly_income, weekly_incomeMedian, total_equivalence) %>% 
   mutate(oecd_adjusted = weekly_incomeMedian/total_equivalence) %>% 
-  mutate(oecd_quintiles = quantcut(oecd_adjusted,5))
+  mutate(oecd_quintiles = quantcut(oecd_adjusted,5)) %>% 
+  select(bcsid, oecd_quintiles)
 
 levels(oecd_income$oecd_quintiles)[1] = "1"
 levels(oecd_income$oecd_quintiles)[2] = "2"
@@ -623,6 +624,8 @@ nrow(analysis_data)
 analysis_data <- merge(all=TRUE, analysis_data, mother_ed,by="bcsid")
 nrow(analysis_data)
 analysis_data <- merge(all=TRUE, analysis_data, father_ed,by="bcsid")
+nrow(analysis_data)
+analysis_data <- merge(all=TRUE, analysis_data, oecd_income,by="bcsid")
 nrow(analysis_data)
 analysis_data <- merge(all=TRUE, analysis_data, highest_occupation, by="bcsid")
 nrow(analysis_data)
