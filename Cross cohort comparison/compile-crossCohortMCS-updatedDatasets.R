@@ -187,7 +187,7 @@ age14_vocab = mcs6_child_assessment %>% select(mcsid, contains("fccmcog"), fcvty
 
 ### Socioeconomic Status Variables ####
 
-#1. Occupational Status
+#1. Occupational Status ####
 # HIGHEST HOUSEHOLD LEVEL AT AGE 5. IF NA, HIGHEST HOUSEHOLD LEVEL AT AGE 3. IF NA, HIGHEST HOUSEHOLD LEVEL AT AGE 9 MONTHS.
 #Age 5
 age5_occupation = mcs3_derived_parent %>% select(mcsid, cdd05s00, celig00) %>% 
@@ -283,7 +283,7 @@ occupational_status = merge(all=TRUE, occupational_status,months9_occupation) %>
   select(mcsid, highest_household_occupation_r) %>% 
   rename("occupational_status" = highest_household_occupation_r)
 
-# Income 
+# 2. Income ####
 #Age 5, if NA, Age 3, If NA, 9 months. 
 #INCOME AT AGE 5. OECD weighted quintiles
 #Create OECD equivilisation for Age 5
@@ -538,7 +538,7 @@ income = age5_income %>% left_join(age3_income) %>%
                                       is.na(oecd_quintilesAge5) & is.na(oecd_quintilesAge3) ~ oecd_quintiles9mo)) %>% 
   select(mcsid, income_quintiles)
 
-# Parent Education ####
+# 3. Parent Education ####
 
 #RESPONDENT VARIABLE
 #parent education variable 
