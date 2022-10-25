@@ -843,6 +843,10 @@ EAL = mcs2_parent_9thEd %>% select(mcsid, bhhlan00) %>%
   mutate(EAL = case_when(!is.na(EAL_sentry1) ~ EAL_sentry1, 
                          is.na(EAL_sentry1) ~ bhhlan00)) %>% 
   select(mcsid, EAL) 
+# Make binary for cross cohort comparison 
+EAL[EAL == 1] <- 0
+EAL[EAL == 2] <- 1
+EAL[EAL == 3] <- 1
 
 #2. Ethnicity####
 #ethnicity single births mcs1
