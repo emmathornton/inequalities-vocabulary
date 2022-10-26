@@ -90,7 +90,8 @@ predM = predM[blocksvec,]
 predM[,c("mcsid")]=0
 #predM[,c("mcs2_weight")]=0
 #set.seed(103)
-imputed_mcs2 = mice(mcs_ses, blocks=blocksvec, method=meth, seed = 1895, predictorMatrix=predM, m=25) #can change this to a smaller numebr so runs quicker when figuring out. 
+imputed_mcs2 = mice(mcs_ses, blocks=blocksvec, method=meth, 
+                    seed = 1895, predictorMatrix=predM, m=25) 
 
 #deriving post imputation variables####
 long_format_mcs <- mice::complete(imputed_mcs2, "long", include=TRUE)
@@ -128,7 +129,10 @@ imputed_mcs2<-as.mids(long_format_mcs)
 
 #save mids object to working directory####
 
-write.mice.imputation(mi.res=imputed_mcs2, name = glue("{today()}_mcs_ses_imputedRQ1"), long=TRUE,dattype = "csv")
+write.mice.imputation(mi.res=imputed_mcs2, 
+                      name = glue("{today()}_mcs_ses_imputedRQ1"),
+                      mids2spss=FALSE,
+                      long=TRUE,dattype = "csv")
 
 #get each individual imputed dataset#####
 imputed_mcs2_0 <- complete(imputed_mcs2)
