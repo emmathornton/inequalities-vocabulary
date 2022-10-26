@@ -51,10 +51,15 @@ pv1 <- function(val) {
 #load in datasets for each cohort 
 
 ```{r}
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/final datasets/2021-02-26_mcs_ses_crossCohort.Rdata")
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-26_mcs_ses_crossCohort/2022-10-26_mcs_ses_crossCohort.Rdata")
 mcs_imputation = mi.res
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/final datasets/2021-02-26_bcs_ses_cross_cohort.Rdata")
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-26_bcs_ses_cross_cohort/2022-10-26_bcs_ses_cross_cohort.Rdata")
 bcs_imputation = mi.res
+
+long_format_bcs <- mice::complete(bcs_imputation, "long", include=TRUE)
+long_format_bcs$occupational_status <- with(long_format_bcs, relevel(highest_occupation, ref = "2"))
+long_format_bcs$occupational_status <- as.factor(long_format_bcs$occupational_status)
+
 
 ```
 
@@ -68,30 +73,37 @@ confounders only models for R2 table later.
 #MCS2001 regressions 
 
 #age 5
-mcs_age5_occupation <- with(mcs_imputation, lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupational_status, weights = weight)) 
-mcs_age5_education <- with(mcs_imputation, lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+ highest_household_education, weights = weight))
-mcs_age5_confounders<- with(mcs_imputation, lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight))
+mcs_age5_occupation <- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  occupational_status, weights = weight2)) 
+mcs_age5_education <- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+ highested1, weights = weight2))
+mcs_age5_income <- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+ income_quintiles, weights = weight2))
+mcs_age5_confounders<- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5, weights = weight2))
+
 #age 11
-mcs_age11_occupation <- with(mcs_imputation, lm(standardised_vocab11 ~ gender + ethnicity +  EAL + standardised_age11+  occupational_status, weights = weight)) 
-mcs_age11_education <- with(mcs_imputation, lm(standardised_vocab11 ~ gender + ethnicity +  EAL + standardised_age11+ highest_household_education, weights = weight))
-mcs_age11_confounders<- with(mcs_imputation, lm(standardised_vocab11 ~ gender + ethnicity +  EAL + standardised_age11,weights = weight))
+mcs_age11_occupation <- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11+  occupational_status, weights = weight2)) 
+mcs_age11_education <- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11+ highested1, weights = weight2))
+mcs_age11_income<- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11+ income_quintiles, weights = weight2))
+mcs_age11_confounders<- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11,weights = weight2))
 #age 14
-mcs_age14_occupation <- with(mcs_imputation, lm(standardised_vocab14 ~ gender + ethnicity +  EAL + standardised_age14+  occupational_status,weights = weight)) 
-mcs_age14_education <- with(mcs_imputation, lm(standardised_vocab14 ~ gender + ethnicity +  EAL + standardised_age14+ highest_household_education,weights = weight))
-mcs_age14_confounders<- with(mcs_imputation, lm(standardised_vocab14 ~ gender + ethnicity +  EAL + standardised_age14,weights = weight))
+mcs_age14_occupation <- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14+  occupational_status,weights = weight2)) 
+mcs_age14_education <- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14+ highested1,weights = weight2))
+mcs_age14_income <- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14+ income_quintiles ,weights = weight2))
+mcs_age14_confounders<- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14,weights = weight2))
 
 #BCS1970 regressions 
-bcs_age5_occupation <- with(bcs_imputation, lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupational_status,weights = weight)) 
-bcs_age5_education <- with(bcs_imputation, lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+ highest_household_education,weights = weight))
-bcs_age5_confounders<- with(bcs_imputation, lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight))
+bcs_age5_occupation <- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  occupational_status,weights = weight)) 
+bcs_age5_education <- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  highestEd1,weights = weight))
+bcs_age5_income <- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+ oecd_quintiles,weights = weight))
+bcs_age5_confounders<- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5, weights = weight))
 #age 10
-bcs_age10_occupation <- with(bcs_imputation, lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupational_status, weights = weight)) 
-bcs_age10_education <- with(bcs_imputation, lm(standardised_vocab10 ~ gender + ethnicity +   EAL + standardised_age10+ highest_household_education, weights = weight))
-bcs_age10_confounders<- with(bcs_imputation, lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight))
+bcs_age10_occupation <- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10+  occupational_status, weights = weight)) 
+bcs_age10_education <- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +   EAL + standardised_age10+  highestEd1, weights = weight))
+bcs_age10_income <- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +   EAL + standardised_age10+  oecd_quintiles, weights = weight))
+bcs_age10_confounders<- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10, weights = weight))
 #age 16
-bcs_age16_occupation <- with(bcs_imputation, lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupational_status, weights = weight)) 
-bcs_age16_education <- with(bcs_imputation, lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+ highest_household_education, weights = weight))
-bcs_age16_confounders<- with(bcs_imputation, lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight))
+bcs_age16_occupation <- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16+  occupational_status, weights = weight)) 
+bcs_age16_education <- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16+  highestEd1, weights = weight))
+bcs_age16_income <- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16+  oecd_quintiles, weights = weight))
+bcs_age16_confounders<- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16, weights = weight))
 
 ```
 
@@ -102,42 +114,52 @@ get the coefficients for the SES measures.
 ```{r}
 mcs_age5_occupation_results = round(summary(pool(mcs_age5_occupation), conf.int =TRUE),2)
 mcs_age5_education_results = round(summary(pool(mcs_age5_education), conf.int =TRUE),2)
+mcs_age5_income_results = round(summary(pool(mcs_age5_income), conf.int =TRUE),2)
 mcs_age11_occupation_results = round(summary(pool(mcs_age11_occupation), conf.int =TRUE),2)
 mcs_age11_education_results = round(summary(pool(mcs_age11_education), conf.int =TRUE),2)
+mcs_age11_income_results = round(summary(pool(mcs_age11_income), conf.int =TRUE),2)
 mcs_age14_occupation_results = round(summary(pool(mcs_age14_occupation), conf.int =TRUE),2)
 mcs_age14_education_results = round(summary(pool(mcs_age14_education), conf.int =TRUE),2)
-
+mcs_age14_income_results = round(summary(pool(mcs_age14_income), conf.int =TRUE),2)
 
 bcs_age5_occupation_results = round(summary(pool(bcs_age5_occupation), conf.int =TRUE),2)
 bcs_age5_education_results = round(summary(pool(bcs_age5_education), conf.int =TRUE),2)
+bcs_age5_income_results = round(summary(pool(bcs_age5_income), conf.int =TRUE),2)
 bcs_age10_occupation_results = round(summary(pool(bcs_age10_occupation), conf.int =TRUE),2)
 bcs_age10_education_results = round(summary(pool(bcs_age10_education), conf.int =TRUE),2)
+bcs_age10_income_results = round(summary(pool(bcs_age10_income), conf.int =TRUE),2)
 bcs_age16_occupation_results = round(summary(pool(bcs_age16_occupation), conf.int =TRUE),2)
 bcs_age16_education_results = round(summary(pool(bcs_age16_education), conf.int =TRUE),2)
-
+bcs_age16_income_results = round(summary(pool(bcs_age16_income), conf.int =TRUE),2)
 
 #pull out SES coefficients for table
 
 MCS_age5_occupation_results = mcs_age5_occupation_results[6:8,]
 MCS_age5_education_results = mcs_age5_education_results[6:8,]
+MCS_age5_income_results = mcs_age5_income_results[6:9,]
 MCS_age11_occupation_results = mcs_age11_occupation_results[6:8,]
 MCS_age11_education_results = mcs_age11_education_results[6:8,]
+MCS_age11_income_results = mcs_age11_income_results[6:9,]
 MCS_age14_occupation_results = mcs_age14_occupation_results[6:8,]
 MCS_age14_education_results = mcs_age14_education_results[6:8,]
+MCS_age14_income_results = mcs_age14_income_results[6:9,]
 
 BCS_age5_occupation_results = bcs_age5_occupation_results[6:8,]
 BCS_age5_education_results = bcs_age5_education_results[6:8,]
+BCS_age5_income_results = bcs_age5_income_results[6:9,]
 BCS_age10_occupation_results = bcs_age10_occupation_results[6:8,]
 BCS_age10_education_results = bcs_age10_education_results[6:8,]
+BCS_age10_income_results = bcs_age10_income_results[6:9,]
 BCS_age16_occupation_results = bcs_age16_occupation_results[6:8,]
 BCS_age16_education_results = bcs_age16_education_results[6:8,]
+BCS_age16_income_results = bcs_age16_income_results[6:9,]
 
-MCS_age5_results = rbind(MCS_age5_occupation_results, MCS_age5_education_results)
-MCS_age11_results = rbind(MCS_age11_occupation_results, MCS_age11_education_results)
-MCS_age14_results = rbind(MCS_age14_occupation_results, MCS_age14_education_results)
-BCS_age5_results = rbind(BCS_age5_occupation_results, BCS_age5_education_results)
-BCS_age10_results = rbind(BCS_age10_occupation_results, BCS_age10_education_results)
-BCS_age16_results = rbind(BCS_age16_occupation_results, BCS_age16_education_results)
+MCS_age5_results = rbind(MCS_age5_occupation_results, MCS_age5_education_results, MCS_age5_income_results)
+MCS_age11_results = rbind(MCS_age11_occupation_results, MCS_age11_education_results, MCS_age11_income_results)
+MCS_age14_results = rbind(MCS_age14_occupation_results, MCS_age14_education_results, MCS_age14_income_results)
+BCS_age5_results = rbind(BCS_age5_occupation_results, BCS_age5_education_results, BCS_age5_income_results)
+BCS_age10_results = rbind(BCS_age10_occupation_results, BCS_age10_education_results, BCS_age10_income_results)
+BCS_age16_results = rbind(BCS_age16_occupation_results, BCS_age16_education_results, BCS_age16_income_results)
 ```
 
 
@@ -287,20 +309,25 @@ cross_cohort_data <- cross_cohort_data %>%
   select(Indicator, early_childhood_bcs,  late_childhood_bcs, adolescent_bcs, early_childhood_mcs, late_childhood_mcs, adolescent_mcs)
 
 #add in reference categories 
-cross_cohort_data = cross_cohort_data  %>% add_row(Indicator= "highest_household_education1",  .before=1) %>% 
-  add_row(Indicator= "occupational_status2",  .before=5) 
+cross_cohort_data = cross_cohort_data  %>% 
+  add_row(Indicator= "highest_household_education1",  .before=1) %>% 
+  add_row(Indicator= "occupational_status2",  .before=5)  %>% 
+  add_row(Indicator= "oecd_quintiles1",  .before=9) 
 cross_cohort_data[is.na(cross_cohort_data)] <- "REFERENCE"
 
 #add indicator labels for vertical column in table. space for most of these as will merge cells later. 
 cross_cohort_data = cross_cohort_data %>%  add_column(z= c("Parent Education", "  ", "  ", "  ", 
                                                      
-                                                     "Occupational Status",  "  ", "  ", "  "
+                                                     "Occupational Status",  "  ", "  ", "  ", 
+                                                     "Income Quintiles", " ", " ", " ", " "
                                                     ),.before = 1)
 
 
 #rename SES variables
 cross_cohort_data$Indicator <- c("No/low level \n qualifications", "O levels/ GCSEs  \n grades A*-C", "Post 16 education", "University level \n qualifications", 
-                            "Routine", "Unemployed", "Intermediate", "Higher managerial ")
+                            "Routine", "Unemployed", "Intermediate", "Higher managerial", 
+                            "Quintile 1 (Most Deprived)", "Quintile 2", "Quintile 3", "Quintile 4", 
+                            "Quintile 5 (Least Deprived)")
 
 cross_cohort_data[is.na(cross_cohort_data)] <- "   "
 ```
@@ -331,12 +358,15 @@ cross_cohort_flex <- cross_cohort_data %>%
   hline_bottom(j=1:8,part="body",  border=my_border) %>% 
   set_header_labels(z= " ", Inidcator= "Indicator",early_childhood_bcs= "Early Childhood Vocabulary (BCS)", late_childhood_bcs="Late Childhood Vocabulary (BCS)",
                     adolescent_bcs = "Adolescent Vocabulary (BCS)",
-                    early_childhood_mcs ="Early Childhood Vocabulary (MCS)", late_childhood_mcs="Late Childhood Vocabulary (MCS)", 
+                    early_childhood_mcs ="Early Childhood Vocabulary (MCS)", 
+                    late_childhood_mcs="Late Childhood Vocabulary (MCS)", 
                     adolescent_mcs = "Adolescent Vocabulary (MCS)") %>% 
   merge_at(j=1, i = 1:4) %>% 
   merge_at(j=1, i=5:8) %>% 
+  merge_at(j=1, i=9:13) %>% 
   rotate(i=1:4, j=1, rotation="btlr", align="center") %>% 
   rotate(i=5:8, j=1, rotation="btlr", align="center") %>% 
+  rotate(i=9:13, j=1, rotation="btlr", align="center") %>% 
  print( preview = "docx") 
 
 
@@ -358,6 +388,10 @@ mcs_age5_education_r2 = round(pool.r.squared(mcs_age5_education),4)*100
 mcs_age11_education_r2= round(pool.r.squared(mcs_age11_education),4)*100
 mcs_age14_education_r2 = round(pool.r.squared(mcs_age14_education),4)*100
 
+mcs_age5_income_r2 = round(pool.r.squared(mcs_age5_income),4)*100
+mcs_age11_income_r2= round(pool.r.squared(mcs_age11_income),4)*100
+mcs_age14_income_r2 = round(pool.r.squared(mcs_age14_income),4)*100
+
 mcs_age5_confounders_r2 = round(pool.r.squared(mcs_age5_confounders), 4)*100
 mcs_age11_confounders_r2= round(pool.r.squared(mcs_age11_confounders), 4)*100
 mcs_age14_confounders_r2= round(pool.r.squared(mcs_age14_confounders), 4)*100
@@ -365,10 +399,13 @@ mcs_age14_confounders_r2= round(pool.r.squared(mcs_age14_confounders), 4)*100
 #partial r squared
 mcs_age5_occupation_partial = mcs_age5_occupation_r2 - mcs_age5_confounders_r2
 mcs_age5_education_partial = mcs_age5_education_r2 - mcs_age5_confounders_r2
+mcs_age5_income_partial = mcs_age5_income_r2 - mcs_age5_confounders_r2
 mcs_age11_occupation_partial = mcs_age11_occupation_r2 - mcs_age11_confounders_r2
 mcs_age11_education_partial = mcs_age11_education_r2 - mcs_age11_confounders_r2
+mcs_age11_income_partial = mcs_age11_income_r2 - mcs_age11_confounders_r2
 mcs_age14_occupation_partial = mcs_age14_occupation_r2 - mcs_age14_confounders_r2
 mcs_age14_education_partial = mcs_age14_education_r2 - mcs_age14_confounders_r2
+mcs_age14_income_partial = mcs_age14_income_r2 - mcs_age14_confounders_r2
 
 #BCS1970
 bcs_age5_occupation_r2 = round(pool.r.squared(bcs_age5_occupation),4)*100
@@ -379,6 +416,10 @@ bcs_age5_education_r2 = round(pool.r.squared(bcs_age5_education),4)*100
 bcs_age10_education_r2= round(pool.r.squared(bcs_age10_education),4)*100
 bcs_age16_education_r2 = round(pool.r.squared(bcs_age16_education),4)*100
 
+bcs_age5_income_r2 = round(pool.r.squared(bcs_age5_income),4)*100
+bcs_age10_income_r2= round(pool.r.squared(bcs_age10_income),4)*100
+bcs_age16_income_r2 = round(pool.r.squared(bcs_age16_income),4)*100
+
 bcs_age5_confounders_r2 = round(pool.r.squared(bcs_age5_confounders), 4)*100
 bcs_age10_confounders_r2= round(pool.r.squared(bcs_age10_confounders), 4)*100
 bcs_age16_confounders_r2= round(pool.r.squared(bcs_age16_confounders), 4)*100
@@ -386,18 +427,21 @@ bcs_age16_confounders_r2= round(pool.r.squared(bcs_age16_confounders), 4)*100
 #partial r squared
 bcs_age5_occupation_partial = bcs_age5_occupation_r2 - bcs_age5_confounders_r2
 bcs_age5_education_partial= bcs_age5_education_r2 - bcs_age5_confounders_r2
+bcs_age5_income_partial= bcs_age5_income_r2 - bcs_age5_confounders_r2
 bcs_age10_occupation_partial = bcs_age10_occupation_r2 - bcs_age10_confounders_r2
 bcs_age10_education_partial = bcs_age10_education_r2 - bcs_age10_confounders_r2
+bcs_age10_income_partial = bcs_age10_income_r2 - bcs_age10_confounders_r2
 bcs_age16_occupation_partial= bcs_age16_occupation_r2 - bcs_age16_confounders_r2
 bcs_age16_education_partial= bcs_age16_education_r2 - bcs_age16_confounders_r2
+bcs_age16_income_partial= bcs_age16_income_r2 - bcs_age16_confounders_r2
 
 
-bcs_partial = as.data.frame(rbind(bcs_age5_education_partial,  bcs_age10_education_partial, bcs_age16_education_partial, bcs_age5_occupation_partial, bcs_age10_occupation_partial, bcs_age16_occupation_partial))
-mcs_partial = as.data.frame(rbind(mcs_age5_education_partial,  mcs_age11_education_partial, mcs_age14_education_partial, mcs_age5_occupation_partial, mcs_age11_occupation_partial, mcs_age14_occupation_partial))
+bcs_partial = as.data.frame(rbind(bcs_age5_education_partial,  bcs_age10_education_partial, bcs_age16_education_partial, bcs_age5_occupation_partial, bcs_age10_occupation_partial, bcs_age16_occupation_partial, bcs_age5_income_partial, bcs_age10_income_partial, bcs_age16_income_partial))
+mcs_partial = as.data.frame(rbind(mcs_age5_education_partial,  mcs_age11_education_partial, mcs_age14_education_partial, mcs_age5_occupation_partial, mcs_age11_occupation_partial, mcs_age14_occupation_partial, mcs_age5_income_partial, mcs_age11_income_partial, mcs_age14_income_partial))
 
 
-bcs_partial = bcs_partial %>%  add_column(indicator= c("Parent Education (early bcs)", "Parent education(late bcs)", "parent education (adolescent bcs)", "Occupation (early bcs)", "occupation (late bcs)", "occupation(adolescent bcs)"), .before = 1)
-mcs_partial = mcs_partial %>%  add_column(indicator= c("Parent Education (early mcs)", "Parent education(late mcs)", "parent education (adolescent mcs)", "Occupation (early mcs)", "occupation (late mcs)", "occupation(adolescent mcs)"), .before = 1)
+bcs_partial = bcs_partial %>%  add_column(indicator= c("Parent Education (early bcs)", "Parent education(late bcs)", "parent education (adolescent bcs)", "Occupation (early bcs)", "occupation (late bcs)", "occupation(adolescent bcs)", "Income (early bcs)", "Income (late bcs)", "Income (adolescent bcs)"), .before = 1)
+mcs_partial = mcs_partial %>%  add_column(indicator= c("Parent Education (early mcs)", "Parent education(late mcs)", "parent education (adolescent mcs)", "Occupation (early mcs)", "occupation (late mcs)", "occupation(adolescent mcs)", "Income (early mcs)", "Income (late mcs)", "Income (adolescent mcs)"), .before = 1)
 
 bcs_partial = bcs_partial[,1:2]
 mcs_partial = mcs_partial[,1:2]
@@ -414,9 +458,14 @@ create data for plots
 
 #early childhood education data
 #add ref category
-MCS_age5_education_results= MCS_age5_education_results %>% add_row(term = "highest_household_education1",  .before=1)
+MCS_age5_education_results= MCS_age5_education_results %>% add_row(term = "highestEd1",  .before=1)
 MCS_age5_education_results[is.na(MCS_age5_education_results)] <- 0
-BCS_age5_education_results= BCS_age5_education_results %>% add_row(term = "highest_household_education1",  .before=1)
+MCS_age5_education_results$term[MCS_age5_education_results$term == "highested11"] <- "highestEd11"
+MCS_age5_education_results$term[MCS_age5_education_results$term == "highested12"] <- "highestEd12"
+MCS_age5_education_results$term[MCS_age5_education_results$term == "highested13"] <- "highestEd13"
+MCS_age5_education_results$term[MCS_age5_education_results$term == "highested14"] <- "highestEd14"
+
+BCS_age5_education_results= BCS_age5_education_results %>% add_row(term = "highestEd1",  .before=1)
 BCS_age5_education_results[is.na(BCS_age5_education_results)] <- 0
 #add cohort
 MCS_age5_education_results = MCS_age5_education_results %>%  mutate(cohort = c("MCS2001"))
@@ -432,9 +481,13 @@ names(early_childhood_education_plotData) <- c("parent_education", "vocabulary",
 #late childhood education data
 #late childhood education data
 #add ref category
-MCS_age11_education_results= MCS_age11_education_results %>% add_row(term = "highest_household_education1",  .before=1)
+MCS_age11_education_results= MCS_age11_education_results %>% add_row(term = "highestEd1",  .before=1)
 MCS_age11_education_results[is.na(MCS_age11_education_results)] <- 0
-BCS_age10_education_results= BCS_age10_education_results %>% add_row(term = "highest_household_education1",  .before=1)
+MCS_age11_education_results$term[MCS_age11_education_results$term == "highested11"] <- "highestEd11"
+MCS_age11_education_results$term[MCS_age11_education_results$term == "highested12"] <- "highestEd12"
+MCS_age11_education_results$term[MCS_age11_education_results$term == "highested13"] <- "highestEd13"
+MCS_age11_education_results$term[MCS_age11_education_results$term == "highested14"] <- "highestEd14"
+BCS_age10_education_results= BCS_age10_education_results %>% add_row(term = "highestEd1",  .before=1)
 BCS_age10_education_results[is.na(BCS_age10_education_results)] <- 0
 #add cohort
 MCS_age11_education_results = MCS_age11_education_results %>%  mutate(cohort = c("MCS2001"))
@@ -448,9 +501,14 @@ late_childhood_education_plotData  = late_childhood_education_plotData  %>%
 names(late_childhood_education_plotData) <- c("parent_education", "vocabulary", "lower_ci", "upper_ci", "cohort")
 
 #adolescent education data
-MCS_age14_education_results= MCS_age14_education_results %>% add_row(term = "highest_household_education1",  .before=1)
+MCS_age14_education_results= MCS_age14_education_results %>% add_row(term = "highestEd1",  .before=1)
 MCS_age14_education_results[is.na(MCS_age14_education_results)] <- 0
-BCS_age16_education_results= BCS_age16_education_results %>% add_row(term = "highest_household_education1",  .before=1)
+MCS_age14_education_results$term[MCS_age14_education_results$term == "highested11"] <- "highestEd11"
+MCS_age14_education_results$term[MCS_age14_education_results$term == "highested12"] <- "highestEd12"
+MCS_age14_education_results$term[MCS_age14_education_results$term == "highested13"] <- "highestEd13"
+MCS_age14_education_results$term[MCS_age14_education_results$term == "highested14"] <- "highestEd14"
+
+BCS_age16_education_results= BCS_age16_education_results %>% add_row(term = "highestEd1",  .before=1)
 BCS_age16_education_results[is.na(BCS_age16_education_results)] <- 0
 #add cohort
 MCS_age14_education_results = MCS_age14_education_results %>%  mutate(cohort = c("MCS2001"))
@@ -523,6 +581,77 @@ adolescent_occupation_plotData$`2.5 %`[which(
 adolescent_occupation_plotData$`97.5 %`[which(
   adolescent_occupation_plotData$term== "occupational_status1")] <-0
 names(adolescent_occupation_plotData) <- c("parent_occupation", "vocabulary", "lower_ci", "upper_ci", "cohort")
+
+#income plot data
+
+#early childhood income data
+#add ref category
+MCS_age5_income_results= MCS_age5_income_results %>% add_row(term = "income_quintiles1",  .before=1)
+MCS_age5_income_results[is.na(MCS_age5_income_results)] <- 0
+BCS_age5_income_results= BCS_age5_income_results %>% add_row(term = "income_quintiles1",  .before=1)
+BCS_age5_income_results[is.na(BCS_age5_income_results)] <- 0
+BCS_age5_income_results$term[BCS_age5_income_results$term == "oecd_quintiles1"] <- "income_quintiles1"
+BCS_age5_income_results$term[BCS_age5_income_results$term == "oecd_quintiles2"] <- "income_quintiles2"
+BCS_age5_income_results$term[BCS_age5_income_results$term == "oecd_quintiles3"] <- "income_quintiles3"
+BCS_age5_income_results$term[BCS_age5_income_results$term == "oecd_quintiles4"] <- "income_quintiles4"
+BCS_age5_income_results$term[BCS_age5_income_results$term == "oecd_quintiles5"] <- "income_quintiles5"
+#add cohort
+MCS_age5_income_results = MCS_age5_income_results %>%  mutate(cohort = c("MCS2001"))
+BCS_age5_income_results = BCS_age5_income_results %>%  mutate(cohort = c("BCS1970"))
+#combine cohorts 
+early_childhood_income_plotData = rbind(BCS_age5_income_results, MCS_age5_income_results)
+#pull out coefficient, 95% CIs and cohort for plot
+early_childhood_income_plotData = early_childhood_income_plotData %>% 
+  select(term, estimate,  `2.5 %`, `97.5 %` , cohort)
+
+names(early_childhood_income_plotData) <- c("income_quintiles", "vocabulary", "lower_ci", "upper_ci", "cohort")
+
+#late childhood income data
+#late childhood income data
+#add ref category
+MCS_age11_income_results= MCS_age11_income_results %>% add_row(term = "income_quintiles1",  .before=1)
+MCS_age11_income_results[is.na(MCS_age11_income_results)] <- 0
+BCS_age10_income_results= BCS_age10_income_results %>% add_row(term = "income_quintiles1",  .before=1)
+BCS_age10_income_results[is.na(BCS_age10_income_results)] <- 0
+BCS_age10_income_results$term[BCS_age10_income_results$term == "oecd_quintiles1"] <- "income_quintiles1"
+BCS_age10_income_results$term[BCS_age10_income_results$term == "oecd_quintiles2"] <- "income_quintiles2"
+BCS_age10_income_results$term[BCS_age10_income_results$term == "oecd_quintiles3"] <- "income_quintiles3"
+BCS_age10_income_results$term[BCS_age10_income_results$term == "oecd_quintiles4"] <- "income_quintiles4"
+BCS_age10_income_results$term[BCS_age10_income_results$term == "oecd_quintiles5"] <- "income_quintiles5"
+#add cohort
+MCS_age11_income_results = MCS_age11_income_results %>%  mutate(cohort = c("MCS2001"))
+BCS_age10_income_results = BCS_age10_income_results %>%  mutate(cohort = c("BCS1970"))
+#combine cohorts 
+late_childhood_income_plotData = rbind(BCS_age10_income_results, MCS_age11_income_results)
+#pull out coefficient, 95% CIs and cohort for plot
+late_childhood_income_plotData  = late_childhood_income_plotData  %>% 
+  select(term, estimate,  `2.5 %`, `97.5 %` , cohort)
+
+names(late_childhood_income_plotData) <- c("income_quintiles", "vocabulary", "lower_ci", "upper_ci", "cohort")
+
+#adolescent income data
+MCS_age14_income_results= MCS_age14_income_results %>% add_row(term = "income_quintiles1",  .before=1)
+MCS_age14_income_results[is.na(MCS_age14_income_results)] <- 0
+BCS_age16_income_results= BCS_age16_income_results %>% add_row(term = "income_quintiles1",  .before=1)
+BCS_age16_income_results[is.na(BCS_age16_income_results)] <- 0
+BCS_age16_income_results$term[BCS_age16_income_results$term == "oecd_quintiles1"] <- "income_quintiles1"
+BCS_age16_income_results$term[BCS_age16_income_results$term == "oecd_quintiles2"] <- "income_quintiles2"
+BCS_age16_income_results$term[BCS_age16_income_results$term == "oecd_quintiles3"] <- "income_quintiles3"
+BCS_age16_income_results$term[BCS_age16_income_results$term == "oecd_quintiles4"] <- "income_quintiles4"
+BCS_age16_income_results$term[BCS_age16_income_results$term == "oecd_quintiles5"] <- "income_quintiles5"
+
+#add cohort
+MCS_age14_income_results = MCS_age14_income_results %>%  mutate(cohort = c("MCS2001"))
+BCS_age16_income_results = BCS_age16_income_results %>%  mutate(cohort = c("BCS1970"))
+#combine cohorts 
+adolescent_income_plotData = rbind(BCS_age16_income_results, MCS_age14_income_results)
+
+#pull out coefficient, 95% CIs and cohort for plot
+adolescent_income_plotData = adolescent_income_plotData %>% 
+  select(term, estimate,  `2.5 %`, `97.5 %` , cohort)
+names(adolescent_income_plotData) <- c("income_quintiles", "vocabulary", "lower_ci", "upper_ci", "cohort")
+
+
 ```
 
 create plot of coefficients for language at each age in both cohorts
@@ -536,9 +665,9 @@ education_early_plot <- ggplot(data=early_childhood_education_plotData, aes(x=pa
   geom_point(aes(color=cohort)) +
   scale_color_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001")) +
   scale_fill_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001"))+ 
-  scale_x_discrete(labels=c("highest_household_education1" = "No Qualifications \n (Reference)", 
-                            "highest_household_education2" = "O-levels / \n GCSEs", "highest_household_education3" = "Post-16 \n Qualifications", 
-                            "highest_household_education4" = "University-level \n Qualifications")) +
+  scale_x_discrete(labels=c("highestEd11" = "No Qualifications \n (Reference)", 
+                            "highestEd12" = "O-levels / \n GCSEs", "highestEd13" = "Post-16 \n Qualifications", 
+                            "highestEd14" = "University-level \n Qualifications")) +
   labs( x = "Highest Household Parent Qualification", y = "Vocabulary Score \n (standardised)", size = 7) + ylim(0, 1) +
   theme_classic()+
   theme(axis.text = element_text(size=14, family = "Times", colour = "black"), axis.title = element_text(size=16, family = "Times"))+
@@ -552,9 +681,9 @@ education_late_plot <- ggplot(data=late_childhood_education_plotData, aes(x=pare
   geom_point(aes(color=cohort)) +
   scale_color_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001")) +
   scale_fill_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001"))+
-  scale_x_discrete(labels=c("highest_household_education1" = "No Qualifications \n (Reference)", 
-                            "highest_household_education2" = "O-levels / \n GCSEs", "highest_household_education3" = "Post-16 \n Qualifications", 
-                            "highest_household_education4" = "University-level \n Qualifications")) +
+  scale_x_discrete(labels=c("highestEd11" = "No Qualifications \n (Reference)", 
+                            "highestEd12" = "O-levels / \n GCSEs", "highestEd13" = "Post-16 \n Qualifications", 
+                            "highestEd14" = "University-level \n Qualifications")) +
   labs( x = "Highest Household Parent Qualification", y = "Vocabulary Score \n (standardised)", size = 7) + ylim(0, 1) +
   theme_classic()+
   theme(axis.text = element_text(size=14, family = "Times", colour = "black"), axis.title = element_text(size=16, family = "Times"))+
@@ -568,9 +697,9 @@ education_adolescent_plot <- ggplot(data=adolescent_education_plotData, aes(x=pa
   geom_point(aes(color=cohort)) +
   scale_color_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001")) +
   scale_fill_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001"))+
-  scale_x_discrete(labels=c("highest_household_education1" = "No Qualifications \n (Reference)", 
-                            "highest_household_education2" = "O-levels / \n GCSEs", "highest_household_education3" = "Post-16 \n Qualifications", 
-                            "highest_household_education4" = "University-level \n Qualifications")) +
+  scale_x_discrete(labels=c("highestEd11" = "No Qualifications \n (Reference)", 
+                            "highestEd12" = "O-levels / \n GCSEs", "highestEd13" = "Post-16 \n Qualifications", 
+                            "highestEd14" = "University-level \n Qualifications")) +
   labs( x = "Highest Household Parent Qualification", y = "Vocabulary Score \n (standardised)", size = 7) + ylim(0, 1) +
   theme_classic()+
   theme(axis.text = element_text(size=14, family = "Times", colour = "black"), axis.title = element_text(size=16, family = "Times"))+
@@ -643,13 +772,79 @@ occupation_plots <- ggarrange(occupation_early_plot, occupation_late_plot, occup
                              ncol =1, nrow=3,  align = c( "hv"),
                              common.legend = TRUE, legend = "right") 
 
+
+
+#Income 
+income_early_plot <- ggplot(data=early_childhood_income_plotData, aes(x=income_quintiles, y=vocabulary, group=cohort)) +
+  geom_line(aes(color=cohort)) +
+  geom_ribbon(data=early_childhood_income_plotData,aes(ymin=lower_ci, ymax=upper_ci, fill=cohort),  alpha=0.1 ) + 
+  geom_point(aes(color=cohort)) +
+  scale_color_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001")) +
+  scale_fill_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001"))+ 
+  scale_x_discrete(labels=c("income_quintiles1" = "Quintile 1 \n (Most Deprived) \n (Reference)", 
+                            "income_quintiles2" = "Quintile 2", "income_quintiles3" = "Quintile 3", 
+                            "income_quintiles4" = "Quintile 4", "income_quintiles5" = "Quintile 5 \n (Least Deprived)")) +
+  labs( x = "Income Quintiles", y = "Vocabulary Score \n (standardised)", size = 7) + ylim(0, 1) +
+  theme_classic() +
+  theme (axis.text = element_text(size=14, 
+                                  family = "Times", 
+                                  colour = "black"), 
+         axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=17, family="Times"), legend.title = element_text(size=18, family="Times"))
+
+
+#late childhood income
+
+income_late_plot <- ggplot(data=late_childhood_income_plotData, aes(x=income_quintiles, y=vocabulary, group=cohort)) +
+  geom_line(aes(color=cohort)) +
+  geom_ribbon(data=late_childhood_income_plotData,aes(ymin=lower_ci, ymax=upper_ci, fill=cohort),  alpha=0.1 ) + 
+  geom_point(aes(color=cohort)) +
+  scale_color_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001")) +
+  scale_fill_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001"))+
+  scale_x_discrete(labels=c("income_quintiles1" = "Quintile 1 \n (Most Deprived) \n (Reference)", 
+                            "income_quintiles2" = "Quintile 2", "income_quintiles3" = "Quintile 3", 
+                            "income_quintiles4" = "Quintile 4", "income_quintiles5" = "Quintile 5 \n (Least Deprived)")) +
+  labs( x = "Income Quintiles", y = "Vocabulary Score \n (standardised)", size = 7) + ylim(0, 1) +
+  theme_classic()+
+  theme(axis.text = element_text(size=14, family = "Times", colour = "black"), axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=17, family="Times"), legend.title = element_text(size=18, family="Times"))
+
+#adolescent income 
+
+income_adolescent_plot <- ggplot(data=adolescent_income_plotData, aes(x=income_quintiles, y=vocabulary, group=cohort)) +
+  geom_line(aes(color=cohort)) +
+  geom_ribbon(data=adolescent_income_plotData,aes(ymin=lower_ci, ymax=upper_ci, fill=cohort),  alpha=0.1 ) + 
+  geom_point(aes(color=cohort)) +
+  scale_color_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001")) +
+  scale_fill_manual(name="Cohort", values=c( "#B2ABD2", "#FDB863"), limits=c( "BCS1970", "MCS2001"))+
+  scale_x_discrete(labels=c("income_quintiles1" = "Quintile 1 \n (Most Deprived) \n (Reference)", 
+                            "income_quintiles2" = "Quintile 2", "income_quintiles3" = "Quintile 3", 
+                            "income_quintiles4" = "Quintile 4", "income_quintiles5" = "Quintile 5 \n (Least Deprived)")) +
+  labs( x = "Income Quintiles", y = "Vocabulary Score \n (standardised)", size = 7) + ylim(0, 1) +
+  theme_classic()+
+  ylim(-0.03, 1) +
+  theme(axis.text = element_text(size=14, family = "Times", colour = "black"), axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=17, family="Times"), legend.title = element_text(size=18, family="Times"))
+
+#combine
+
+income_plots <- ggarrange(income_early_plot, income_late_plot, income_adolescent_plot,
+                             labels = c("Early Childhood", "Late Childhood", "Adolescence"), 
+                             #label.x=0, label.y=0,
+                             font.label = list(size = 13, color = "black", face="italic", family="Times"),
+                             hjust= -1,
+                             vjust=1.8,
+                             ncol =1, nrow=3,  align = c( "hv"),
+                             common.legend = TRUE, legend = "right") 
+
+
 #combine education and occupation into one plot 
 
-early_childhood = ggarrange(education_early_plot, occupation_early_plot, 
+early_childhood = ggarrange(education_early_plot, occupation_early_plot, income_early_plot,
                              #labels = c("Early Childhood"), 
                              #hjust = -3, 
                              #font.label = list(size = 7, color = "black", face="bold" ),
-                             ncol =2, nrow=1,  align = c( "hv"),
+                             ncol =3, nrow=1,  align = c( "hv"),
                              common.legend = TRUE, legend = "none") 
 #earlyChildhood = early_childhood + rremove("legend")
 
@@ -658,20 +853,20 @@ early_childhood1 = annotate_figure(early_childhood,
 
 
 
-late_childhood = ggarrange(education_late_plot, occupation_late_plot, 
+late_childhood = ggarrange(education_late_plot, occupation_late_plot, income_late_plot,
                             #labels = c("Early Childhood"), 
                             #hjust = -3, 
                             #font.label = list(size = 7, color = "black", face="bold" ),
-                            ncol =2, nrow=1,  align = c( "hv"),
+                            ncol =3, nrow=1,  align = c( "hv"),
                             common.legend = TRUE, legend = "none")
 late_childhood1= annotate_figure(late_childhood,
                 top = text_grob("Late Childhood", color="black", face="bold", size=18, family="Times"))
 
-adolescence= ggarrange(education_adolescent_plot, occupation_adolescent_plot, 
+adolescence= ggarrange(education_adolescent_plot, occupation_adolescent_plot, income_adolescent_plot,
                            #labels = c("Early Childhood"), 
                            #hjust = -3, 
                            #font.label = list(size = 7, color = "black", face="bold" ),
-                           ncol =2, nrow=1,  align = c( "hv"),
+                           ncol =3, nrow=1,  align = c( "hv"),
                            common.legend = TRUE, legend = "none")
 adolescence1= annotate_figure(adolescence,
                 top = text_grob("Adolescence", color="black", face="bold", size=18, family="Times"))
@@ -683,7 +878,7 @@ combined_plot= ggarrange(early_childhood1, late_childhood1, adolescence1,
           ncol =1, nrow=3,  align = c( "hv"),
           legend.grob = get_legend(education_early_plot), legend="right")
 
-ggsave("cross-cohort.png", combined_plot, width=14.8, height=16.3, units= "in" ,dpi=300)
+ggsave("cross-cohort.jpeg", combined_plot, width=18, height=15, units= "in" ,dpi=300)
 #add title and footnote information to bottom of plot. this will be Fig. 3. 
 #p =combined_plot + labs(title = "Fig. 3: Cross-cohort relatonships between SEC and language ability") +
   # theme(plot.title = element_text(face="bold", size=15, family ="Times", vjust = 10))
@@ -721,8 +916,22 @@ mcsearly_occupationPartial = mcsearly_occupationPartial %>%  add_column(indicato
 mcsearly_occupationPartial = mcsearly_occupationPartial %>%  add_column(cohort= c("MCS2001 \n Highest Household \n Occupation"), .before =2 )
 names(mcsearly_occupationPartial) = c("cohort", "indicator", "r2")
 
+#income
+mcsearly_incomePartial =as.data.frame(mcs_age5_income_partial[,1])
+mcsearly_incomePartial = mcsearly_incomePartial %>%  add_column(indicator= c("MCS2001 \n Income Quintiles"), .before =1 )
+mcsearly_incomePartial = mcsearly_incomePartial %>%  add_column(cohort= c("MCS2001 \n Income Quintiles"), .before =2 )
+names(mcsearly_incomePartial) = c("cohort", "indicator", "r2")
+
+bcsearly_incomePartial =as.data.frame(bcs_age5_income_partial[,1])
+bcsearly_incomePartial = bcsearly_incomePartial %>%  add_column(indicator= c("BCS1970 \n Income Quintiles"), .before =1 )
+bcsearly_incomePartial = bcsearly_incomePartial %>%  add_column(cohort= c("BCS1970 \n Income Quintiles"), .before =2 )
+names(bcsearly_incomePartial) = c("cohort", "indicator", "r2")
+
+
+
 earlyLang_Partial = rbind(bcsearly_educationPartial, bcsearly_occupationPartial, 
-                          mcsearly_educationPartial, mcsearly_occupationPartial)
+                          bcsearly_incomePartial, mcsearly_educationPartial, 
+                          mcsearly_occupationPartial, mcsearly_incomePartial)
 earlyLang_Partial = earlyLang_Partial %>%  mutate(vocab = c("Early Childhood"), .before = 1)
 
 #late language
@@ -749,8 +958,21 @@ mcslate_occupationPartial = mcslate_occupationPartial %>%  add_column(indicator=
 mcslate_occupationPartial = mcslate_occupationPartial %>%  add_column(cohort= c("MCS2001 \n Highest Household \n Occupation"), .before =2 )
 names(mcslate_occupationPartial) = c("cohort", "indicator", "r2")
 
+#income
+mcslate_incomePartial =as.data.frame(mcs_age11_income_partial[,1])
+mcslate_incomePartial = mcslate_incomePartial %>%  add_column(indicator= c("MCS2001 \n Income Quintiles"), .before =1 )
+mcslate_incomePartial = mcslate_incomePartial %>%  add_column(cohort= c("MCS2001 \n Income Quintiles"), .before =2 )
+names(mcslate_incomePartial) = c("cohort", "indicator", "r2")
+
+bcslate_incomePartial =as.data.frame(bcs_age10_income_partial[,1])
+bcslate_incomePartial = bcslate_incomePartial %>%  add_column(indicator= c("BCS1970 \n Income Quintiles"), .before =1 )
+bcslate_incomePartial = bcslate_incomePartial %>%  add_column(cohort= c("BCS1970 \n Income Quintiles"), .before =2 )
+names(bcslate_incomePartial) = c("cohort", "indicator", "r2")
+
+
 lateLang_Partial = rbind(bcslate_educationPartial,bcslate_occupationPartial,
-                         mcslate_educationPartial, mcslate_occupationPartial)
+                         bcslate_incomePartial, mcslate_educationPartial,
+                         mcslate_occupationPartial, mcslate_incomePartial)
 lateLang_Partial = lateLang_Partial %>%  mutate(vocab = c("Late Childhood"), .before = 1)
 
 
@@ -778,8 +1000,21 @@ mcsadolescent_occupationPartial = mcsadolescent_occupationPartial %>%  add_colum
 mcsadolescent_occupationPartial = mcsadolescent_occupationPartial %>%  add_column(cohort= c("MCS2001 \n Highest Household \n Occupation"), .before =2 )
 names(mcsadolescent_occupationPartial) = c("cohort", "indicator", "r2")
 
+#income
+mcsadolescent_incomePartial =as.data.frame(mcs_age14_income_partial[,1])
+mcsadolescent_incomePartial = mcsadolescent_incomePartial %>%  add_column(indicator= c("MCS2001 \n Income Quintiles"), .before =1 )
+mcsadolescent_incomePartial = mcsadolescent_incomePartial %>%  add_column(cohort= c("MCS2001 \n Income Quintiles"), .before =2 )
+names(mcsadolescent_incomePartial) = c("cohort", "indicator", "r2")
+
+bcsadolescent_incomePartial =as.data.frame(bcs_age16_income_partial[,1])
+bcsadolescent_incomePartial = bcsadolescent_incomePartial %>%  add_column(indicator= c("BCS1970 \n Income Quintiles"), .before =1 )
+bcsadolescent_incomePartial = bcsadolescent_incomePartial %>%  add_column(cohort= c("BCS1970 \n Income Quintiles"), .before =2 )
+names(bcsadolescent_incomePartial) = c("cohort", "indicator", "r2")
+
+
 adolescentLang_Partial = rbind(bcsadolescent_educationPartial,bcsadolescent_occupationPartial,
-                               mcsadolescent_educationPartial, mcsadolescent_occupationPartial)
+                         bcsadolescent_incomePartial, mcsadolescent_educationPartial,
+                         mcsadolescent_occupationPartial, mcsadolescent_incomePartial)
 adolescentLang_Partial = adolescentLang_Partial %>%  mutate(vocab = c("Adolescence"), .before = 1)
 
 
@@ -799,15 +1034,29 @@ r2_plot1 <- partialr2_data %>%
   ggplot() +
   geom_point(mapping=aes(x=vocab, y=r2,  group= cohort, color=cohort, fill=cohort, shape = indicator), 
              size=5, position = position_dodge(width=0.5)) +
-  scale_color_manual(name="Cohort and Indicator", values=c( "#B2ABD2","#B2ABD2", "#FDB863", "#FDB863"), 
-                     limits=c( "BCS1970 \n Highest Household \n Education", "BCS1970 \n Highest Household \n Occupation",
-                               "MCS2001 \n Highest Household \n Education", "MCS2001 \n Highest Household \n Occupation")) +
-  scale_fill_manual(name="Cohort and Indicator", values=c( "#B2ABD2","#B2ABD2", "#FDB863", "#FDB863"), 
-                    limits=c("BCS1970 \n Highest Household \n Education", "BCS1970 \n Highest Household \n Occupation",
-                             "MCS2001 \n Highest Household \n Education", "MCS2001 \n Highest Household \n Occupation")) +
-scale_shape_manual(name= "Cohort and Indicator", values =c(15, 16, 15,  16), 
-                    limits = c ("BCS1970 \n Highest Household \n Education", "BCS1970 \n Highest Household \n Occupation",
-                                "MCS2001 \n Highest Household \n Education", "MCS2001 \n Highest Household \n Occupation")) +
+  scale_color_manual(name="Cohort and Indicator", values=c( "#B2ABD2","#B2ABD2","#B2ABD2", 
+                                                            "#FDB863","#FDB863", "#FDB863"), 
+                     limits=c( "BCS1970 \n Highest Household \n Education", 
+                               "BCS1970 \n Highest Household \n Occupation",
+                               "BCS1970 \n Income Quintiles",
+                               "MCS2001 \n Highest Household \n Education", 
+                               "MCS2001 \n Highest Household \n Occupation", 
+                              "MCS2001 \n Income Quintiles" )) +
+  scale_fill_manual(name="Cohort and Indicator", values=c( "#B2ABD2","#B2ABD2","#B2ABD2", 
+                                                           "#FDB863", "#FDB863","#FDB863"), 
+                    limits=c("BCS1970 \n Highest Household \n Education", 
+                               "BCS1970 \n Highest Household \n Occupation",
+                               "BCS1970 \n Income Quintiles",
+                               "MCS2001 \n Highest Household \n Education", 
+                               "MCS2001 \n Highest Household \n Occupation", 
+                              "MCS2001 \n Income Quintiles")) +
+scale_shape_manual(name= "Cohort and Indicator", values =c(15, 16, 17,  16, 15, 17), 
+                    limits = c ("BCS1970 \n Highest Household \n Education", 
+                               "BCS1970 \n Highest Household \n Occupation",
+                               "BCS1970 \n Income Quintiles",
+                               "MCS2001 \n Highest Household \n Education", 
+                               "MCS2001 \n Highest Household \n Occupation", 
+                              "MCS2001 \n Income Quintiles")) +
   theme_classic2()+
   xlab(label="\n Vocabulary") +
   ylab(label="Partial R squared (%)") +
