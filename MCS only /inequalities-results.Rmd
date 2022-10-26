@@ -53,7 +53,7 @@ here we have the datasets for each age sensitivity and wealth sensitivity - load
 ```{r}
 
 #main analysis
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/final datasets/2021-03-03_mcs_ses_imputedRQ1.Rdata")
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-26_mcs_ses_imputedRQ1/2022-10-26_mcs_ses_imputedRQ1.Rdata")
 imputed_mcs2=mi.res
 
 #complete cases age 3
@@ -1635,11 +1635,11 @@ age5_no_income<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +
 age5_no_wealth<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
 age5_no_occupation<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
 age5_no_imd<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
-D1(age5_all_predictors, age5_no_nvq ,method = "wald")
-D1(age5_all_predictors, age5_no_income ,method = "wald")
-D1(age5_all_predictors, age5_no_wealth ,method = "wald")
-D1(age5_all_predictors, age5_no_occupation ,method = "wald")
-D1(age5_all_predictors, age5_no_imd ,method = "wald")
+D1(age5_all_predictors, age5_no_nvq )
+D1(age5_all_predictors, age5_no_income )
+D1(age5_all_predictors, age5_no_wealth)
+D1(age5_all_predictors, age5_no_occupation )
+D1(age5_all_predictors, age5_no_imd) 
 
 #age 11
 #model with all SES predictors included 
@@ -1650,11 +1650,11 @@ age11_no_income<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity
 age11_no_wealth<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
 age11_no_occupation<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
 age11_no_imd<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
-D1(age11_all_predictors, age11_no_nvq ,method = "wald")
-D1(age11_all_predictors, age11_no_income ,method = "wald")
-D1(age11_all_predictors, age11_no_wealth ,method = "wald")
-D1(age11_all_predictors, age11_no_occupation ,method = "wald")
-D1(age11_all_predictors, age11_no_imd ,method = "wald")
+D1(age11_all_predictors, age11_no_nvq )
+D1(age11_all_predictors, age11_no_income )
+D1(age11_all_predictors, age11_no_wealth)
+D1(age11_all_predictors, age11_no_occupation)
+D1(age11_all_predictors, age11_no_imd )
 
 #age 14
 #model with all SES predictors included 
@@ -1665,11 +1665,11 @@ age14_no_income<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity
 age14_no_wealth<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
 age14_no_occupation<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
 age14_no_imd<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
-D1(age14_all_predictors, age14_no_nvq ,method = "wald")
-D1(age14_all_predictors, age14_no_income ,method = "wald")
-D1(age14_all_predictors, age14_no_wealth ,method = "wald")
-D1(age14_all_predictors, age14_no_occupation ,method = "wald")
-D1(age14_all_predictors, age14_no_imd ,method = "wald")
+D1(age14_all_predictors, age14_no_nvq )
+D1(age14_all_predictors, age14_no_income )
+D1(age14_all_predictors, age14_no_wealth)
+D1(age14_all_predictors, age14_no_occupation )
+D1(age14_all_predictors, age14_no_imd)
 
 ```
 
