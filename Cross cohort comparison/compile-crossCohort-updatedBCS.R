@@ -553,7 +553,7 @@ accommodation_age5 = f699b %>% select(bcsid, e218) %>%
 accommodation = accommodation_age5 %>% full_join(accommodation_birth) %>% 
   select(bcsid, accommodation_age5, accommodation_birth) %>% 
   mutate(accommodation = case_when(!is.na(accommodation_age5) ~ accommodation_age5,
-                                   is.na(accommodation_age5) ~ accommodation_birth))
+                                   is.na(accommodation_age5) ~ accommodation_birth)) 
 
 
 
