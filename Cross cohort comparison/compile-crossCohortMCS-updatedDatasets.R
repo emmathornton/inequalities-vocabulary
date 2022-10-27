@@ -386,15 +386,15 @@ age11income_wide = age11_income %>%
   select(mcsid, annual_income) %>% 
   inner_join(age11_equivalence) %>% 
   mutate(oecd_adjusted = annual_income/total_equivalenceage11) %>%  #divide income by the total_equivalence to give equivalised income 
-  mutate(oecd_quintilesAge11 = quantcut(oecd_adjusted,5)) %>% 
-  select(mcsid, oecd_quintilesAge11) %>% 
+  mutate(income_quintiles = quantcut(oecd_adjusted,5)) %>% 
+  select(mcsid, income_quintiles) %>% 
   distinct(mcsid, .keep_all =  TRUE)
 
-levels(age11income_wide$oecd_quintilesAge11)[1] = "1"
-levels(age11income_wide$oecd_quintilesAge11)[2] = "2"
-levels(age11income_wide$oecd_quintilesAge11)[3] = "3"
-levels(age11income_wide$oecd_quintilesAge11)[4] = "4"
-levels(age11income_wide$oecd_quintilesAge11)[5] = "5"
+levels(age11income_wide$income_quintiles)[1] = "1"
+levels(age11income_wide$income_quintiles)[2] = "2"
+levels(age11income_wide$income_quintiles)[3] = "3"
+levels(age11income_wide$income_quintiles)[4] = "4"
+levels(age11income_wide$income_quintiles)[5] = "5"
 
 
 # 3. Parent Education ####
