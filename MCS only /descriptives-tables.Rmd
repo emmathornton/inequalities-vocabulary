@@ -1352,7 +1352,15 @@ names(new_descriptives_age14) <- c( "Indicator", "Age14")
 
 lang_descriptives1 = data.frame(new_descriptives_age3, new_descriptives_age5, new_descriptives_age11, new_descriptives_age14)
 language_descriptives = lang_descriptives1 %>% 
-  select(Indicator, Age3, Age5, Age11, Age14)
+  select(Indicator, Age3, Age5, Age11, Age14) %>% 
+  add_row(Indicator = "Parent Education", .before = 1) %>%  #add in rows to divide table up 
+  add_row(Indicator = "Income", .before = 8) %>% 
+  add_row(Indicator = "Wealth", .before = 14) %>% 
+  add_row(Indicator = "Occupational Status", .before = 20) %>% 
+  add_row(Indicator = "Relative Neighbourhood Deprivation", .before = 25)
+language_descriptives [is.na(language_descriptives )] <- " "
+
+
 
 ```
 
@@ -1380,7 +1388,7 @@ language_sesDescriptives <- language_descriptives %>%
   set_header_labels(`Indicator`= "SEC Indicator", `Age3` = "Age 3 Vocabulary", 
                     `Age5` = "Age 5 Vocabulary", `Age11` = "Age 11 Vocabulary", 
                     `Age14` = "Age 14 Vocabulary") %>% 
-  #add_header_row(values = c(" ", "Proportion (%) or \n Mean(±SD) [95% CIs]" ), colwidths = c(2,5)) %>% 
+  add_header_row(values = c(" ", "Proportion (%) or Mean(±SD) [95% CIs]" ), colwidths = c(1,4)) %>% 
   font(fontname = "Times New Roman", part="header") %>% 
   align(align="center", part="header") %>% 
   hline_top(j = 2:5, part = "all", border = my_border)  %>% 
