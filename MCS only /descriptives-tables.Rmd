@@ -1402,7 +1402,7 @@ language_sesDescriptives <- language_descriptives %>%
   italic(part = "header", italic = TRUE)
   
 
- print(full_descriptives, preview = "docx") 
+ print(language_sesDescriptives, preview = "docx") 
 
 
 
