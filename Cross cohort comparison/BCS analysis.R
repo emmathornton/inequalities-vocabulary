@@ -37,7 +37,7 @@ predM = init$predictorMatrix
 meth[c("bcsid")]=""
 meth[c("weight")]=""
 #Now let specify the methods for imputing the missing values. 
-#There are specific methods for continues, binary and ordinal variables. 
+#There are specific methods for continuous, binary and ordinal variables. 
 #I set different methods for each variable. You can add more than one variable in each methods.
 
 
@@ -62,7 +62,7 @@ meth[c("ethnicity")]="logreg"
 meth[c("age_atBirth")]="cart"
 meth[c("highestEd1")]="polyreg"
 meth[c("oecd_quintiles")]="polyreg"
-meth[c("highest_occupation")]="polr"
+meth[c("highest_occupation")]="polyreg"
 meth[c("accommodation_type")]="polyreg"
 meth[c("age5_vocab")]="cart" 
 meth[c("age10_vocab")]="cart" 
@@ -71,7 +71,7 @@ meth[c("b16vocab_harmonised")]="cart"
 meth[c("cm_age5")]="cart" 
 meth[c("cm_age10")]="cart" 
 meth[c("cm_age16")]="cart" 
-
+#meth[c("weight")]="cart" 
 #now lets run the imputation (m=20) imputations
 
 blocksvec=names(meth)
