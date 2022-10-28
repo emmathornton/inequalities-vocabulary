@@ -1,0 +1,625 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+Libraries and custom functions 
+
+```{r}
+
+library(mice)
+library(pander)
+library(xtable)
+library(dplyr)
+library(gt)
+library(glue)
+library(miceadds)
+library(swfscMisc)
+library(imputools)
+library(haven)
+library(sjmisc)
+library(Hmisc)
+library(psych)
+library(lavaan)
+library(ggplot2)
+library(ggpubr)
+library(officer)
+library(flextable)
+library(ftExtra) 
+library(dummies)
+library(tidyverse)
+library(DescTools)
+
+weighted_descriptives_imputed_datasets<- function (dataAll,variable) {
+  variable=deparse(substitute(variable))
+  imputed_datasets <- unique(dataAll$.imp)
+  results <- data.frame(
+    Mean = as.numeric(rep(0, length(imputed_datasets))),
+    SD = as.numeric(rep(0, length(imputed_datasets))),
+    lower=as.numeric(rep(0, length(imputed_datasets))),
+    upper=as.numeric(rep(0, length(imputed_datasets))))
+  results$Imputed <-  imputed_datasets
+  for (i in 1:length(imputed_datasets)) {
+    data <- dataAll[dataAll$.imp == imputed_datasets[i], ]
+    results[i, "Mean"] <- get_weighted_descriptives(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[1]
+    results[i, "SD"] <- get_weighted_descriptives(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[2]
+    results[i, "lower"] <- get_weighted_descriptives(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[3]
+    results[i, "upper"] <- get_weighted_descriptives(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[4]
+  }
+  return (results)
+}
+
+
+weighted_proportions_imputed_datasets<- function (dataAll,variable) {
+  variable=deparse(substitute(variable))
+  imputed_datasets <- unique(dataAll$.imp)
+  results <- data.frame(
+    Level1 = as.numeric(rep(0, length(imputed_datasets))),
+    Level2 = as.numeric(rep(0, length(imputed_datasets))),
+    Level3=as.numeric(rep(0, length(imputed_datasets))),
+    Level4=as.numeric(rep(0, length(imputed_datasets))),
+    Level5=as.numeric(rep(0, length(imputed_datasets))),
+    Level6=as.numeric(rep(0, length(imputed_datasets))),
+    Level7=as.numeric(rep(0, length(imputed_datasets))),
+    Level8=as.numeric(rep(0, length(imputed_datasets))),
+    Level9=as.numeric(rep(0, length(imputed_datasets))),
+    Level10=as.numeric(rep(0, length(imputed_datasets))))
+  results$Imputed <-  imputed_datasets
+  for (i in 1:length(imputed_datasets)) {
+    data <- dataAll[dataAll$.imp == imputed_datasets[i], ]
+    results[i, "Level1"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[1]
+    results[i, "Level2"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[2]
+    results[i, "Level3"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[3]
+    results[i, "Level4"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[4]
+    results[i, "Level5"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[5]
+    results[i, "Level6"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[6]
+    results[i, "Level7"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[7]
+    results[i, "Level8"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[8]
+    results[i, "Level9"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[9]
+    results[i, "Level10"] <- get_weighted_proportions(eval(parse(text = paste("data",variable,sep="$"))), weights = data$weight)[10]
+    
+  }
+  return (results)
+}
+
+```
+
+Load in Data 
+
+```{r}
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-27_mcs_ses_crossCohort/2022-10-27_mcs_ses_crossCohort.Rdata")
+mcs_imputation = mi.res
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-28_bcs_ses_cross_cohort/2022-10-28_bcs_ses_cross_cohort.Rdata")
+bcs_imputation = mi.res
+
+
+```
+
+
+Get descriptives
+```{r}
+#Need long datasets without original data for imputed descriptives functions 
+#Rename MCS weight so that the functions will run
+mcs_long = mice::complete(mcs_imputation, "long", include=FALSE)
+mcs_long$weight = mcs_long$weight2
+
+bcs_long = mice::complete(bcs_imputation, "long", include=FALSE)
+
+#bcs analysis data ####
+
+#Vocabulary ####
+age5_vocabBCS = weighted_descriptives_imputed_datasets(bcs_long, age5_vocab)
+age10_vocabBCS = weighted_descriptives_imputed_datasets(bcs_long, age10_vocab)
+age16_vocabBCS = weighted_descriptives_imputed_datasets(bcs_long, age16_vocab)
+
+
+combined_vocab_age5DescriptivesBCS = round(combine_imputed_descriptives(age5_vocabBCS),2) %>% 
+  select(!Imputed) %>% 
+  slice_head(n=1) 
+
+combined_vocab_age10DescriptivesBCS = round(combine_imputed_descriptives(age10_vocabBCS),2) %>% 
+  select(!Imputed) %>% 
+  slice_head(n=1) 
+
+combined_vocab_age16DescriptivesBCS = round(combine_imputed_descriptives(age16_vocabBCS),2) %>% 
+  select(!Imputed) %>% 
+  slice_head(n=1) 
+
+
+#proportions
+
+sexProportionsBCS = weighted_proportions_imputed_datasets(bcs_long, sex) %>% 
+  select(Level1:Level2) 
+ethnicityProportionsBCS = weighted_proportions_imputed_datasets(bcs_long, ethnicity) %>% 
+  select(Level1:Level2) 
+ealProportionsBCS = weighted_proportions_imputed_datasets(bcs_long, EAL) %>% 
+  select(Level1:Level2) 
+educationProportionsBCS = weighted_proportions_imputed_datasets(bcs_long, highestEd1) %>% 
+  select(Level1:Level4) 
+incomeProportionsBCS = weighted_proportions_imputed_datasets(bcs_long, oecd_quintiles) %>% 
+  select(Level1:Level5) 
+occupationProportionsBCS = weighted_proportions_imputed_datasets(bcs_long, occupational_status) %>% 
+  select(Level1:Level5) 
+
+
+sexCombinedBCS = round(combine_imputed_descriptives(sexProportionsBCS)*100, 2) %>% 
+  slice_head(n=1) %>% 
+  rename("Sex (Male)" = Level1,
+         "Sex (Female)" = Level2) 
+sexCombinedBCS = as.data.frame(t(sexCombinedBCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+ethnicityCombinedBCS = round(combine_imputed_descriptives(ethnicityProportionsBCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename( "Ethnicity \n (White)" = Level1, 
+          "Ethnicity \n (Minority)" = Level2)
+ethnicityCombinedBCS = as.data.frame(t(ethnicityCombinedBCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+ealCombinedBCS = round(combine_imputed_descriptives(ealProportionsBCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("EAL \n (English only)" = Level1, 
+         "EAL \n (EAL)" = Level2)
+ealCombinedBCS = as.data.frame(t(ealCombinedBCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+educationCombinedBCS = round(combine_imputed_descriptives(educationProportionsBCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("Parent education \n (no/low level)" = Level1, 
+         "Parent Education \n (O-levels/GCSEs grades A*-C)"= Level2, 
+         "Parent Education \n (post-16 quals)" = Level3,
+         "Parent Education \n (university level quals)" = Level4)
+educationCombinedBCS = as.data.frame(t(educationCombinedBCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+incomeCombinedBCS = round(combine_imputed_descriptives(incomeProportionsBCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("Income Quintile 1" = Level1, 
+         "Income Quintile 2" = Level2, 
+         "Income Quintile 3" = Level3, 
+         "Income Quintile 4" = Level4 , 
+         "Income Quintile 5" = Level5)
+incomeCombined = as.data.frame(t(incomeCombinedBCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+occupationCombinedBCS = round(combine_imputed_descriptives(occupationProportionsBCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("Occupational Status \n (routine)" = Level1, 
+         "Occupational Status \n (intermediate)" = Level2,
+         "Occupational Status \n (higher managerial)" = Level3,
+         "Occupational Status \n (unemployed)" = Level4)
+occupationCombinedBCS = as.data.frame(t(occupationCombinedBCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+
+BCSdescriptivesTable = rbind(combined_vocab_age5DescriptivesBCS,
+                          combined_vocab_age10DescriptivesBCS, combined_vocab_age5DescriptivesBCS,
+                          sexCombinedBCS, ethnicityCombinedBCS, ealCombinedBCS, 
+                          educationCombinedBCS, incomeCombinedBCS,  occupationCombinedBCS) %>% 
+  add_row(Variable = "Vocabulary", .before = 1) %>%  #add in rows to divide table up 
+  add_row(Variable = "Demographics", .before = 4) %>% #needs fixing
+  add_row(Variable = "Socioeconomic Circumstances", .before = 12)
+BCSdescriptivesTable [is.na(BCSdescriptivesTable )] <- " "
+
+#mcs analysis data  ####
+
+#Vocabulary ####
+age5_vocabMCS = weighted_descriptives_imputed_datasets(mcs_long, age5_vocab)
+age11_vocabMCS = weighted_descriptives_imputed_datasets(mcs_long, age11_vocab)
+age14_vocabMCS = weighted_descriptives_imputed_datasets(mcs_long, age14_vocab)
+
+
+combined_vocab_age5DescriptivesMCS = round(combine_imputed_descriptives(age5_vocabMCS),2) %>% 
+  select(!Imputed) %>% 
+  slice_head(n=1) 
+
+combined_vocab_age11DescriptivesMCS = round(combine_imputed_descriptives(age11_vocabMCS),2) %>% 
+  select(!Imputed) %>% 
+  slice_head(n=1) 
+
+combined_vocab_age14DescriptivesMCS = round(combine_imputed_descriptives(age14_vocabMCS),2) %>% 
+  select(!Imputed) %>% 
+  slice_head(n=1) 
+
+#proportions
+
+sexProportionsMCS = weighted_proportions_imputed_datasets(mcs_long, sex) %>% 
+  select(Level1:Level2) 
+ethnicityProportionsMCS = weighted_proportions_imputed_datasets(mcs_long, ethnicity) %>% 
+  select(Level1:Level2) 
+ealProportionsMCS = weighted_proportions_imputed_datasets(mcs_long, EAL) %>% 
+  select(Level1:Level2) 
+educationProportionsMCS = weighted_proportions_imputed_datasets(mcs_long, highested1) %>% 
+  select(Level1:Level4) 
+incomeProportionsMCS = weighted_proportions_imputed_datasets(mcs_long, income_quintiles) %>% 
+  select(Level1:Level5) 
+occupationProportionsMCS = weighted_proportions_imputed_datasets(mcs_long, occupational_status) %>% 
+  select(Level1:Level4) 
+
+
+sexCombinedMCS = round(combine_imputed_descriptives(sexProportionsMCS)*100, 2) %>% 
+  slice_head(n=1) %>% 
+  rename("Sex (Male)" = Level1,
+         "Sex (Female)" = Level2) 
+sexCombinedMCS = as.data.frame(t(sexCombinedMCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+ethnicityCombinedMCS = round(combine_imputed_descriptives(ethnicityProportionsMCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename( "Ethnicity \n (White)" = Level1, 
+          "Ethnicity \n (Minority)" = Level2)
+ethnicityCombinedMCS = as.data.frame(t(ethnicityCombinedMCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+ealCombinedMCS = round(combine_imputed_descriptives(ealProportionsMCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("EAL \n (English only)" = Level1, 
+         "EAL \n (EAL)" = Level2)
+ealCombinedMCS = as.data.frame(t(ealCombinedMCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+educationCombinedMCS = round(combine_imputed_descriptives(educationProportionsMCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("Parent education \n (no/low level)" = Level1, 
+         "Parent Education \n (O-levels/GCSEs grades A*-C)"= Level2, 
+         "Parent Education \n (post-16 quals)" = Level3,
+         "Parent Education \n (university level quals)" = Level4)
+educationCombinedMCS = as.data.frame(t(educationCombinedMCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+incomeCombinedMCS = round(combine_imputed_descriptives(incomeProportionsMCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("Income Quintile 1" = Level1, 
+         "Income Quintile 2" = Level2, 
+         "Income Quintile 3" = Level3, 
+         "Income Quintile 4" = Level4 , 
+         "Income Quintile 5" = Level5)
+incomeCombined = as.data.frame(t(incomeCombinedMCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+occupationCombinedMCS = round(combine_imputed_descriptives(occupationProportionsMCS)*100,2)%>% 
+  slice_head(n=1) %>% 
+  rename("Occupational Status \n (routine)" = Level1, 
+         "Occupational Status \n (intermediate)" = Level2,
+         "Occupational Status \n (higher managerial)" = Level3,
+         "Occupational Status \n (unemployed)" = Level4)
+occupationCombinedMCS = as.data.frame(t(occupationCombinedMCS)) %>% 
+  rownames_to_column() %>% 
+  rename("Variable" = rowname,
+         "Proportion (%) or \n Mean(±SD) [95% CIs]" = V1) 
+
+
+MCSdescriptivesTable = rbind(vocabulary_age5DescriptivesMCS,
+                          vocabulary_age11DescriptivesMCS, vocabulary_age14DescriptivesMCS,
+                          sexCombinedMCS, ethnicityCombinedMCS, ealCombinedMCS, 
+                          educationCombinedMCS, incomeCombinedMCS,  occupationCombinedMCS) %>% 
+  add_row(Variable = "Vocabulary", .before = 1) %>%  #add in rows to divide table up 
+  add_row(Variable = "Demographics", .before = 4) %>% 
+  add_row(Variable = "Socioeconomic Circumstances", .before = 12)
+MCSdescriptivesTable [is.na(MCSdescriptivesTable )] <- " "
+
+
+
+```
+
+Whole Cohort Descriptives 
+
+```{r}
+
+#read in full cohort data
+#MCS ####
+
+mcs_cohort<-read.csv("mcs_ses_comparison_data.csv")
+mcs_cohort[,1]<- NULL
+#redorder nvq and occupational status variables 
+
+#get weighted proportions - need to remove NA values 
+#sex
+MCScohort_sex = round(get_weighted_proportions(mcs_cohort[!is.na(mcs_cohort$sex),]$sex,
+                                            mcs_cohort[!is.na(mcs_cohort$sex),]$weight2)*100, 2)
+MCScohort_sex = as_tibble(MCScohort_sex) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = value) %>% 
+  add_column(Variable = c("Sex (Male)", "Sex (Female)"), .before = 1) 
+
+#ethnicity
+MCScohort_ethnicity = round(get_weighted_proportions(mcs_cohort[!is.na(mcs_cohort$ethnicity),]$ethnicity,
+                                                  mcs_cohort[!is.na(mcs_cohort$ethnicity),]$weight2)*100,2)
+MCScohort_ethnicity = as_tibble(MCScohort_ethnicity) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = value) %>% 
+  add_column(Variable = c("Ethnicity \n (White)",
+                          "Ethnicity \n (Minority)"), .before = 1)
+#EAL
+MCScohort_eal = round(get_weighted_proportions(mcs_cohort[!is.na(mcs_cohort$EAL),]$EAL,
+                                            mcs_cohort[!is.na(mcs_cohort$EAL),]$weight2)*100,2)
+MCScohort_eal = as_tibble(MCScohort_eal) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = value) %>% 
+  add_column(Variable = c("EAL \n (English only)", 
+                          "EAL \n (EAL)"), .before = 1)
+
+#NVQ
+mcs_cohort$highest_nvq = as.factor(mcs_cohort$highested1)
+MCScohort_nvq = round(get_weighted_proportions(mcs_cohort[!is.na(mcs_cohort$highested1),]$highested1,
+                                            mcs_cohort[!is.na(mcs_cohort$highested1),]$weight2)*100,2)
+MCScohort_nvq =  as_tibble(MCScohort_nvq) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = value) %>% 
+  add_column(Variable = c("Parent Education \n (no/low level)",
+                          "Parent Education \n (O-levels/GCSEs grades A*-C)",
+                          "Parent Education \n (post-16 quals)",
+                          "Parent Education \n (university level quals)"), .before = 1)
+#income
+MCScohort_income = round(get_weighted_proportions(mcs_cohort[!is.na(mcs_cohort$income_quintiles),]$income_quintiles,
+                                               mcs_cohort[!is.na(mcs_cohort$income_quintiles),]$weight2)*100,2)
+MCScohort_income =  as_tibble(MCScohort_income) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = value) %>% 
+  add_column(Variable = c("Income Quintile 1",
+                          "Income Quintile 2", 
+                          "Income Quintile 3", 
+                          "Income Quintile 4", 
+                          "Income Quintile 5"), .before = 1)
+#occupational status
+mcs_cohort$occupational_status = as.factor(mcs_cohort$occupational_status)
+MCScohort_occupation = round(get_weighted_proportions(mcs_cohort[!is.na(mcs_cohort$occupational_status),]$occupational_status,
+                                                   mcs_cohort[!is.na(mcs_cohort$occupational_status),]$weight2)*100,2)
+MCScohort_occupation =  as_tibble(MCScohort_occupation) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = value) %>% 
+  add_column(Variable = c("Occupational Status \n (routine)", #check ordering of this
+                          "Occupational Status \n (intermediate)",
+                          "Occupational Status \n (higher managerial)",
+                          "Occupational Status \n (unemployed)"), .before = 1)
+
+#means and SDs
+#vocabulary
+
+#Age 5  
+MCScohort_vocabAge5 = round(get_weighted_descriptives(mcs_cohort[!is.na(mcs_cohort$age5_vocab),]$age5_vocab,
+                                                   mcs_cohort[!is.na(mcs_cohort$age5_vocab),]$weight2),2)
+MCScohort_vocabAge5 = as.data.frame(t(MCScohort_vocabAge5)) %>% 
+  rename("mean" = V1, 
+         "sd" = V2, 
+         "lower" = V3, 
+         "upper" = V4) 
+MCScohort_vocabAge5 = MCScohort_vocabAge5 %>% add_column(paste0(MCScohort_vocabAge5$mean,"(±",MCScohort_vocabAge5$sd,")", 
+                                                          "\n", "[", MCScohort_vocabAge5$lower, ";", MCScohort_vocabAge5$upper,"]")) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = `paste0(...)`) %>% 
+  select(`Proportion (%) or \n Mean(±SD) [95% CIs]`) %>% 
+  add_column(Variable = c("Cohort Member Vocabulary \n Age 5 (Naming Vocabulary Score)"), .before = 1)
+
+#Age 11 
+MCScohort_vocabAge11 = round(get_weighted_descriptives(mcs_cohort[!is.na(mcs_cohort$age11_vocab),]$age11_vocab,
+                                                    mcs_cohort[!is.na(mcs_cohort$age11_vocab),]$weight2),2)
+MCScohort_vocabAge11 = as.data.frame(t(MCScohort_vocabAge11)) %>% 
+  rename("mean" = V1, 
+         "sd" = V2, 
+         "lower" = V3, 
+         "upper" = V4) 
+MCScohort_vocabAge11 = MCScohort_vocabAge11 %>% add_column(paste0(MCScohort_vocabAge11$mean,"(±",MCScohort_vocabAge11$sd,")", 
+                                                            "\n", "[", MCScohort_vocabAge11$lower, ";", MCScohort_vocabAge11$upper,"]")) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = `paste0(...)`) %>% 
+  select(`Proportion (%) or \n Mean(±SD) [95% CIs]`) %>% 
+  add_column(Variable = c("Cohort Member Vocabulary \n Age 11 (Word Similarities Score)"), .before = 1)
+
+#Age 14
+MCScohort_vocabAge14 = round(get_weighted_descriptives(mcs_cohort[!is.na(mcs_cohort$age14_vocab),]$age14_vocab,
+                                                    mcs_cohort[!is.na(mcs_cohort$age14_vocab),]$weight2),2)
+MCScohort_vocabAge14 = as.data.frame(t(MCScohort_vocabAge14)) %>% 
+  rename("mean" = V1, 
+         "sd" = V2, 
+         "lower" = V3, 
+         "upper" = V4) 
+MCScohort_vocabAge14 = MCScohort_vocabAge14 %>% add_column(paste0(MCScohort_vocabAge14$mean,"(±",MCScohort_vocabAge14$sd,")", 
+                                                            "\n", "[", MCScohort_vocabAge14$lower, ";", MCScohort_vocabAge14$upper,"]")) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = `paste0(...)`) %>% 
+  select("Proportion (%) or \n Mean(±SD) [95% CIs]") %>% 
+  add_column(Variable = c("Cohort Member Vocabulary \n Age 14 (Word Activity Tast Score)"), .before = 1)
+
+descriptivesCohortMCS = rbind(MCScohort_vocabAge5, 
+MCScohort_vocabAge11, MCScohort_vocabAge14, 
+MCScohort_sex, MCScohort_ethnicity, MCScohort_eal,
+MCScohort_nvq, MCScohort_income, MCScohort_occupation) %>% 
+
+  add_row(Variable = "Vocabulary", .before = 1) %>%  #add in rows to divide table up 
+  add_row(Variable = "Demographics", .before = 4) %>% 
+  add_row(Variable = "Socioeconomic Circumstances", .before = 12)
+    
+descriptivesCohortMCS [is.na(descriptivesCohortMCS )] <- " "
+
+#bcs cohort ####
+
+bcs_cohort<-read.csv("bcs_ses_comparison_data.csv")
+bcs_cohort[,1]<- NULL
+
+#means and SDs
+#vocabulary
+
+#Age 5  
+BCScohort_vocabAge5 = round(MeanCI(bcs_cohort$age5_vocab, na.rm = TRUE),2)
+BCScohort_vocabAge5 = as.data.frame(t(BCScohort_vocabAge5)) %>% 
+  rename("lower" = lwr.ci, 
+         "upper" = upr.ci) %>% 
+  mutate(sd = round(sd(bcs_cohort$age5_vocab, na.rm = TRUE),2), .after = 1)
+BCScohort_vocabAge5 = BCScohort_vocabAge5 %>% add_column(paste0(BCScohort_vocabAge5$mean,"(±",BCScohort_vocabAge5$sd,")", 
+                                                                "\n", "[", BCScohort_vocabAge5$lower, ";", BCScohort_vocabAge5$upper,"]")) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = `paste0(...)`) %>% 
+  select(`Proportion (%) or \n Mean(±SD) [95% CIs]`) %>% 
+  add_column(Variable = c("Cohort Member Vocabulary \n Age 5 (EPVT)"), .before = 1)
+
+#Age 10
+BCScohort_vocabAge10 = round(MeanCI(bcs_cohort$b10bass, na.rm = TRUE),2)
+BCScohort_vocabAge10 = as.data.frame(t(BCScohort_vocabAge10)) %>% 
+  rename("lower" = lwr.ci, 
+         "upper" = upr.ci) %>% 
+  mutate(sd = round(sd(bcs_cohort$b10bass, na.rm = TRUE),2), .after = 1)
+BCScohort_vocabAge10 = BCScohort_vocabAge10 %>% add_column(paste0(BCScohort_vocabAge10$mean,"(±",BCScohort_vocabAge10$sd,")", 
+                                                                  "\n", "[", BCScohort_vocabAge10$lower, ";", BCScohort_vocabAge10$upper,"]")) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = `paste0(...)`) %>% 
+  select(`Proportion (%) or \n Mean(±SD) [95% CIs]`) %>% 
+  add_column(Variable = c("Cohort Member Vocabulary \n Age 10 (Verbal Similarities Score)"), .before = 1)
+
+#Age 16
+BCScohort_vocabAge16 = round(MeanCI(bcs_cohort$b16vocab, na.rm = TRUE),2)
+BCScohort_vocabAge16 = as.data.frame(t(BCScohort_vocabAge16)) %>% 
+  rename("lower" = lwr.ci, 
+         "upper" = upr.ci) %>% 
+  mutate(sd = round(sd(bcs_cohort$b16vocab, na.rm = TRUE),2), .after = 1)
+BCScohort_vocabAge16 = BCScohort_vocabAge16 %>% add_column(paste0(BCScohort_vocabAge16$mean,"(±",BCScohort_vocabAge16$sd,")", 
+                                                                  "\n", "[", BCScohort_vocabAge16$lower, ";", BCScohort_vocabAge16$upper,"]")) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = `paste0(...)`) %>% 
+  select(`Proportion (%) or \n Mean(±SD) [95% CIs]`) %>% 
+  add_column(Variable = c("Cohort Member Vocabulary \n Age 16 (Vocabulary Test)"), .before = 1)
+
+#Proportions ####
+#sex
+BCSgender = bcs_cohort %>% select(bcsid, a0255)
+BCSgender = na.omit(BCSgender)
+BCSgender$a0255 = as.factor(BCSgender$a0255)
+BCSsex = table(BCSgender$a0255)
+BCScohort_sex = as.data.frame(round(prop.table(sex),4)*100)
+  
+BCScohort_sex = as_tibble(BCScohort_sex) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = Freq) %>% 
+  add_column(Variable = c("Sex (Male)", "Sex (Female)"), .before = 1)  %>% 
+  select(-Var1)
+
+#Ethnicity 
+
+BCSethnicity = bcs_cohort %>% select(bcsid, ethnicity )
+BCSethnicity = na.omit(BCSethnicity)
+BCSethnicity$ethnicity = as.factor(BCSethnicity$ethnicity)
+BCSethnicity = table(BCSethnicity$ethnicity)
+BCScohort_ethnicity = as.data.frame(round(prop.table(BCSethnicity),4)*100)
+
+BCScohort_ethnicity = as_tibble(BCScohort_ethnicity) %>% 
+  rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = Freq) %>% 
+  add_column(Variable = c("Ethnicity (White)", "Ethnicity (Minority)"), .before = 1)  %>% 
+  select(-Var1)
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+#whole cohorts
+bcs_cohort<-read.csv("bcs_whole_cohort.csv")
+bcs_cohort[,8]<- NULL
+bcs_cohort[,8]<- NULL
+
+names(bcs_cohort) <- c("id", "gender", "ethnicity", "EAL", "mothers_age", "accommodation_type",  
+                     "highest_household_education",  "occupational_status", "age5_vocab", "age_5" ,
+                     "age10_vocab","age10", "age16_vocab", "age16")
+
+#not weighted here as it is just the attrition weight that we have for BCS, not sample weight. 
+vocab= bcs_cohort %>% select(id, age5_vocab, age10_vocab, age16_vocab)
+describe(vocab)
+
+round(MeanCI(vocab$age5_vocab, na.rm = TRUE),2)
+round(MeanCI(vocab$age10_vocab, na.rm = TRUE),2)
+round(MeanCI(vocab$age16_vocab, na.rm = TRUE),2)
+
+#proportions
+
+gender = bcs_cohort %>% select(id, gender)
+gender = na.omit(gender)
+gender$gender = as.factor(gender$gender)
+sex = table(gender$gender)
+round(prop.table(sex),4)*100
+
+
+ethnicity = bcs_cohort %>% select(id, ethnicity)
+ethnicity = na.omit(ethnicity)
+ethnicity$ethnicity = as.factor(ethnicity$eethnicity)
+ethnic = table(ethnicity$ethnicity)
+round(prop.table(ethnic),4)*100
+
+
+EAL = bcs_cohort %>% select(id, EAL)
+EAL = na.omit(EAL)
+EAL$EAL = as.factor(EAL$eEAL)
+lang = table(EAL$EAL)
+round(prop.table(lang),4)*100
+
+highest_household_education = bcs_cohort %>% select(id, highest_household_education)
+highest_household_education = na.omit(highest_household_education)
+highest_household_education$highest_household_education = as.factor(highest_household_education$ehighest_household_education)
+education = table(highest_household_education$highest_household_education)
+round(prop.table(education),4)*100
+
+occupational_status = bcs_cohort %>% select(id, occupational_status)
+occupational_status = na.omit(occupational_status)
+occupational_status$occupational_status = as.factor(occupational_status$occupational_status)
+occupation = table(occupational_status$occupational_status)
+round(prop.table(occupation),4)*100
+
+
+#MCS whole cohort. 
+mcs_cohort<-read.csv("mcs_crossCohort_fullCohort.csv")
+mcs_cohort[,1]<- NULL
+
+names(mcs_cohort) <- c("id", "gender", "ethnicity", "EAL", "mothers_age", "accommodation_type",  
+                       "highest_household_education",  "occupational_status", "age5_vocab", "age_5" ,
+                       "age11_vocab","age11", "age14_vocab", "age14", "weight")
+
+
+age5_vocab = mcs_cohort %>% select(id, age5_vocab, weight)
+vocab_age5=na.omit(age5_vocab)
+round(get_weighted_descriptives(vocab_age5$age5_vocab, vocab_age5$weight),2)
+
+age11_vocab = mcs_cohort %>% select(id, age11_vocab, weight)
+vocab_age11=na.omit(age11_vocab)
+round(get_weighted_descriptives(vocab_age11$age11_vocab, vocab_age11$weight),2)
+
+age14_vocab = mcs_cohort %>% select(id, age14_vocab, weight)
+vocab_age14=na.omit(age14_vocab)
+round(get_weighted_descriptives(vocab_age14$age14_vocab, vocab_age14$weight),2)
+
+#proportions
+
+gender = mcs_cohort %>% select(id, gender, weight)
+gender = na.omit(gender)
+round(get_weighted_proportions(gender$gender, gender$weight), 4)*100
+
+ethnicity = mcs_cohort %>% select(id, ethnicity, weight)
+ethnicity = na.omit(ethnicity)
+round(get_weighted_proportions(ethnicity$ethnicity, ethnicity$weight), 4)*100
+
+EAL = mcs_cohort %>% select(id, EAL, weight)
+EAL = na.omit(EAL)
+round(get_weighted_proportions(EAL$EAL, EAL$weight), 4)*100
+
+highest_household_education = mcs_cohort %>% select(id, highest_household_education, weight)
+highest_household_education = na.omit(highest_household_education)
+round(get_weighted_proportions(highest_household_education$highest_household_education, highest_household_education$weight), 4)*100
+
+
+
+
+occupational_status = mcs_cohort %>% select(id, occupational_status, weight)
+occupational_status = na.omit(occupational_status)
+round(get_weighted_proportions(occupational_status$occupational_status, occupational_status$weight), 4)*100
+
+
+
+
