@@ -679,7 +679,7 @@ random.impute.data.frame <- function(dat, cols) {
   dat
 }
 
-combined_data <- random.impute.data.frame(combined_data, c(2,23, 24, 25, 26))
+combined_data <- random.impute.data.frame(combined_data, c(2, 14, 23, 24, 25, 26))
 #combined_data<- merge(all=TRUE, bcs_analysis, new_birth_variables,by="bcsid")
 #generate response variable (this will be the outcome variable in the logistic regression)
 #combined_data$complete <- as.integer(complete.cases( combined_data$b5epvt))
@@ -691,16 +691,16 @@ combined_data <- random.impute.data.frame(combined_data, c(2,23, 24, 25, 26))
 
 combined_data$complete=as.factor(combined_data$complete)
 combined_data$a0255.imputed=as.factor(combined_data$a0255.imputed)
-combined_data$highest_occupation=as.factor(combined_data$highest_occupation)
+combined_data$highest_occupation.imputed=as.factor(combined_data$highest_occupation.imputed)
 combined_data$teen_mum.imputed=as.factor(combined_data$teen_mum.imputed)
 combined_data$high_parity.imputed =as.factor(combined_data$high_parity.imputed)
 combined_data$heavy_smoker.imputed=as.factor(combined_data$heavy_smoker.imputed)
 combined_data$a0012.imputed=as.factor(combined_data$a0012.imputed)
 #logistic regression to predict response at age 5
-missing <- glm(complete ~  a0255.imputed + highest_occupation  + teen_mum.imputed + high_parity.imputed + heavy_smoker.imputed +a0012.imputed  , family=binomial(link='logit'), data=combined_data)
+missing <- glm(complete ~  a0255.imputed + highest_occupation.imputed  + teen_mum.imputed + high_parity.imputed + heavy_smoker.imputed +a0012.imputed  , family=binomial(link='logit'), data=combined_data)
 predicted <- plogis(predict(missing)) 
 #new_predicted <- 1 / (1 + exp(-predicted)) - maybe?
-predicted[combined_data$complete==0] <- NA
+predicted[combined_data$complete == 0] <- NA
 
 combined_data$predicted_age5 <- predicted
 #to get bcsid
