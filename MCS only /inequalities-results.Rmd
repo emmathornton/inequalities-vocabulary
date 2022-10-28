@@ -1402,23 +1402,23 @@ aic_flex<- AIC_values %>%
  width(j=1, width=1.3) %>% 
   width(j=2,  width=1) %>% 
   width(j=4,  width=1) %>% 
-  width(j=6,  width=1) %>% 
+  width(j=9,  width=1) %>% 
   width(j=8,  width=1) %>% 
   width(j=3,  width=0.6) %>% 
   width(j=5,  width=0.6) %>%
   width(j=7,  width=0.6) %>%
   width(j=9,  width=0.6) %>%
- line_spacing(i=1:5, space=1.5) %>% 
+ #line_spacing(i=1:8, space=1.5) %>% 
   border_remove() %>% 
   hline_top(j=1:9, part="all", border=my_border) %>% 
   hline_bottom(j=1:9,part="body",  border=my_border) %>% 
   set_header_labels(indicator= "Indicator", result = "AIC", delta_aic = "dAIC", result.1= "AIC", delta_aic.1 = "dAIC", 
                     result.2 = "AIC", delta_aic.2 = "dAIC", result.3 = "AIC", delta_aic.3 = "dAIC") %>% 
-  footnote(value=as_paragraph(c("AIC* = best model",  
-"Values are the mean AIC values across 25 imputed datasets", 
-"All models adjusted for sex, ethnicity and EAL.")),
-           ref_symbols = c(" "), inline=TRUE) %>% 
-  fontsize(size=8, part="footer") %>% 
+ # footnote(value=as_paragraph(c("AIC* = best model",  
+#"Values are the mean AIC values across 25 imputed datasets", 
+#"All models adjusted for sex, ethnicity and EAL.")),
+      #     ref_symbols = c(" "), inline=TRUE) %>% 
+ # fontsize(size=8, part="footer") %>% 
   #font(fontname = "Times New Roman", part="footer") %>% 
      print( preview = "docx") 
 
@@ -1594,11 +1594,11 @@ aic_flex<- AIC_comp_table %>%
   hline_bottom(j=1:9,part="body",  border=my_border) %>% 
   set_header_labels(indicator= "Indicator", result = "AIC", delta_aic = "dAIC", result.1= "AIC", delta_aic.1 = "dAIC", 
                     result.2 = "AIC", delta_aic.2 = "dAIC", result.3 = "AIC", delta_aic.3 = "dAIC") %>% 
-  footnote(value=as_paragraph(c("AIC* = best model",  
-"Values are the mean AIC values across 25 imputed datasets", 
-"All models adjusted for sex, ethnicity and EAL.")),
-           ref_symbols = c(" "), inline=TRUE) %>% 
-  fontsize(size=8, part="footer") %>% 
+  #footnote(value=as_paragraph(c("AIC* = best model",  
+#"Values are the mean AIC values across 25 imputed datasets", 
+#"All models adjusted for sex, ethnicity and EAL.")),
+        #   ref_symbols = c(" "), inline=TRUE) %>% 
+ # fontsize(size=8, part="footer") %>% 
  # font(fontname = "Times New Roman", part="footer") %>% 
   
      print( preview = "docx") 
@@ -1804,18 +1804,18 @@ wealth_indicator <- ggplot(data=wealth_plot, aes(x=wealth, y=language, group=age
 #occupation
 occupation_plot <- data.frame(
   occupational_status = factor(c("Routine", "Intermediate", "Higher managerial"), levels=c("Routine", "Intermediate", "Higher managerial")),
-  language = c(0,  0.22,  0.40 ,
-               0,  0.20 ,0.48  , 
-               0,   0.19, 0.43 ,  
-               0, 0.12, 0.45),
+  language = c(0,  0.22,  0.39 ,
+               0,  0.20 ,0.47  , 
+               0,   0.18, 0.42 ,  
+               0, 0.12, 0.44),
   lower_ci_occupation = c( 0, 0.17 , 0.36,
                           0,  0.15, 0.44, 
                           0,  0.13, 0.38, 
-                          0,  0.06, 0.40),
+                          0,  0.06, 0.39),
   upper_ci_occupation = c(0, 0.26, 0.43, 
                          0,  0.24, 0.51,
-                        0,   0.24, 0.47,
-                        0,  0.17, 0.50
+                        0,   0.23, 0.46,
+                        0,  0.17, 0.49
   ),
   age = factor(c("Age 3", "Age 3", "Age 3", 
                  "Age 5", "Age 5", "Age 5", 
@@ -2035,7 +2035,7 @@ p1= p+ theme(plot.title = element_text(face="italic", size=20, family ="Times",h
 
 #annotate_figure(combined_plot, top = text_grob("Early Childhood Language", face="bold", size=12))
 
-ggsave("mcs-results.png", plot, width=12.8, height=14.3, units= "in" ,dpi=300)
+ggsave("mcs-results.png", plot, width=13, height=14.3, units= "in" ,dpi=300)
 
 
 ```
