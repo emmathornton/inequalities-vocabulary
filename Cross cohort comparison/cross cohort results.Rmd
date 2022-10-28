@@ -56,9 +56,9 @@ mcs_imputation = mi.res
 load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-26_bcs_ses_cross_cohort/2022-10-26_bcs_ses_cross_cohort.Rdata")
 bcs_imputation = mi.res
 
-long_format_bcs <- mice::complete(bcs_imputation, "long", include=TRUE)
-long_format_bcs$occupational_status <- with(long_format_bcs, relevel(highest_occupation, ref = "2"))
-long_format_bcs$occupational_status <- as.factor(long_format_bcs$occupational_status)
+#long_format_bcs <- mice::complete(bcs_imputation, "long", include=TRUE)
+#long_format_bcs$occupational_status <- with(long_format_bcs, relevel(highest_occupation, ref = "2"))
+#long_format_bcs$occupational_status <- as.factor(long_format_bcs$occupational_status)
 
 
 ```
