@@ -76,7 +76,11 @@ age5_vocab = f699c_new %>% select(bcsid, b5epvt, f112) %>%
 # Compiled from code in Parsons (2014) documentation on cognition measures, done in SPSS. 
 # https://cls.ucl.ac.uk/wp-content/uploads/2017/07/BCS70-Childhood-cognition-in-the-1970-British-Cohort-Study-Nov-2014-final.pdf
 
-age10_vocab1 = age10 %>% select(bcsid, b10bass) 
+age10_vocab1 = age10 %>% select(bcsid, b10bass, b10sin) %>% 
+  mutate(b10bass = case_when(
+    b10bass == 0 & b10sin == 0 ~ NA_real_, 
+                             TRUE ~ as.numeric(b10bass))) %>% 
+  select(-b10sin)
 age10_vocab = age10_derived %>% select(bcsid, bd3age) %>% 
   right_join(age10_vocab1) %>% 
   distinct(bcsid, .keep_all = TRUE)
