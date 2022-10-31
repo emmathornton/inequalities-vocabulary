@@ -1033,30 +1033,35 @@ r2_plot1 <- partialr2_data %>%
                             "Early Childhood", "Late Childhood", "Adolescence")) %>% #reorder age for x axis 
   ggplot() +
   geom_point(mapping=aes(x=vocab, y=r2,  group= cohort, color=cohort, fill=cohort, shape = indicator), 
-             size=5, position = position_dodge(width=0.5)) +
-  scale_color_manual(name="Cohort and Indicator", values=c( "#B2ABD2","#B2ABD2","#B2ABD2", 
-                                                            "#FDB863","#FDB863", "#FDB863"), 
-                     limits=c( "BCS1970 \n Highest Household \n Education", 
-                               "BCS1970 \n Highest Household \n Occupation",
-                               "BCS1970 \n Income Quintiles",
-                               "MCS2001 \n Highest Household \n Education", 
-                               "MCS2001 \n Highest Household \n Occupation", 
-                              "MCS2001 \n Income Quintiles" )) +
-  scale_fill_manual(name="Cohort and Indicator", values=c( "#B2ABD2","#B2ABD2","#B2ABD2", 
-                                                           "#FDB863", "#FDB863","#FDB863"), 
+             size=5, position = position_dodge(width=0.7)) +
+  scale_color_manual(name="Cohort and Indicator", values=c( "#B2ABD2","#FDB863",
+                                                          "#B2ABD2","#FDB863",
+                                                          "#B2ABD2", "#FDB863"
+                                                          ), 
+                   limits=c( "BCS1970 \n Highest Household \n Education", 
+                             "MCS2001 \n Highest Household \n Education",
+                             "BCS1970 \n Highest Household \n Occupation",
+                             "MCS2001 \n Highest Household \n Occupation",
+                             "BCS1970 \n Income Quintiles",
+                             "MCS2001 \n Income Quintiles" )) +
+  scale_fill_manual(name="Cohort and Indicator", values=c("#B2ABD2","#FDB863",
+                                                          "#B2ABD2","#FDB863",
+                                                          "#B2ABD2", "#FDB863"), 
                     limits=c("BCS1970 \n Highest Household \n Education", 
-                               "BCS1970 \n Highest Household \n Occupation",
-                               "BCS1970 \n Income Quintiles",
-                               "MCS2001 \n Highest Household \n Education", 
-                               "MCS2001 \n Highest Household \n Occupation", 
-                              "MCS2001 \n Income Quintiles")) +
-scale_shape_manual(name= "Cohort and Indicator", values =c(15, 16, 17,  16, 15, 17), 
-                    limits = c ("BCS1970 \n Highest Household \n Education", 
-                               "BCS1970 \n Highest Household \n Occupation",
-                               "BCS1970 \n Income Quintiles",
-                               "MCS2001 \n Highest Household \n Education", 
-                               "MCS2001 \n Highest Household \n Occupation", 
-                              "MCS2001 \n Income Quintiles")) +
+                             "MCS2001 \n Highest Household \n Education",
+                             "BCS1970 \n Highest Household \n Occupation",
+                             "MCS2001 \n Highest Household \n Occupation",
+                             "BCS1970 \n Income Quintiles",
+                             "MCS2001 \n Income Quintiles" )) +
+  scale_shape_manual(name= "Cohort and Indicator", values =c(15, 15,
+                                                             16, 16,
+                                                             17, 17), 
+                     limits = c ("BCS1970 \n Highest Household \n Education", 
+                                 "MCS2001 \n Highest Household \n Education",
+                                 "BCS1970 \n Highest Household \n Occupation",
+                                 "MCS2001 \n Highest Household \n Occupation",
+                                 "BCS1970 \n Income Quintiles",
+                                 "MCS2001 \n Income Quintiles" )) +
   theme_classic2()+
   xlab(label="\n Vocabulary") +
   ylab(label="Partial R squared (%)") +
@@ -1066,14 +1071,18 @@ scale_shape_manual(name= "Cohort and Indicator", values =c(15, 16, 17,  16, 15, 
         legend.title = element_text(size=15, family="Times"))+
   ylim(0,12)+ 
   geom_vline(xintercept = 1.5:3.5, colour="#E0E0E0") +
-  theme(legend.position = "top") +
+  theme(legend.position = "top", legend.box="horizontal") +
+  guides(fill=guide_legend(nrow=2,byrow=FALSE))+
   
  #ggtitle("Main Analysis") +
  #theme(plot.title = element_text(face="italic", size=15, family ="Times",hjust = 0.5)) +
   
   geom_text(aes(x=vocab, y=r2, label=round(r2,1), color=factor(cohort), hjust=-1.4),
             family = "Times New Roman",
-            position = position_dodge(width=0.5)) 
+            vjust = -1.5,
+            hjust = 0.5,
+            #check_overlap = TRUE,
+            position = position_dodge(0.7))
   #main = annotate_figure(r2_plot1, top = text_grob("Main Analysis", 
        #                           color="black", face="bold", 
                   #                size=14, family="Times"))
