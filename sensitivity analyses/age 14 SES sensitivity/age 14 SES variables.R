@@ -5,20 +5,24 @@ require(sjmisc)
 require(Hmisc)
 require(psych)
 #load in data
-mcs2_child_assessment <- read_sav("mcs2_child_assessment_data.sav")
-mcs3_child_assessment <- read_sav("mcs3_child_assessment_data.sav")
-mcs5_child_assessment <- read_sav("mcs5_cm_assessment.sav")
-mcs6_child_assessment<- read_sav("mcs6_cm_assessment.sav")
+mcs2_child_assessment <- read_sav("mcs2_cm_cognitive_assessment.sav")
+mcs3_child_assessment <- read_sav("mcs3_cm_cognitive_assessment.sav")
+mcs5_child_assessment <- read_sav("mcs5_cm_cognitive_assessment.sav")
+mcs5_child_derived <- read_sav("mcs5_cm_derived.sav")
+mcs6_child_assessment<- read_sav("mcs6_cm_cognitive_assessment.sav")
 mcs1_hh <- read_sav("mcs1_hhgrid.sav")
 mcs2_hh <- read_sav("mcs2_hhgrid.sav")
+mcs6_hh <- read_sav("mcs6_hhgrid.sav")
 #mcs3_hh <- read_sav("mcs3_hhgrid.sav")
 #mcs5_hh <- read_sav("mcs5_hhgrid.sav")
 #mcs6_hh <- read_sav("mcs6_hhgrid.sav")
 mcs_family <- read_sav("mcs_longitudinal_family_file.sav")
 mcs1_parent <- read_sav("mcs1_parent_interview.sav")
+mcs1_derived <- read_sav("mcs1_parent_derived.sav")
 mcs2_parent <- read_sav("mcs2_parent_interview.sav")
-mcs2_derived <- read_sav("mcs2_derived_variables.sav")
-mcs1_derived <- read_sav("mcs1_derived_variables.sav")
+mcs2_derived <- read_sav("mcs2_parent_derived.sav")
+mcs2_derived_family <- read_sav("mcs2_family_derived.sav")
+mcs1_derived_family <- read_sav("mcs1_family_derived.sav")
 mcs5_parent<- read_sav("mcs5_parent_interview.sav")
 mcs6_imd_eng <- read_stata("mcs_sweep6_imd_e_2004.dta")
 mcs6_imd_ni <- read_stata("mcs_sweep6_imd_n_2004.dta")
@@ -33,6 +37,7 @@ mcs5_parent <- read_sav("mcs5_parent_interview.sav")
 mcs4_parent <- read_sav("mcs4_parent_interview.sav")
 mcs3_parent <- read_sav("mcs3_parent_interview.sav")
 mcs5_derived_parent <- read_sav("mcs5_parent_derived.sav")
+
 #convert all to lowercase
 names(mcs2_child_assessment) <- tolower(names(mcs2_child_assessment))
 names(mcs3_child_assessment) <- tolower(names(mcs3_child_assessment))
@@ -46,6 +51,7 @@ names(mcs2_derived) <- tolower(names(mcs2_derived))
 names(mcs1_derived) <- tolower(names(mcs1_derived))
 names(mcs1_hh) <- tolower(names(mcs1_hh))
 names(mcs2_hh) <- tolower(names(mcs2_hh))
+names(mcs6_hh) <- tolower(names(mcs6_hh))
 #names(mcs2_geography) <- tolower(names(mcs2_geography))
 #names(mcs1_geography) <- tolower(names(mcs1_geography))
 names(mcs6_derived_family) <- tolower(names(mcs6_derived_family))
@@ -781,25 +787,70 @@ parents_home$parents_in_household <- ifelse(!is.na(parents_home$house_combine), 
 PARENTS_IN_HH <- c("mcsid", "parents_in_household")
 PARENTS_IN_HH <- parents_home[PARENTS_IN_HH]
 
-#WEALTH 
-wealth_variables <- c("mcsid", "fresp00", "fpmopa00", "fphval00", "fpinvt00", "fpdeba00")
-wealth_variables <- mcs6_parent[wealth_variables]
-wealth_variables$fresp00 = as.character(wealth_variables$fresp00)
-wealth1 <- wealth_variables[which(wealth_variables$fresp00 == "1"),]
+#4. Wealth ####
+wealth_variables <- mcs6_parent %>%  select(mcsid, fresp00, fpmopa00, fphval00, fpinvt00, fpdeba00, felig00) %>% 
+  filter(felig00 == 1) %>% 
+  select(mcsid, fpmopa00, fphval00, fpinvt00, fpdeba00) %>% 
+  rename("mortgage" = fpmopa00,
+         "houseValue" = fphval00, 
+         "savings" = fpinvt00, 
+         "debt" = fpdeba00)
 
-mortgage1 <-c ("mcsid", "fpmopa00")
-mortgage1 <- wealth1[mortgage1]
-mortgage1[mortgage1 ==-1:-9] <- NA
-value1 <-c ("mcsid", "fphval00")
-value1 <- wealth1[value1]
-value1[value1 ==-1:-9] <- NA
-savings1 <-c ("mcsid", "fpinvt00")
-savings1 <- wealth1[savings1]
-savings1[savings1 ==-1:-9] <- NA
-debt1 <-c ("mcsid", "fpdeba00")
-debt1 <- wealth1[debt1]
-debt1[debt1 ==-1:-9] <- NA
+tenure = mcs6_family %>% select(mcsid, fdroow00)
 
+
+new_wealth = merge(all=TRUE, wealth_variables, tenure, by = "mcsid")
+#if mortgage missing and tenure = not a home owner --> mortgage = 0 
+
+housing_wealthVars = new_wealth %>% 
+  mutate(new_mortgage = case_when(
+    !is.na(mortgage) ~ as.numeric(mortgage),
+    is.na(mortgage) & fdroow00 == 2 | fdroow00 == 3 ~ NA_real_,
+    (fdroow00 != 2 | fdroow00 != 3) & (is.na(mortgage))   ~ 0 
+  )) %>% 
+  mutate(new_value = case_when(
+    !is.na(houseValue) ~ as.numeric(houseValue), 
+    is.na(mortgage) & fdroow00 == 1 | fdroow00 == 2 | fdroow00 == 3 ~ NA_real_,
+    (fdroow00 != 1 | fdroow00 != 2 | fdroow00 != 3) & (is.na(mortgage))   ~ 0
+  )) %>% 
+  select(mcsid, mortgage, new_mortgage, houseValue, new_value)
+
+
+#savings variables
+savings = mcs6_parent %>% select(mcsid, fpinvt00, contains("fpsavi0"), felig00) %>% 
+  filter(felig00 == 1) %>% 
+  mutate(new_savings = case_when(
+    !is.na(fpinvt00) ~ as.numeric(fpinvt00), 
+    is.na(fpinvt00) & fpsavi0a == 1 |fpsavi0b == 1 |
+      fpsavi0c == 1 | fpsavi0d == 1 | fpsavi0e == 1 |
+      fpsavi0f == 1 | fpsavi0g == 1 | fpsavi0h == 1 ~ NA_real_, 
+    (fpsavi0a == 0 |fpsavi0b == 0 |
+       fpsavi0c == 0 | fpsavi0d == 0 | fpsavi0e == 0 |
+       fpsavi0f == 0 | fpsavi0g == 0 | fpsavi0h == 0) & is.na(fpinvt00)  ~ 0
+  )) %>% 
+  select(mcsid, fpinvt00, new_savings)
+
+#debt variables 
+debt = mcs6_parent %>% select(mcsid, fpdeba00, contains("fpdebt0"), felig00) %>% 
+  filter(felig00 == 1) %>% 
+  select(-felig00) %>% 
+  mutate(new_debt = case_when(
+    !is.na(fpdeba00) ~ as.numeric(fpdeba00), 
+    is.na(fpdeba00) & fpdebt0a == 1 |fpdebt0b == 1 |
+      fpdebt0c == 1 | fpdebt0d == 1 | fpdebt0e == 1 |
+      fpdebt0f == 1 | fpdebt0g == 1 | fpdebt0h == 1 |
+      fpdebt0i == 1 ~ NA_real_, 
+    (fpdebt0a == 0 |fpdebt0b == 0 |
+       fpdebt0c == 0 | fpdebt0d == 0 | 
+       fpdebt0e == 0 | fpdebt0f == 0 | 
+       fpdebt0g == 0 | fpdebt0h == 0 | fpdebt0i == 0) & is.na(fpdeba00)  ~ 0
+  )) %>% 
+  select(mcsid, fpdeba00, new_debt)
+
+wealth_vars = merge(all = TRUE, housing_wealthVars, savings, by = "mcsid")
+wealth_vars = merge(all= TRUE, wealth_vars, debt, by = "mcsid")
+
+wealth = wealth_vars %>% select(mcsid, new_mortgage, new_value, new_savings, new_debt)
 
 
 analysis_data <- merge(all=TRUE, cm_sex, cm_ethnicity,by="mcsid")
@@ -830,13 +881,7 @@ analysis_data <- merge(all=TRUE, analysis_data, oecd_sweep6,by="mcsid")
 nrow(analysis_data)
 analysis_data <- merge(all=TRUE, analysis_data, highest_parent_occupation6,by="mcsid")
 nrow(analysis_data)
-analysis_data <- merge(all=TRUE, analysis_data, mortgage1,by="mcsid")
-nrow(analysis_data)
-analysis_data <- merge(all=TRUE, analysis_data,value1,by="mcsid")
-nrow(analysis_data)
-analysis_data <- merge(all=TRUE, analysis_data, debt1,by="mcsid")
-nrow(analysis_data)
-analysis_data <- merge(all=TRUE, analysis_data, savings1,by="mcsid")
+analysis_data <- merge(all=TRUE, analysis_data, wealth,by="mcsid")
 nrow(analysis_data)
 analysis_data <- merge(all=TRUE, analysis_data, age14_language,by="mcsid")
 nrow(analysis_data)
