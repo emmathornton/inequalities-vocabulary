@@ -53,7 +53,7 @@ pv1 <- function(val) {
 ```{r}
 load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-26_mcs_ses_crossCohort/2022-10-26_mcs_ses_crossCohort.Rdata")
 mcs_imputation = mi.res
-load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-28_bcs_ses_cross_cohort/2022-10-28_bcs_ses_cross_cohort.Rdata")
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-31_bcs_ses_cross_cohort/2022-10-31_bcs_ses_cross_cohort.Rdata")
 bcs_imputation = mi.res
 
 #long_format_bcs <- mice::complete(bcs_imputation, "long", include=TRUE)
