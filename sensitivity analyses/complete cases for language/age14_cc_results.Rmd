@@ -1,0 +1,2066 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+libraries and custom functions
+
+```{r}
+library(mice)
+library(pander)
+library(xtable)
+library(dplyr)
+library(gt)
+library(glue)
+library(tidyverse)
+library(miceadds)
+library(swfscMisc)
+library(imputools)
+library(haven)
+library(sjmisc)
+library(Hmisc)
+library(psych)
+library(lavaan)
+library(ggplot2)
+library(ggpubr)
+library(officer)
+library(flextable)
+library(gtools)
+#this will take a float (e.g. a p value) and return a string with 3 digits and no leading 0
+
+bv <- function(val) {
+  return(sub("^(-?)0.", "\\1.", sprintf("%.2f", val)))
+}
+
+#if the number is less than .001, it will give <.001. 
+pv1 <- function(val) {
+  return(paste("=", sub("^(-?)0.", "\\1.", sprintf("%.3f", val))))
+}
+
+
+
+```
+
+
+
+#load in data and rename to be imputed_mcs2 
+here we have the datasets for each age sensitivity and wealth sensitivity - load in one at a time and run code to get tables and then repeat 
+```{r}
+
+#main analysis
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-26_mcs_ses_imputedRQ1/2022-10-26_mcs_ses_imputedRQ1.Rdata")
+imputed_mcs2=mi.res
+
+#Get complete cases for age 3 vocabulary 
+long_format_mcs = mice::complete(imputed_mcs2, "long", include=TRUE)
+age14_cc = long_format_mcs %>% filter(.imp ==0 & !is.na(vocabulary_age14))
+age14_complete_cases = long_format_mcs[long_format_mcs$mcsid %in% age14_cc$mcsid,] 
+imputed_mcs2 = as.mids(age14_complete_cases)
+
+```
+
+
+#regression models 
+```{r}
+#age 3
+age3_nvq_unadjusted <- with(imputed_mcs2, lm(age3_standardised ~ highest_NVQ, weights = mcs2_weight))
+age3_nvq_adjusted <- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ, weights = mcs2_weight))
+age3_income_unadjusted <- with(imputed_mcs2, lm(age3_standardised ~ income_quintiles, weights = mcs2_weight))
+age3_income_adjusted <- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + income_quintiles, weights = mcs2_weight))
+age3_wealth_unadjusted <- with(imputed_mcs2, lm(age3_standardised ~ wealth_quintiles, weights = mcs2_weight))
+age3_wealth_adjusted <- with(imputed_mcs2, lm(age3_standardised ~  gender +ethnicity +language_used_at_home + wealth_quintiles, weights = mcs2_weight))
+age3_occupation_unadjusted <- with(imputed_mcs2, lm(age3_standardised ~ occupational_status, weights = mcs2_weight))
+age3_occupation_adjusted <- with(imputed_mcs2, lm(age3_standardised ~  gender +ethnicity +language_used_at_home + occupational_status, weights = mcs2_weight))
+age3_imd_unadjusted <- with(imputed_mcs2, lm(age3_standardised ~ imd, weights = mcs2_weight))
+age3_imd_adjusted <- with(imputed_mcs2, lm(age3_standardised ~  gender +ethnicity +language_used_at_home + imd, weights = mcs2_weight))
+
+#age 5
+age5_nvq_unadjusted <- with(imputed_mcs2, lm(age5_standardised ~ highest_NVQ, weights = mcs2_weight))
+age5_nvq_adjusted <- with(imputed_mcs2, lm(age5_standardised ~  gender +ethnicity +language_used_at_home +highest_NVQ, weights = mcs2_weight))
+age5_income_unadjusted <- with(imputed_mcs2, lm(age5_standardised ~ income_quintiles, weights = mcs2_weight))
+age5_income_adjusted <- with(imputed_mcs2, lm(age5_standardised ~  gender +ethnicity +language_used_at_home + income_quintiles, weights = mcs2_weight))
+age5_wealth_unadjusted <- with(imputed_mcs2, lm(age5_standardised ~ wealth_quintiles, weights = mcs2_weight))
+age5_wealth_adjusted <- with(imputed_mcs2, lm(age5_standardised ~  gender +ethnicity +language_used_at_home +wealth_quintiles, weights = mcs2_weight))
+age5_occupation_unadjusted <- with(imputed_mcs2, lm(age5_standardised ~ occupational_status, weights = mcs2_weight))
+age5_occupation_adjusted <- with(imputed_mcs2, lm(age5_standardised ~ gender +ethnicity +language_used_at_home + occupational_status, weights = mcs2_weight))
+age5_imd_unadjusted <- with(imputed_mcs2, lm(age5_standardised ~ imd, weights = mcs2_weight))
+age5_imd_adjusted <- with(imputed_mcs2, lm(age5_standardised ~ gender +ethnicity +language_used_at_home + imd, weights = mcs2_weight))
+
+#age11
+age11_nvq_unadjusted <- with(imputed_mcs2, lm(age11_standardised ~ highest_NVQ, weights = mcs2_weight))
+age11_nvq_adjusted <- with(imputed_mcs2, lm(age11_standardised ~  gender +ethnicity +language_used_at_home +highest_NVQ, weights = mcs2_weight))
+age11_income_unadjusted <- with(imputed_mcs2, lm(age11_standardised ~ income_quintiles, weights = mcs2_weight))
+age11_income_adjusted <- with(imputed_mcs2, lm(age11_standardised ~  gender +ethnicity +language_used_at_home + income_quintiles, weights = mcs2_weight))
+age11_wealth_unadjusted <- with(imputed_mcs2, lm(age11_standardised ~ wealth_quintiles, weights = mcs2_weight))
+age11_wealth_adjusted <- with(imputed_mcs2, lm(age11_standardised ~  gender +ethnicity +language_used_at_home + wealth_quintiles, weights = mcs2_weight))
+age11_occupation_unadjusted <- with(imputed_mcs2, lm(age11_standardised ~ occupational_status, weights = mcs2_weight))
+age11_occupation_adjusted <- with(imputed_mcs2, lm(age11_standardised ~ gender +ethnicity +language_used_at_home + occupational_status, weights = mcs2_weight))
+age11_imd_unadjusted <- with(imputed_mcs2, lm(age11_standardised ~ imd, weights = mcs2_weight))
+age11_imd_adjusted <- with(imputed_mcs2, lm(age11_standardised ~ gender +ethnicity +language_used_at_home + imd, weights = mcs2_weight))
+
+#age 14
+age14_nvq_unadjusted <- with(imputed_mcs2, lm(age14_standardised ~ highest_NVQ, weights = mcs2_weight))
+age14_nvq_adjusted <- with(imputed_mcs2, lm(age14_standardised ~  gender +ethnicity +language_used_at_home +highest_NVQ, weights = mcs2_weight))
+age14_income_unadjusted <- with(imputed_mcs2, lm(age14_standardised ~ income_quintiles, weights = mcs2_weight))
+age14_income_adjusted <- with(imputed_mcs2, lm(age14_standardised ~ gender +ethnicity +language_used_at_home +income_quintiles, weights = mcs2_weight))
+age14_wealth_unadjusted <- with(imputed_mcs2, lm(age14_standardised ~ wealth_quintiles, weights = mcs2_weight))
+age14_wealth_adjusted <- with(imputed_mcs2, lm(age14_standardised ~  gender +ethnicity +language_used_at_home +wealth_quintiles, weights = mcs2_weight))
+age14_occupation_unadjusted <- with(imputed_mcs2, lm(age14_standardised ~ occupational_status, weights = mcs2_weight))
+age14_occupation_adjusted <- with(imputed_mcs2, lm(age14_standardised ~  gender +ethnicity +language_used_at_home+occupational_status, weights = mcs2_weight))
+age14_imd_unadjusted <- with(imputed_mcs2, lm(age14_standardised ~ imd, weights = mcs2_weight))
+age14_imd_adjusted <- with(imputed_mcs2, lm(age14_standardised ~  gender +ethnicity +language_used_at_home +imd, weights = mcs2_weight))
+
+
+#results of regressions 
+
+#age 3
+age3_nvq_results = round(summary(pool(age3_nvq_adjusted), conf.int =TRUE),2)
+age3_income_results = round(summary(pool(age3_income_adjusted), conf.int =TRUE),2)
+age3_wealth_results= round(summary(pool(age3_wealth_adjusted), conf.int =TRUE),2)
+age3_occupation_results = round(summary(pool(age3_occupation_adjusted), conf.int =TRUE),2)
+age3_imd_results = round(summary(pool(age3_imd_adjusted), conf.int =TRUE),2)
+
+
+#pull out only SES predictor oefficients etc so dont have confounders
+age3_nvq = age3_nvq_results[10:14, ]
+#age3_nvq= age3_nvq %>% add_row(term= "highest_NVQ1",  .before=1)  #add column for reference category
+#age3_nvq[is.na(age3_nvq)] <- "REFERENCE"
+#nvq = c("highest_NVQ1", "highest_NVQ2", "highest_NVQ3", "highest_NVQ4", "highest_NVQ5", "highest_NVQ0") #so can reorder into right order for table (move NVQ0 to end)
+#age3_nvq<- age3_nvq %>%  slice(match(nvq, term))
+
+age3_income = age3_income_results[10:13,]
+#age3_income= age3_income %>% add_row(term= "income_quintiles1",  .before=1) #add column for reference category
+#age3_income[is.na(age3_income)] <- "REFERENCE"
+
+age3_wealth = age3_wealth_results[10:13,]
+#age3_wealth= age3_wealth %>% add_row(term= "wealth_quintiles1",  .before=1) #add column for reference category
+#age3_wealth[is.na(age3_wealth)] <- "REFERENCE"
+
+age3_occupation = age3_occupation_results[10:12,]
+#age3_occupation= age3_occupation %>% add_row(term= "occupational_status2",  .before=1) #add column for reference category
+#age3_occupation[is.na(age3_occupation)] <- "REFERENCE"
+
+age3_imd = age3_imd_results[10:18,]
+#age3_imd= age3_imd%>% add_row(term= "imd1",  .before=1) #add column for reference category
+#age3_imd[is.na(age3_imd)] <- "REFERENCE"
+
+#combine indicators together
+age3_results = rbind(age3_nvq, age3_income, age3_wealth, age3_occupation, age3_imd)
+
+#age 5 
+age5_nvq_results = round(summary(pool(age5_nvq_adjusted), conf.int =TRUE),2)
+age5_income_results = round(summary(pool(age5_income_adjusted), conf.int =TRUE),2)
+age5_wealth_results= round(summary(pool(age5_wealth_adjusted), conf.int =TRUE),2)
+age5_occupation_results = round(summary(pool(age5_occupation_adjusted), conf.int =TRUE),2)
+age5_imd_results = round(summary(pool(age5_imd_adjusted), conf.int =TRUE),2)
+
+#pull out only SES predictor oefficients etc so dont have confounders
+age5_nvq = age5_nvq_results[10:14, ]
+#age5_nvq= age5_nvq %>% add_row(term= "highest_NVQ1",  .before=1)  #add column for reference category
+#age5_nvq[is.na(age5_nvq)] <- "REFERENCE"
+#nvq = c("highest_NVQ1", "highest_NVQ2", "highest_NVQ3", "highest_NVQ4", "highest_NVQ5", "highest_NVQ0") #so can reorder into right order for table (move NVQ0 to end)
+#age5_nvq<- age5_nvq %>%  slice(match(nvq, term))
+
+age5_income = age5_income_results[10:13,]
+#age5_income= age5_income %>% add_row(term= "income_quintiles1",  .before=1) #add column for reference category
+#age5_income[is.na(age5_income)] <- "REFERENCE"
+
+age5_wealth = age5_wealth_results[10:13,]
+#age5_wealth= age5_wealth %>% add_row(term= "wealth_quintiles1",  .before=1) #add column for reference category
+#age5_wealth[is.na(age5_wealth)] <- "REFERENCE"
+
+age5_occupation = age5_occupation_results[10:12,]
+#age5_occupation= age5_occupation %>% add_row(term= "occupational_status2",  .before=1) #add column for reference category
+#age5_occupation[is.na(age5_occupation)] <- "REFERENCE"
+
+age5_imd = age5_imd_results[10:18,]
+#age5_imd= age5_imd%>% add_row(term= "imd1",  .before=1) #add column for reference category
+#age5_imd[is.na(age5_imd)] <- "REFERENCE"
+
+#combine indicators together
+age5_results = rbind(age5_nvq, age5_income, age5_wealth, age5_occupation, age5_imd)
+
+#age 11
+age11_nvq_results = round(summary(pool(age11_nvq_adjusted), conf.int =TRUE),2)
+age11_income_results = round(summary(pool(age11_income_adjusted), conf.int =TRUE),2)
+age11_wealth_results= round(summary(pool(age11_wealth_adjusted), conf.int =TRUE),2)
+age11_occupation_results = round(summary(pool(age11_occupation_adjusted), conf.int =TRUE),2)
+age11_imd_results = round(summary(pool(age11_imd_adjusted), conf.int =TRUE),2)
+
+
+#pull out only SES predictor oefficients etc so dont have confounders
+age11_nvq = age11_nvq_results[10:14, ]
+#age11_nvq= age11_nvq %>% add_row(term= "highest_NVQ1",  .before=1)  #add column for reference category
+#age11_nvq[is.na(age11_nvq)] <- "REFERENCE"
+#nvq = c("highest_NVQ1", "highest_NVQ2", "highest_NVQ3", "highest_NVQ4", "highest_NVQ5", "highest_NVQ0") #so can reorder into right order for table (move NVQ0 to end)
+#age11_nvq<- age11_nvq %>%  slice(match(nvq, term))
+
+age11_income = age11_income_results[10:13,]
+#age11_income= age11_income %>% add_row(term= "income_quintiles1",  .before=1) #add column for reference category
+#age11_income[is.na(age11_income)] <- "REFERENCE"
+
+age11_wealth = age11_wealth_results[10:13,]
+#age11_wealth= age11_wealth %>% add_row(term= "wealth_quintiles1",  .before=1) #add column for reference category
+#age11_wealth[is.na(age11_wealth)] <- "REFERENCE"
+
+age11_occupation = age11_occupation_results[10:12,]
+#age11_occupation= age11_occupation %>% add_row(term= "occupational_status2",  .before=1) #add column for reference category
+#age11_occupation[is.na(age11_occupation)] <- "REFERENCE"
+
+age11_imd = age11_imd_results[10:18,]
+#age11_imd= age11_imd%>% add_row(term= "imd1",  .before=1) #add column for reference category
+#age11_imd[is.na(age11_imd)] <- "REFERENCE"
+#combine indicators together
+age11_results = rbind(age11_nvq, age11_income, age11_wealth, age11_occupation, age11_imd)
+
+#age 14
+age14_nvq_results = round(summary(pool(age14_nvq_adjusted), conf.int =TRUE),2)
+age14_income_results = round(summary(pool(age14_income_adjusted), conf.int =TRUE),2)
+age14_wealth_results= round(summary(pool(age14_wealth_adjusted), conf.int =TRUE),2)
+age14_occupation_results = round(summary(pool(age14_occupation_adjusted), conf.int =TRUE),2)
+age14_imd_results = round(summary(pool(age14_imd_adjusted), conf.int =TRUE),2)
+
+
+#pull out only SES predictor oefficients etc so dont have confounders
+age14_nvq = age14_nvq_results[10:14, ]
+#age14_nvq= age14_nvq %>% add_row(term= "highest_NVQ1",  .before=1)  #add column for reference category
+#age14_nvq[is.na(age14_nvq)] <- "REFERENCE"
+#nvq = c("highest_NVQ1", "highest_NVQ2", "highest_NVQ3", "highest_NVQ4", "highest_NVQ5", "highest_NVQ0") #so can reorder into right order for table (move NVQ0 to end)
+#age14_nvq<- age14_nvq %>%  slice(match(nvq, term))
+
+age14_income = age14_income_results[10:13,]
+#age14_income= age14_income %>% add_row(term= "income_quintiles1",  .before=1) #add column for reference category
+#age14_income[is.na(age14_income)] <- "REFERENCE"
+
+age14_wealth = age14_wealth_results[10:13,]
+#age14_wealth= age14_wealth %>% add_row(term= "wealth_quintiles1",  .before=1) #add column for reference category
+#age14_wealth[is.na(age14_wealth)] <- "REFERENCE"
+
+age14_occupation = age14_occupation_results[10:12,]
+#age14_occupation= age14_occupation %>% add_row(term= "occupational_status2",  .before=1) #add column for reference category
+#age14_occupation[is.na(age14_occupation)] <- "REFERENCE"
+
+age14_imd = age14_imd_results[10:18,]
+#age14_imd= age14_imd%>% add_row(term= "imd1",  .before=1) #add column for reference category
+#age14_imd[is.na(age14_imd)] <- "REFERENCE"
+#combine indicators together
+age14_results = rbind(age14_nvq, age14_income, age14_wealth, age14_occupation, age14_imd)
+```
+
+
+#factor analysis to get composite ses predictor 
+```{r}
+imputed_mcs2_1 <- complete(imputed_mcs2,1)
+imputed_mcs2_2 <- complete(imputed_mcs2,2)
+imputed_mcs2_3 <- complete(imputed_mcs2,3)
+imputed_mcs2_4 <- complete(imputed_mcs2,4)
+imputed_mcs2_5 <- complete(imputed_mcs2,5)
+imputed_mcs2_6 <- complete(imputed_mcs2,6)
+imputed_mcs2_7 <- complete(imputed_mcs2,7)
+imputed_mcs2_8 <- complete(imputed_mcs2,8)
+imputed_mcs2_9 <- complete(imputed_mcs2,9)
+imputed_mcs2_10 <- complete(imputed_mcs2,10)
+imputed_mcs2_11 <- complete(imputed_mcs2,11)
+imputed_mcs2_12 <- complete(imputed_mcs2,12)
+imputed_mcs2_13 <- complete(imputed_mcs2,13)
+imputed_mcs2_14 <- complete(imputed_mcs2,14)
+imputed_mcs2_15 <- complete(imputed_mcs2,15)
+imputed_mcs2_16 <- complete(imputed_mcs2,16)
+imputed_mcs2_17 <- complete(imputed_mcs2,17)
+imputed_mcs2_18 <- complete(imputed_mcs2,18)
+imputed_mcs2_19 <- complete(imputed_mcs2,19)
+imputed_mcs2_20<- complete(imputed_mcs2,20)
+imputed_mcs2_21<- complete(imputed_mcs2,21)
+imputed_mcs2_22<- complete(imputed_mcs2,22)
+imputed_mcs2_23<- complete(imputed_mcs2,23)
+imputed_mcs2_24<- complete(imputed_mcs2,24)
+imputed_mcs2_25<- complete(imputed_mcs2,25)
+
+#factor analysis to get factor score####
+#factor analysis model
+
+
+#create imputed datasets as a list - this is so can run CFA over each dataset
+imputed_datasets = list(imputed_mcs2_1, imputed_mcs2_2, imputed_mcs2_3, imputed_mcs2_4, imputed_mcs2_5, 
+                        imputed_mcs2_6, imputed_mcs2_7, imputed_mcs2_8, imputed_mcs2_9, imputed_mcs2_10, 
+                        imputed_mcs2_11, imputed_mcs2_12, imputed_mcs2_13, imputed_mcs2_14, imputed_mcs2_15,
+                        imputed_mcs2_16, imputed_mcs2_17, imputed_mcs2_18, imputed_mcs2_19, imputed_mcs2_20, 
+                        imputed_mcs2_21, imputed_mcs2_22, imputed_mcs2_23, imputed_mcs2_24, imputed_mcs2_25)
+
+#define CFA model to create SEP
+SEP_model <- 'SEP=~ highest_NVQ + income_quintiles + wealth_quintiles + occupational_status + imd'
+
+#run CFA across 25 imputed datasets
+cfa_imputed = function(ert){
+  fit = cfa(SEP_model, 
+            data = ert,
+            ordered = c("highest_NVQ", "income_quintiles","wealth_quintiles", "occupational_status", "imd"), 
+            std.lv=TRUE, estimator="WLSMV")
+  ses_latent = lavPredict(fit, type = "lv")
+}
+
+#create and add SES latent variable to each dataset
+imputed_datasets$ses_latent = lapply(imputed_datasets, cfa_imputed)
+
+#get individual datasets from list - these will now have SEP composite (pull this out for each dataset). 
+#this is so can run the regression over each dataset. 
+imputed_data1 = imputed_datasets[[1]]
+imputed_data1$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[1]], center = TRUE, scale = TRUE))
+#imputed_data1$ses_latent = scale(imputed_data1$ses_latent, center = TRUE, scale = TRUE)
+imputed_data2 = imputed_datasets[[2]]
+imputed_data2$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[2]], center = TRUE, scale = TRUE))
+#imputed_data2$ses_latent = scale(imputed_data2$ses_latent, center = TRUE, scale = TRUE)
+imputed_data3 = imputed_datasets[[3]]
+imputed_data3$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[3]], center = TRUE, scale = TRUE))
+#imputed_data3$ses_latent = scale(imputed_data3$ses_latent, center = TRUE, scale = TRUE)
+imputed_data4 = imputed_datasets[[4]]
+imputed_data4$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[4]], center = TRUE, scale = TRUE))
+#imputed_data4$ses_latent = scale(imputed_data4$ses_latent, center = TRUE, scale = TRUE)
+imputed_data5 = imputed_datasets[[5]]
+imputed_data5$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[5]], center = TRUE, scale = TRUE))
+#imputed_data5$ses_latent = scale(imputed_data5$ses_latent, center = TRUE, scale = TRUE)
+imputed_data6 = imputed_datasets[[6]]
+imputed_data6$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[6]], center = TRUE, scale = TRUE))
+#imputed_data6$ses_latent = scale(imputed_data6$ses_latent, center = TRUE, scale = TRUE)
+imputed_data7 = imputed_datasets[[7]]
+imputed_data7$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[7]], center = TRUE, scale = TRUE))
+#imputed_data7$ses_latent = scale(imputed_data7$ses_latent, center = TRUE, scale = TRUE)
+imputed_data8 = imputed_datasets[[8]]
+imputed_data8$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[8]], center = TRUE, scale = TRUE))
+#imputed_data8$ses_latent = scale(imputed_data8$ses_latent, center = TRUE, scale = TRUE)
+imputed_data9 = imputed_datasets[[9]]
+imputed_data9$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[9]], center = TRUE, scale = TRUE))
+#imputed_data9$ses_latent = scale(imputed_data9$ses_latent, center = TRUE, scale = TRUE)
+imputed_data10 = imputed_datasets[[10]]
+imputed_data10$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[10]], center = TRUE, scale = TRUE))
+#imputed_data10$ses_latent = scale(imputed_data10$ses_latent, center = TRUE, scale = TRUE)
+imputed_data11 = imputed_datasets[[11]]
+imputed_data11$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[11]],center = TRUE, scale = TRUE))
+#imputed_data11$ses_latent = scale(imputed_data11$ses_latent, center = TRUE, scale = TRUE)
+imputed_data12 = imputed_datasets[[12]]
+imputed_data12$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[12]], center = TRUE, scale = TRUE))
+#imputed_data12$ses_latent = scale(imputed_data12$ses_latent, center = TRUE, scale = TRUE)
+imputed_data13 = imputed_datasets[[13]]
+imputed_data13$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[13]], center = TRUE, scale = TRUE))
+#imputed_data13$ses_latent = scale(imputed_data13$ses_latent, center = TRUE, scale = TRUE)
+imputed_data14 = imputed_datasets[[14]]
+imputed_data14$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[14]], center = TRUE, scale = TRUE))
+#imputed_data14$ses_latent = scale(imputed_data14$ses_latent, center = TRUE, scale = TRUE)
+imputed_data15 = imputed_datasets[[15]]
+imputed_data15$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[15]], center = TRUE, scale = TRUE))
+#imputed_data15$ses_latent = scale(imputed_data15$ses_latent, center = TRUE, scale = TRUE)
+imputed_data16 = imputed_datasets[[16]]
+imputed_data16$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[16]], center = TRUE, scale = TRUE))
+#imputed_data16$ses_latent = scale(imputed_data16$ses_latent, center = TRUE, scale = TRUE)
+imputed_data17 = imputed_datasets[[17]]
+imputed_data17$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[17]], center = TRUE, scale = TRUE))
+#imputed_data17$ses_latent = scale(imputed_data17$ses_latent, center = TRUE, scale = TRUE)
+imputed_data18 = imputed_datasets[[18]]
+imputed_data18$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[18]], center = TRUE, scale = TRUE))
+#imputed_data18$ses_latent = scale(imputed_data18$ses_latent, center = TRUE, scale = TRUE)
+imputed_data19 = imputed_datasets[[19]]
+imputed_data19$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[19]], center = TRUE, scale = TRUE))
+#imputed_data19$ses_latent = scale(imputed_data19$ses_latent, center = TRUE, scale = TRUE)
+imputed_data20 = imputed_datasets[[20]]
+imputed_data20$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[20]], center = TRUE, scale = TRUE))
+#imputed_data20$ses_latent = scale(imputed_data20$ses_latent, center = TRUE, scale = TRUE)
+imputed_data21 = imputed_datasets[[21]]
+imputed_data21$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[21]], center = TRUE, scale = TRUE))
+#imputed_data21$ses_latent = scale(imputed_data21$ses_latent, center = TRUE, scale = TRUE)
+imputed_data22 = imputed_datasets[[22]]
+imputed_data22$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[22]], center = TRUE, scale = TRUE))
+#imputed_data22$ses_latent = scale(imputed_data22$ses_latent, center = TRUE, scale = TRUE)
+imputed_data23 = imputed_datasets[[23]]
+imputed_data23$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[23]], center = TRUE, scale = TRUE))
+#imputed_data23$ses_latent = scale(imputed_data23$ses_latent, center = TRUE, scale = TRUE)
+imputed_data24 = imputed_datasets[[24]]
+imputed_data24$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[24]], center = TRUE, scale = TRUE))
+#imputed_data24$ses_latent = scale(imputed_data24$ses_latent, center = TRUE, scale = TRUE)
+imputed_data25 = imputed_datasets[[25]]
+imputed_data25$ses_latent = as.numeric(scale(imputed_datasets$ses_latent[[25]], center = TRUE, scale = TRUE))
+#imputed_data25$ses_latent = scale(imputed_data25$ses_latent, center = TRUE, scale = TRUE)
+
+#create composite SEC quintiles (these will be used for plotting later)
+#add composite quintiles to data
+#data 1
+imputed_data1$composite_quintiles = quantcut(imputed_data1$ses_latent,5)
+levels(imputed_data1$composite_quintiles)[1] = "1"
+levels(imputed_data1$composite_quintiles)[2] = "2"
+levels(imputed_data1$composite_quintiles)[3] = "3"
+levels(imputed_data1$composite_quintiles)[4] = "4"
+levels(imputed_data1$composite_quintiles)[5] = "5"
+#data2
+imputed_data2$composite_quintiles = quantcut(imputed_data2$ses_latent,5)
+levels(imputed_data2$composite_quintiles)[1] = "1"
+levels(imputed_data2$composite_quintiles)[2] = "2"
+levels(imputed_data2$composite_quintiles)[3] = "3"
+levels(imputed_data2$composite_quintiles)[4] = "4"
+levels(imputed_data2$composite_quintiles)[5] = "5"
+#data3
+imputed_data3$composite_quintiles = quantcut(imputed_data3$ses_latent,5)
+levels(imputed_data3$composite_quintiles)[1] = "1"
+levels(imputed_data3$composite_quintiles)[2] = "2"
+levels(imputed_data3$composite_quintiles)[3] = "3"
+levels(imputed_data3$composite_quintiles)[4] = "4"
+levels(imputed_data3$composite_quintiles)[5] = "5"
+#dat4
+imputed_data4$composite_quintiles = quantcut(imputed_data4$ses_latent,5)
+levels(imputed_data4$composite_quintiles)[1] = "1"
+levels(imputed_data4$composite_quintiles)[2] = "2"
+levels(imputed_data4$composite_quintiles)[3] = "3"
+levels(imputed_data4$composite_quintiles)[4] = "4"
+levels(imputed_data4$composite_quintiles)[5] = "5"
+#DATA5
+imputed_data5$composite_quintiles = quantcut(imputed_data5$ses_latent,5)
+levels(imputed_data5$composite_quintiles)[1] = "1"
+levels(imputed_data5$composite_quintiles)[2] = "2"
+levels(imputed_data5$composite_quintiles)[3] = "3"
+levels(imputed_data5$composite_quintiles)[4] = "4"
+levels(imputed_data5$composite_quintiles)[5] = "5"
+#data6
+imputed_data6$composite_quintiles = quantcut(imputed_data6$ses_latent,5)
+levels(imputed_data6$composite_quintiles)[1] = "1"
+levels(imputed_data6$composite_quintiles)[2] = "2"
+levels(imputed_data6$composite_quintiles)[3] = "3"
+levels(imputed_data6$composite_quintiles)[4] = "4"
+levels(imputed_data6$composite_quintiles)[5] = "5"
+#data7
+imputed_data7$composite_quintiles = quantcut(imputed_data7$ses_latent,5)
+levels(imputed_data7$composite_quintiles)[1] = "1"
+levels(imputed_data7$composite_quintiles)[2] = "2"
+levels(imputed_data7$composite_quintiles)[3] = "3"
+levels(imputed_data7$composite_quintiles)[4] = "4"
+levels(imputed_data7$composite_quintiles)[5] = "5"
+#data 8
+imputed_data8$composite_quintiles = quantcut(imputed_data8$ses_latent,5)
+levels(imputed_data8$composite_quintiles)[1] = "1"
+levels(imputed_data8$composite_quintiles)[2] = "2"
+levels(imputed_data8$composite_quintiles)[3] = "3"
+levels(imputed_data8$composite_quintiles)[4] = "4"
+levels(imputed_data8$composite_quintiles)[5] = "5"
+#data 9 
+imputed_data9$composite_quintiles = quantcut(imputed_data9$ses_latent,5)
+levels(imputed_data9$composite_quintiles)[1] = "1"
+levels(imputed_data9$composite_quintiles)[2] = "2"
+levels(imputed_data9$composite_quintiles)[3] = "3"
+levels(imputed_data9$composite_quintiles)[4] = "4"
+levels(imputed_data9$composite_quintiles)[5] = "5"
+#data10
+imputed_data10$composite_quintiles = quantcut(imputed_data10$ses_latent,5)
+levels(imputed_data10$composite_quintiles)[1] = "1"
+levels(imputed_data10$composite_quintiles)[2] = "2"
+levels(imputed_data10$composite_quintiles)[3] = "3"
+levels(imputed_data10$composite_quintiles)[4] = "4"
+levels(imputed_data10$composite_quintiles)[5] = "5"
+#data11
+imputed_data11$composite_quintiles = quantcut(imputed_data11$ses_latent,5)
+levels(imputed_data11$composite_quintiles)[1] = "1"
+levels(imputed_data11$composite_quintiles)[2] = "2"
+levels(imputed_data11$composite_quintiles)[3] = "3"
+levels(imputed_data11$composite_quintiles)[4] = "4"
+levels(imputed_data11$composite_quintiles)[5] = "5"
+#data12
+imputed_data12$composite_quintiles = quantcut(imputed_data12$ses_latent,5)
+levels(imputed_data12$composite_quintiles)[1] = "1"
+levels(imputed_data12$composite_quintiles)[2] = "2"
+levels(imputed_data12$composite_quintiles)[3] = "3"
+levels(imputed_data12$composite_quintiles)[4] = "4"
+levels(imputed_data12$composite_quintiles)[5] = "5"
+#data13
+imputed_data13$composite_quintiles = quantcut(imputed_data13$ses_latent,5)
+levels(imputed_data13$composite_quintiles)[1] = "1"
+levels(imputed_data13$composite_quintiles)[2] = "2"
+levels(imputed_data13$composite_quintiles)[3] = "3"
+levels(imputed_data13$composite_quintiles)[4] = "4"
+levels(imputed_data13$composite_quintiles)[5] = "5"
+#data14
+imputed_data14$composite_quintiles = quantcut(imputed_data14$ses_latent,5)
+levels(imputed_data14$composite_quintiles)[1] = "1"
+levels(imputed_data14$composite_quintiles)[2] = "2"
+levels(imputed_data14$composite_quintiles)[3] = "3"
+levels(imputed_data14$composite_quintiles)[4] = "4"
+levels(imputed_data14$composite_quintiles)[5] = "5"
+#data15
+imputed_data15$composite_quintiles = quantcut(imputed_data15$ses_latent,5)
+levels(imputed_data15$composite_quintiles)[1] = "1"
+levels(imputed_data15$composite_quintiles)[2] = "2"
+levels(imputed_data15$composite_quintiles)[3] = "3"
+levels(imputed_data15$composite_quintiles)[4] = "4"
+levels(imputed_data15$composite_quintiles)[5] = "5"
+#data16
+imputed_data16$composite_quintiles = quantcut(imputed_data16$ses_latent,5)
+levels(imputed_data16$composite_quintiles)[1] = "1"
+levels(imputed_data16$composite_quintiles)[2] = "2"
+levels(imputed_data16$composite_quintiles)[3] = "3"
+levels(imputed_data16$composite_quintiles)[4] = "4"
+levels(imputed_data16$composite_quintiles)[5] = "5"
+#data 17
+imputed_data17$composite_quintiles = quantcut(imputed_data17$ses_latent,5)
+levels(imputed_data17$composite_quintiles)[1] = "1"
+levels(imputed_data17$composite_quintiles)[2] = "2"
+levels(imputed_data17$composite_quintiles)[3] = "3"
+levels(imputed_data17$composite_quintiles)[4] = "4"
+levels(imputed_data17$composite_quintiles)[5] = "5"
+#data18
+imputed_data18$composite_quintiles = quantcut(imputed_data18$ses_latent,5)
+levels(imputed_data18$composite_quintiles)[1] = "1"
+levels(imputed_data18$composite_quintiles)[2] = "2"
+levels(imputed_data18$composite_quintiles)[3] = "3"
+levels(imputed_data18$composite_quintiles)[4] = "4"
+levels(imputed_data18$composite_quintiles)[5] = "5"
+#data 19
+imputed_data19$composite_quintiles = quantcut(imputed_data19$ses_latent,5)
+levels(imputed_data19$composite_quintiles)[1] = "1"
+levels(imputed_data19$composite_quintiles)[2] = "2"
+levels(imputed_data19$composite_quintiles)[3] = "3"
+levels(imputed_data19$composite_quintiles)[4] = "4"
+levels(imputed_data19$composite_quintiles)[5] = "5"
+#data 20
+imputed_data20$composite_quintiles = quantcut(imputed_data20$ses_latent,5)
+levels(imputed_data20$composite_quintiles)[1] = "1"
+levels(imputed_data20$composite_quintiles)[2] = "2"
+levels(imputed_data20$composite_quintiles)[3] = "3"
+levels(imputed_data20$composite_quintiles)[4] = "4"
+levels(imputed_data20$composite_quintiles)[5] = "5"
+#data 21
+imputed_data21$composite_quintiles = quantcut(imputed_data21$ses_latent,5)
+levels(imputed_data21$composite_quintiles)[1] = "1"
+levels(imputed_data21$composite_quintiles)[2] = "2"
+levels(imputed_data21$composite_quintiles)[3] = "3"
+levels(imputed_data21$composite_quintiles)[4] = "4"
+levels(imputed_data21$composite_quintiles)[5] = "5"
+#data22
+imputed_data22$composite_quintiles = quantcut(imputed_data22$ses_latent,5)
+levels(imputed_data22$composite_quintiles)[1] = "1"
+levels(imputed_data22$composite_quintiles)[2] = "2"
+levels(imputed_data22$composite_quintiles)[3] = "3"
+levels(imputed_data22$composite_quintiles)[4] = "4"
+levels(imputed_data22$composite_quintiles)[5] = "5"
+#data 23
+imputed_data23$composite_quintiles = quantcut(imputed_data23$ses_latent,5)
+levels(imputed_data23$composite_quintiles)[1] = "1"
+levels(imputed_data23$composite_quintiles)[2] = "2"
+levels(imputed_data23$composite_quintiles)[3] = "3"
+levels(imputed_data23$composite_quintiles)[4] = "4"
+levels(imputed_data23$composite_quintiles)[5] = "5"
+#data 24
+imputed_data24$composite_quintiles = quantcut(imputed_data24$ses_latent,5)
+levels(imputed_data24$composite_quintiles)[1] = "1"
+levels(imputed_data24$composite_quintiles)[2] = "2"
+levels(imputed_data24$composite_quintiles)[3] = "3"
+levels(imputed_data24$composite_quintiles)[4] = "4"
+levels(imputed_data24$composite_quintiles)[5] = "5"
+#data 25
+imputed_data25$composite_quintiles = quantcut(imputed_data25$ses_latent,5)
+levels(imputed_data25$composite_quintiles)[1] = "1"
+levels(imputed_data25$composite_quintiles)[2] = "2"
+levels(imputed_data25$composite_quintiles)[3] = "3"
+levels(imputed_data25$composite_quintiles)[4] = "4"
+levels(imputed_data25$composite_quintiles)[5] = "5"
+
+
+#regression models with composite as the mdoerator. run this across 25 imputed datasets that have the ses_latent variable in. 
+
+#age3
+age3_model <- function(df) {
+  fit <- lm(age3_standardised ~ gender +ethnicity + language_used_at_home + ses_latent, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+#age5
+age5_model <- function(df) {
+  fit <- lm(age5_standardised ~ gender +ethnicity + language_used_at_home + ses_latent, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+
+#age11
+age11_model <- function(df) {
+  fit <- lm(age11_standardised ~ gender +ethnicity + language_used_at_home + ses_latent, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+
+#age14
+age14_model <- function(df) {
+  fit <- lm(age14_standardised ~ gender +ethnicity + language_used_at_home + ses_latent, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+
+#results
+
+#put new imputed datasets into lists (i.e. ones with the latent variable in them) and apply regression model to each
+age3CompositeResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                  imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                  imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                  imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                  imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                             age3_model)
+age5CompositeResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                    imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                    imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                    imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                    imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                               age5_model)
+age11CompositeResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                    imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                    imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                    imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                    imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                               age11_model)
+age14CompositeResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                    imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                    imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                    imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                    imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                               age14_model)
+
+
+#results
+age3_latentResults <- summary(pool(as.mira(age3CompositeResults)),conf.int = TRUE, conf.level = 0.95) 
+age5_latentResults <- summary(pool(as.mira(age5CompositeResults)),conf.int = TRUE, conf.level = 0.95) 
+age11_latentResults <- summary(pool(as.mira(age11CompositeResults)),conf.int = TRUE, conf.level = 0.95) 
+age14_latentResults <- summary(pool(as.mira(age14CompositeResults)),conf.int = TRUE, conf.level = 0.95) 
+
+
+#confounders only models 
+
+age3_compositeConfounders <- function(df) {
+  fit <- lm(age3_standardised ~ gender + ethnicity + language_used_at_home, weight=mcs2_weight, data=df)
+  return(fit)
+}
+
+age5_compositeConfounders <- function(df) {
+  fit <- lm(age5_standardised ~ gender + ethnicity + language_used_at_home, weight=mcs2_weight, data=df)
+  return(fit)
+}
+
+age11_compositeConfounders <- function(df) {
+  fit <- lm(age11_standardised ~ gender + ethnicity + language_used_at_home, weight=mcs2_weight, data=df)
+  return(fit)
+}
+
+age14_compositeConfounders <- function(df) {
+  fit <- lm(age14_standardised ~ gender + ethnicity + language_used_at_home, weight=mcs2_weight, data=df)
+  return(fit)
+}
+
+
+
+age3CompositeConfoundersResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                  imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                  imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                  imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                  imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                             age3_compositeConfounders)
+
+
+age5CompositeConfoundersResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                  imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                  imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                  imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                  imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                             age5_compositeConfounders)
+
+
+age11CompositeConfoundersResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                  imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                  imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                  imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                  imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                             age11_compositeConfounders)
+
+
+age14CompositeConfoundersResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                  imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                  imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                  imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                  imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                             age14_compositeConfounders)
+```
+
+
+
+
+#start to gather relevant information for tables
+
+```{r}
+age3_results$estimate = bv(age3_results$estimate) #no leading 0 
+#age3_results$estimate = round(age3_results$estimate,2)
+age3_results$`2.5 %` = bv(age3_results$`2.5 %`)
+age3_results$`97.5 %` = bv(age3_results$`97.5 %`)
+age3_results$p.value1= ifelse(age3_results$p.value< .001, "<.001" , pv1(age3_results$p.value))
+#age3_results$p.value = round(age3_results$p.value, 3)
+age3_results$coefficient = paste0(age3_results$estimate, "[", age3_results$`2.5 %`, ";", age3_results$`97.5 %`, "]")
+#age3_results$p.value [age3_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age3_results$stars = add.significance.stars(age3_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age3_results$p1 = paste0(age3_results$p.value1, "")
+age3_results$p = paste0("p", age3_results$p1)
+age3_results$new_coef = paste0(age3_results$coefficient, age3_results$stars)  #combine coefficients and stars into column.
+
+age5_results$estimate = bv(age5_results$estimate) #no leading 0 
+#age5_results$estimate = round(age5_results$estimate,2)
+age5_results$`2.5 %` = bv(age5_results$`2.5 %`)
+age5_results$`97.5 %` = bv(age5_results$`97.5 %`)
+age5_results$p.value1= ifelse(age5_results$p.value< .001, "<.001" , pv1(age5_results$p.value))
+#age5_results$p.value = round(age5_results$p.value, 3)
+age5_results$coefficient = paste0(age5_results$estimate, "[", age5_results$`2.5 %`, ";", age5_results$`97.5 %`, "]")
+#age5_results$p.value [age5_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age5_results$stars = add.significance.stars(age5_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age5_results$p1 = paste0(age5_results$p.value1, "") 
+age5_results$p = paste0("p", age5_results$p1)
+age5_results$new_coef = paste0(age5_results$coefficient, age5_results$stars)#combine coefficients and stars into column.
+
+
+age11_results$estimate = bv(age11_results$estimate) #no leading 0 
+#age11_results$estimate = round(age11_results$estimate,2)
+age11_results$`2.5 %` = bv(age11_results$`2.5 %`)
+age11_results$`97.5 %` = bv(age11_results$`97.5 %`)
+age11_results$p.value1= ifelse(age11_results$p.value< .001, "<.001" , pv1(age11_results$p.value))
+#age11_results$p.value = round(age11_results$p.value, 3)
+age11_results$coefficient = paste0(age11_results$estimate, "[", age11_results$`2.5 %`, ";", age11_results$`97.5 %`, "]")
+#age11_results$p.value [age11_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age11_results$stars = add.significance.stars(age11_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age11_results$p1 = paste0(age11_results$p.value1, "") 
+age11_results$p = paste0("p", age11_results$p1)
+age11_results$new_coef = paste0(age11_results$coefficient, age11_results$stars)#combine coefficients and stars into column.
+
+age14_results$estimate = bv(age14_results$estimate) #no leading 0 
+#age14_results$estimate = round(age14_results$estimate,2)
+age14_results$`2.5 %` = bv(age14_results$`2.5 %`)
+age14_results$`97.5 %` = bv(age14_results$`97.5 %`)
+age14_results$p.value1= ifelse(age14_results$p.value< .001, "<.001" , pv1(age14_results$p.value))
+#age14_results$p.value = round(age14_results$p.value, 3)
+age14_results$coefficient = paste0(age14_results$estimate, "[", age14_results$`2.5 %`, ";", age14_results$`97.5 %`, "]")
+#age14_results$p.value [age14_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age14_results$stars = add.significance.stars(age14_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age14_results$p1 = paste0(age14_results$p.value1, "") 
+age14_results$p = paste0("p", age14_results$p1)
+age14_results$new_coef = paste0(age14_results$coefficient, age14_results$stars)#combine coefficients and stars into column.
+
+
+#age 3 results
+age3_latent_results <- age3_latentResults[10,]
+age3_latent_results$`2.5 %` = bv(age3_latent_results$`2.5 %`)
+age3_latent_results$`97.5 %` = bv(age3_latent_results$`97.5 %`)
+age3_latent_results$CIs = paste0("[", age3_latent_results$`2.5 %`, ";", age3_latent_results$`97.5 %`, "]")
+age3_latent_results$estimate = bv(age3_latent_results$estimate) #no leading 0 
+age3_latent_results$p.value1= ifelse(age3_latent_results$p.value< .001, "<.001" , pv1(age3_latent_results$p.value))
+#age3_latent_results$p.value = round(age3_latent_results$p.value, 3)
+age3_latent_results$coefficient = paste0(age3_latent_results$estimate, age3_latent_results$CIs)
+#age3_latent_results$p.value [age3_latent_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age3_latent_results$stars = add.significance.stars(age3_latent_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age3_latent_results$p1 = paste0(age3_latent_results$p.value1, "")
+age3_latent_results$p = paste0("p", age3_latent_results$p1)
+age3_latent_results$new_coef = paste0(age3_latent_results$coefficient, age3_latent_results$stars)  #combine coefficients and stars into column.
+age3_composite_result <- age3_latent_results %>% 
+  select(term, new_coef, p)
+
+
+
+#age 5 results
+age5_latent_results <- age5_latentResults[10,]
+age5_latent_results$`2.5 %` = bv(age5_latent_results$`2.5 %`)
+age5_latent_results$`97.5 %` = bv(age5_latent_results$`97.5 %`)
+age5_latent_results$CIs = paste0("[", age5_latent_results$`2.5 %`, ";", age5_latent_results$`97.5 %`, "]")
+age5_latent_results$estimate = bv(age5_latent_results$estimate) #no leading 0 
+age5_latent_results$p.value1= ifelse(age5_latent_results$p.value< .001, "<.001" , pv1(age5_latent_results$p.value))
+#age5_latent_results$p.value = round(age5_latent_results$p.value, 3)
+age5_latent_results$coefficient = paste0(age5_latent_results$estimate, age5_latent_results$CIs)
+#age5_latent_results$p.value [age5_latent_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age5_latent_results$stars = add.significance.stars(age5_latent_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age5_latent_results$p1 = paste0(age5_latent_results$p.value1, "")
+age5_latent_results$p = paste0("p", age5_latent_results$p1)
+age5_latent_results$new_coef = paste0(age5_latent_results$coefficient, age5_latent_results$stars)  #combine coefficients and stars into column.
+age5_composite_result <- age5_latent_results %>% 
+  select(term, new_coef, p)
+
+
+#age 11 results
+age11_latent_results <- age11_latentResults[10,]
+age11_latent_results$`2.5 %` = bv(age11_latent_results$`2.5 %`)
+age11_latent_results$`97.5 %` = bv(age11_latent_results$`97.5 %`)
+age11_latent_results$CIs = paste0("[", age11_latent_results$`2.5 %`, ";", age11_latent_results$`97.5 %`, "]")
+age11_latent_results$estimate = bv(age11_latent_results$estimate) #no leading 0 
+age11_latent_results$p.value1= ifelse(age11_latent_results$p.value< .001, "<.001" , pv1(age11_latent_results$p.value))
+#age11_latent_results$p.value = round(age11_latent_results$p.value, 3)
+age11_latent_results$coefficient = paste0(age11_latent_results$estimate, age11_latent_results$CIs)
+#age11_latent_results$p.value [age11_latent_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age11_latent_results$stars = add.significance.stars(age11_latent_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age11_latent_results$p1 = paste0(age11_latent_results$p.value1, "")
+age11_latent_results$p = paste0("p", age11_latent_results$p1)
+age11_latent_results$new_coef = paste0(age11_latent_results$coefficient, age11_latent_results$stars)  #combine coefficients and stars into column.
+age11_composite_result <- age11_latent_results %>% 
+  select(term, new_coef, p)
+
+
+#age 14 results
+#age 14  results
+age14_latent_results <- age14_latentResults[10,]
+age14_latent_results$`2.5 %` = bv(age14_latent_results$`2.5 %`)
+age14_latent_results$`97.5 %` = bv(age14_latent_results$`97.5 %`)
+age14_latent_results$CIs = paste0("[", age14_latent_results$`2.5 %`, ";", age14_latent_results$`97.5 %`, "]")
+age14_latent_results$estimate = bv(age14_latent_results$estimate) #no leading 0 
+age14_latent_results$p.value1= ifelse(age14_latent_results$p.value< .001, "<.001" , pv1(age14_latent_results$p.value))
+#age14_latent_results$p.value = round(age14_latent_results$p.value, 3)
+age14_latent_results$coefficient = paste0(age14_latent_results$estimate, age14_latent_results$CIs)
+#age14_latent_results$p.value [age14_latent_results$p.value <.001] <- paste0("<.001") #change p=0.000 to p<.001
+age14_latent_results$stars = add.significance.stars(age14_latent_results$p.value, cutoffs=c(0.05, 0.01, 0.001))
+age14_latent_results$p1 = paste0(age14_latent_results$p.value1, "")
+age14_latent_results$p = paste0("p", age14_latent_results$p1)
+age14_latent_results$new_coef = paste0(age14_latent_results$coefficient, age14_latent_results$stars)  #combine coefficients and stars into column.
+age14_composite_result <- age14_latent_results %>% 
+  select(term, new_coef, p)
+
+
+age3_tableData <- age3_results %>%  select(term, new_coef, p)
+age3_tableData= as_tibble(age3_tableData)
+
+age5_tableData <- age5_results %>%  select(term, new_coef, p)
+age5_tableData= as_tibble(age5_tableData)
+
+age11_tableData <- age11_results %>%  select(term, new_coef, p)
+age11_tableData= as_tibble(age11_tableData)
+
+age14_tableData <- age14_results %>%  select(term, new_coef, p)
+age14_tableData= as_tibble(age14_tableData)
+
+age3_tableData = rbind(age3_tableData, age3_composite_result)
+age5_tableData = rbind(age5_tableData, age5_composite_result)
+age11_tableData = rbind(age11_tableData, age11_composite_result)
+age14_tableData = rbind(age14_tableData, age14_composite_result)
+
+#write results how would want them in results table (all in one column) - for use with gt table
+#age3_tableData$age3 <- paste0(age3_tableData$coefficient,",", age3_tableData$p)
+#age5_tableData$age5 <- paste0(age5_tableData$coefficient,",", age5_tableData$p)
+#age11_tableData$age11 <- paste0(age11_tableData$coefficient,",", age11_tableData$p)
+#age14_tableData$age14 <- paste0(age14_tableData$coefficient,",", age14_tableData$p)
+
+
+#write results how would want them in results table (all in one column)
+age3_tableData$age3 <- paste0(age3_tableData$new_coef,"\n", age3_tableData$p)
+age5_tableData$age5 <- paste0(age5_tableData$new_coef,"\n", age5_tableData$p)
+age11_tableData$age11 <- paste0(age11_tableData$new_coef,"\n", age11_tableData$p)
+age14_tableData$age14 <- paste0(age14_tableData$new_coef,"\n", age14_tableData$p)
+
+
+#merge ages together. want to keep "term" and "ageX"
+
+age3_tableData <- age3_tableData%>% 
+  select(term, age3)
+
+age5_tableData <- age5_tableData%>% 
+  select(term, age5)
+
+age11_tableData <- age11_tableData%>% 
+  select(term, age11)
+
+age14_tableData <- age14_tableData%>% 
+  select(term, age14)
+
+ses_table_data <- cbind(age3_tableData, age5_tableData, age11_tableData, age14_tableData) 
+
+names(ses_table_data)<-c("Indicator", "age3", "indicator.1", "age5", "indicator.2", "age11", "indicator.3", "age14") 
+  
+ses_table_data <- ses_table_data %>% 
+  select(Indicator, age3, age5, age11, age14)
+
+#add in reference categories 
+ses_table_data= ses_table_data %>% add_row(Indicator= "highest_NVQ1",  .before=1) %>% 
+  add_row(Indicator= "income_quintiles1",  .before=7) %>% 
+  add_row(Indicator= "wealth_quintiles1",  .before=12) %>% 
+  add_row(Indicator= "occupational_status2",  .before=17) %>% 
+  add_row(Indicator= "imd1",  .before=21)  
+ses_table_data[is.na(ses_table_data)] <- "REFERENCE"
+#add indicator labels for vertical column in table. space for most of these as will merge cells later. 
+ses_table_data = ses_table_data %>%  add_column(z= c("Parent Education", "  ", "  ", "  ", "  ", "  ",
+                                                     "Income", "  ", "  ", "  ", "  ",  
+                                                     "Wealth",  "  ", "  ", "  ", "  ", 
+                                                     "Occupational Status",  "  ", "  ", "  ",
+                                                     "Neighbourhood Deprivation",  "  ", "  ", "  ", "  ",  "  ", "  ", "  ", "  ",  "  ", "Composite"),.before = 1)
+
+#rename SES variables
+ses_table_data$Indicator <- c("Parent Education \n (NVQ1)", "Parent Education \n (None of these/overseas qualifications)", "Parent Education \n (NVQ2", "Parent Education \n (NVQ3)", "Parent Education \n (NVQ4)", "Parent Education \n (NVQ5)", 
+                           "Income Quintile 1", "Income Quintile", "Income Quintile 3", "Income Quintile 4", "Income Quintile 5", 
+                          "Wealth Quintile 1", "Wealth Quintile 2", "Wealth Quintile 3", "Wealth Quintile 4", "Wealth Quintile 5", "Occupational Status \n (routine)", "Occupational Status \n (unemployed)", "Occupational Status \n (intermediate)", "Occupational Status \n (higher managerial)",  "Relative Neighbourhood \n Deprivation \n (most deprived decile)", "Relative Neighbourhood \n Deprivation \n (10 - <20%)", "Relative Neighbourhood \n Deprivation \n (20 - <30%)", "Relative Neighbourhood \n Deprivation \n (30 - <40%)", "Relative Neighbourhood \n Deprivation \n (40 - <50%)", "Relative Neighbourhood \n Deprivation \n (50 - <60%)", "Relative Neighbourhood \n Deprivation \n (60 - <70%)", "Relative Neighbourhood \n  Deprivation \n (70 - <80%)", "Relative Neighbourhood \n Deprivation \n (80 - <90%)", "Relative Neighbourhood \n Deprivation \n (least deprived decile)", "Composite SEP")
+
+ses_table_data[is.na(ses_table_data)] <- "   "
+
+```
+
+
+#now make table using gt package!
+
+```{r}
+ses_results_table <- ses_table_data %>% 
+mutate(age3 = str_replace_all(age3, ",", "<br>")) %>% #put p values on second line of cell 
+  mutate(age5 = str_replace_all(age5, ",", "<br>")) %>% 
+mutate(age11 = str_replace_all(age11, ",", "<br>")) %>% 
+  mutate(age14 = str_replace_all(age14, ",", "<br>")) %>% 
+  mutate(Indicator = str_replace_all(Indicator, "\n", "<br>")) %>% #separate variable names across 2 lines
+ gt() %>% 
+  tab_header(
+    title="Predicting language at ages 3, 5, 11 and 14 with 5 SEP indicators", 
+    subtitle = "Coef[95% CI]"
+    ) %>% 
+  tab_style(
+    style=list(
+      cell_text(align = "center")
+    ), 
+    locations = cells_body(
+      columns=vars(age3, age5, age11, age14)
+    )
+  ) %>% 
+   tab_style(
+    style=list(
+      cell_text(align = "center")
+    ), 
+    locations = cells_column_labels(
+      columns=vars(age3, age5, age11, age14)
+    )
+  ) %>% 
+  tab_style(style = list(
+    cell_text(size=12)
+  ), locations = cells_body(
+    columns = vars(age3, age5, age11, age14)
+  )
+  ) %>% 
+  tab_style(style = list(
+    cell_text(size=11)
+  ), locations = cells_body(
+    columns = vars(Indicator)
+  )
+  ) %>% 
+  cols_label(age3 = "Age 3", 
+             age5= "Age 5", 
+             age11= "Age 11",
+             age14= "Age 14")%>% 
+  #tab_style(
+   # style=list(
+    #  cell_text(style="italic", font = "Times")
+  #  ), locations = cells_body(
+   #   columns = vars(p)
+  #  )
+  #)  %>% 
+  tab_options(table.font.names = "Times", 
+              table_body.border.top.color = "black", 
+              table_body.hlines.color ="white",
+              table_body.vlines.color = "white",
+              table_body.border.bottom.color = "black") %>% 
+  fmt_markdown(columns=TRUE) 
+  
+      #save
+
+gtsave(mcs_results_table, "practise_results_table.html")
+```
+
+#create table with flextable package, which can be exported to word 
+
+```{r}
+
+
+#define border
+my_border = border= fp_border(color="black", width=1)
+ses_table_flex <- ses_table_data %>% 
+  flextable() %>% 
+  font(fontname = "Times New Roman", part="all") %>% 
+  fontsize(size=11, part = "all") %>% 
+  align(j=2, align="left", part="all") %>% 
+  align(j=3:6, align="center", part="all") %>% 
+  color(j=1:6, color="black", part="all") %>% 
+  width(j=1, width=0.5) %>% 
+  width(j=2, width=1.5) %>% 
+  width(j=3:6, width=1.3) %>% 
+  line_spacing(j=3:6, space=1.5) %>% 
+  line_spacing(j=1, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:6, part="all", border=my_border) %>% 
+  hline_bottom(j=1:6,part="body",  border=my_border) %>% 
+  set_header_labels(z= " ", Inidcator= "Indicator",age3= "Age 3",
+                    age5= "Age 5",age11= "Age 11", age14="Age 14") %>% 
+  merge_at(j=1, i = 1:6) %>% 
+  merge_at(j=1, i=7:11) %>% 
+  merge_at(j=1, i = 12:16) %>%
+  merge_at(j=1, i = 17:20) %>% 
+  merge_at(j=1, i=21:30) %>% 
+  rotate(i=1:6, j=1, rotation="btlr", align="center") %>% 
+  rotate(i=7:11, j=1, rotation="btlr", align="center") %>% 
+  rotate(i=12:16, j=1, rotation="btlr", align="center") %>% 
+  rotate(i=17:20, j=1, rotation="btlr", align="center") %>% 
+  rotate(i=21:30, j=1, rotation="btlr", align="center") %>% 
+  rotate(i=31, j=1, rotation="btlr", align="center") %>% 
+  align(j=1, align="center", part="all") %>% 
+  
+  
+  
+ print( preview = "docx") 
+
+
+
+ 
+```
+
+
+#now the r squared table!
+
+```{r}
+age3_confounders <- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+age5_confounders <- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+age11_confounders <- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+age14_confounders <- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+
+
+
+age3_ed_r2 = round(pool.r.squared(age3_nvq_adjusted),4)*100
+age3_income_r2 = round(pool.r.squared(age3_income_adjusted),4)*100
+age3_wealth_r2= round(pool.r.squared(age3_wealth_adjusted),4)*100
+age3_occupation_r2 = round(pool.r.squared(age3_occupation_adjusted),4)*100
+age3_imd_r2 = round(pool.r.squared(age3_imd_adjusted),4)*100
+age3_confounders_r2 = round(pool.r.squared(age3_confounders),4)*100
+#partial r squareds
+age3_ed_partial = age3_ed_r2 - age3_confounders_r2
+age3_income_partial = age3_income_r2 - age3_confounders_r2
+age3_wealth_partial = age3_wealth_r2 - age3_confounders_r2
+age3_occupation_partial = age3_occupation_r2 - age3_confounders_r2
+age3_imd_partial = age3_imd_r2 - age3_confounders_r2
+
+age5_ed_r2 = round(pool.r.squared(age5_nvq_adjusted),4)*100
+age5_income_r2 = round(pool.r.squared(age5_income_adjusted),4)*100
+age5_wealth_r2= round(pool.r.squared(age5_wealth_adjusted),4)*100
+age5_occupation_r2 = round(pool.r.squared(age5_occupation_adjusted),4)*100
+age5_imd_r2 = round(pool.r.squared(age5_imd_adjusted),4)*100
+age5_confounders_r2 = round(pool.r.squared(age5_confounders),4)*100
+#partial r squareds
+age5_ed_partial = age5_ed_r2 - age5_confounders_r2
+age5_income_partial = age5_income_r2 - age5_confounders_r2
+age5_wealth_partial = age5_wealth_r2 - age5_confounders_r2
+age5_occupation_partial = age5_occupation_r2 - age5_confounders_r2
+age5_imd_partial = age5_imd_r2 - age5_confounders_r2
+
+age11_ed_r2 = round(pool.r.squared(age11_nvq_adjusted),4)*100
+age11_income_r2 = round(pool.r.squared(age11_income_adjusted),4)*100
+age11_wealth_r2= round(pool.r.squared(age11_wealth_adjusted),4)*100
+age11_occupation_r2 = round(pool.r.squared(age11_occupation_adjusted),4)*100
+age11_imd_r2 = round(pool.r.squared(age11_imd_adjusted),4)*100
+age11_confounders_r2 = round(pool.r.squared(age11_confounders),4)*100
+#partial r squareds
+age11_ed_partial = age11_ed_r2 - age11_confounders_r2
+age11_income_partial = age11_income_r2 - age11_confounders_r2
+age11_wealth_partial = age11_wealth_r2 - age11_confounders_r2
+age11_occupation_partial = age11_occupation_r2 - age11_confounders_r2
+age11_imd_partial = age11_imd_r2 - age11_confounders_r2
+
+age14_ed_r2 = round(pool.r.squared(age14_nvq_adjusted),4)*100
+age14_income_r2 = round(pool.r.squared(age14_income_adjusted),4)*100
+age14_wealth_r2= round(pool.r.squared(age14_wealth_adjusted),4)*100
+age14_occupation_r2 = round(pool.r.squared(age14_occupation_adjusted),4)*100
+age14_imd_r2 = round(pool.r.squared(age14_imd_adjusted),4)*100
+age14_confounders_r2 = round(pool.r.squared(age14_confounders),4)*100
+#partial r squareds
+age14_ed_partial = age14_ed_r2 - age14_confounders_r2
+age14_income_partial = age14_income_r2 - age14_confounders_r2
+age14_wealth_partial = age14_wealth_r2 - age14_confounders_r2
+age14_occupation_partial = age14_occupation_r2 - age14_confounders_r2
+age14_imd_partial = age14_imd_r2 - age14_confounders_r2
+
+
+
+#composite r squareds 
+age3_composite_r2 <- as.data.frame(pool.r.squared(as.mira(age3CompositeResults)))*100
+age5_composite_r2 <- as.data.frame(pool.r.squared(as.mira(age5CompositeResults)))*100
+age11_composite_r2 <- as.data.frame(pool.r.squared(as.mira(age11CompositeResults)))*100
+age14_composite_r2 <- as.data.frame(pool.r.squared(as.mira(age14CompositeResults)))*100
+#confounders only
+age3_composite_confounders_r2 <- as.data.frame(pool.r.squared(as.mira(age3CompositeConfoundersResults)))*100
+age5_composite_confounders_r2 <- as.data.frame(pool.r.squared(as.mira(age5CompositeConfoundersResults)))*100
+age11_composite_confounders_r2 <- as.data.frame(pool.r.squared(as.mira(age11CompositeConfoundersResults)))*100
+age14_composite_confounders_r2 <- as.data.frame(pool.r.squared(as.mira(age14CompositeConfoundersResults)))*100
+
+
+
+age3_composite_partial <- age3_composite_r2 - age3_confounders_r2
+age5_composite_partial <- age5_composite_r2 - age5_confounders_r2
+age11_composite_partial <- age11_composite_r2 - age11_confounders_r2
+age14_composite_partial <- age14_composite_r2 - age14_confounders_r2
+
+
+age3_partial  = rbind(age3_ed_partial, age3_income_partial, age3_wealth_partial, age3_occupation_partial, age3_imd_partial, age3_composite_partial)
+age5_partial  = rbind(age5_ed_partial, age5_income_partial, age5_wealth_partial, age5_occupation_partial, age5_imd_partial, age5_composite_partial)
+age11_partial  = rbind(age11_ed_partial, age11_income_partial, age11_wealth_partial, age11_occupation_partial, age11_imd_partial, age11_composite_partial)
+age14_partial  = rbind(age14_ed_partial, age14_income_partial, age14_wealth_partial, age14_occupation_partial, age14_imd_partial,age14_composite_partial)
+
+
+age3_partial = as.data.frame(age3_partial)
+age5_partial = as.data.frame(age5_partial)
+age11_partial = as.data.frame(age11_partial)
+age14_partial = as.data.frame(age14_partial)
+
+age3_partial = age3_partial %>%  add_column(indicator= c("Parent Education", "Income", "Wealth", "Occupational Status", "Relative Neighbourhood Deprivation", "SEC Composite"), .before = 1)
+age5_partial = age5_partial %>%  add_column(indicator= c("Parent Education", "Income", "Wealth", "Occupational Status", "Relative Neighbourhood Deprivation", "SEC Composite"), .before = 1)
+age11_partial = age11_partial %>%  add_column(indicator= c("Parent Education", "Income", "Wealth", "Occupational Status", "Relative Neighbourhood Deprivation", "SEC Composite"), .before = 1)
+age14_partial = age14_partial %>%  add_column(indicator= c("Parent Education", "Income", "Wealth", "Occupational Status", "Relative Neighbourhood Deprivation", "SEC Composite"), .before = 1)
+
+
+age3_partialr2= age3_partial[,1:2]
+age5_partialr2= age5_partial[,1:2]
+age11_partialr2= age11_partial[,1:2]
+age14_partialr2= age14_partial[,1:2]
+
+
+
+
+
+partial_r2_values = cbind(age3_partialr2, age5_partialr2, age11_partialr2, age14_partialr2)
+names(partial_r2_values) = c("indicator", "age3", "indicator.1", "age5", "indicator2", "age11", "indicator.3", "age14")
+
+partial_r2_table <- partial_r2_values %>% 
+  select(indicator, age3, age5, age11, age14)
+
+rownames(partial_r2_table) <- NULL
+
+```
+
+
+#now put r2 data into flextable!
+
+```{r}
+#define border
+my_border = border= fp_border(color="black", width=1)
+
+partial_r2_flex<- partial_r2_table %>% 
+  flextable() %>% 
+  #add_header_row(top = TRUE, values = "Partial R2 (%)", colwidths = 5) %>% 
+  font(fontname = "Times New Roman", part="all") %>% 
+  fontsize(size=12, part = "all") %>% 
+  align(j=1, align="left", part="all") %>% 
+  align(j=2:5, align="center", part="all") %>% 
+  color(j=1:5, color="black", part="all") %>% 
+  width(j=1, width=2.2) %>% 
+  width(j=2:5, width=1) %>% 
+  line_spacing(j=2:5, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:5, part="all", border=my_border) %>% 
+  hline_bottom(j=1:5,part="body",  border=my_border) %>% 
+  set_header_labels(indicator= "Indicator",age3= "Age 3",
+                    age5= "Age 5",age11= "Age 11", age14="Age 14") %>% 
+ print( preview = "docx") 
+```
+
+
+#now the AIC values..
+```{r}
+#age 3
+age3_nvq_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age3_standardised ~ gender +ethnicity +language_used_at_home +highest_NVQ, weights = mcs2_weight")
+age3_income_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age3_standardised ~ gender +ethnicity +language_used_at_home + income_quintiles, weights = mcs2_weight")
+age3_wealth_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age3_standardised ~ gender +ethnicity +language_used_at_home + wealth_quintiles, weights = mcs2_weight")
+age3_occupation_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age3_standardised ~ gender +ethnicity +language_used_at_home +occupational_status, weights = mcs2_weight")
+age3_imd_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age3_standardised ~ gender +ethnicity +language_used_at_home +imd, weights = mcs2_weight")
+
+#composite
+AIC_age3 <- data.frame(matrix(lapply(age3CompositeResults, AIC)))
+
+
+names(AIC_age3) <- c("AIC")
+
+deviance_age3 <- data.frame(matrix(lapply(age3CompositeResults, function(x) -logLik(x)[1]*2 )))
+
+names(deviance_age3) <- c("deviance")
+
+fit_stats_age3 <- data.frame(AIC_age3, deviance_age3)
+
+fit_stats_age3$AIC <- as.numeric(fit_stats_age3$AIC)
+fit_stats_age3$deviance <- as.numeric(fit_stats_age3$deviance)
+age3_composite_aic = combine_imputed_descriptives(fit_stats_age3)
+
+#age 5
+age5_nvq_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age5_standardised ~ gender +ethnicity +language_used_at_home +highest_NVQ, weights = mcs2_weight")
+age5_income_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age5_standardised ~ gender +ethnicity +language_used_at_home + income_quintiles, weights = mcs2_weight")
+age5_wealth_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age5_standardised ~ gender +ethnicity +language_used_at_home +wealth_quintiles, weights = mcs2_weight")
+age5_occupation_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age5_standardised ~ gender +ethnicity +language_used_at_home +occupational_status, weights = mcs2_weight")
+age5_imd_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age5_standardised ~ gender +ethnicity +language_used_at_home +imd, weights = mcs2_weight")
+
+#composite
+
+AIC_age5 <- data.frame(matrix(lapply(age5CompositeResults, AIC)))
+
+
+names(AIC_age5) <- c("AIC")
+
+deviance_age5 <- data.frame(matrix(lapply(age5CompositeResults, function(x) -logLik(x)[1]*2 )))
+
+names(deviance_age5) <- c("deviance")
+
+fit_stats_age5 <- data.frame(AIC_age5, deviance_age5)
+
+fit_stats_age5$AIC <- as.numeric(fit_stats_age5$AIC)
+fit_stats_age5$deviance <- as.numeric(fit_stats_age5$deviance)
+age5_composite_aic = combine_imputed_descriptives(fit_stats_age5)
+
+#age 11
+age11_nvq_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age11_standardised ~ gender +ethnicity +language_used_at_home +highest_NVQ, weights = mcs2_weight")
+age11_income_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age11_standardised ~ gender +ethnicity +language_used_at_home + income_quintiles, weights = mcs2_weight")
+age11_wealth_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age11_standardised ~ gender +ethnicity +language_used_at_home +wealth_quintiles, weights = mcs2_weight")
+age11_occupation_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age11_standardised ~ gender +ethnicity +language_used_at_home +occupational_status, weights = mcs2_weight")
+age11_imd_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age11_standardised ~ gender +ethnicity +language_used_at_home +imd, weights = mcs2_weight")
+
+#composite
+AIC_age11 <- data.frame(matrix(lapply(age11CompositeResults, AIC)))
+
+
+names(AIC_age11) <- c("AIC")
+
+deviance_age11 <- data.frame(matrix(lapply(age11CompositeResults, function(x) -logLik(x)[1]*2 )))
+
+names(deviance_age11) <- c("deviance")
+
+fit_stats_age11 <- data.frame(AIC_age11, deviance_age11)
+
+fit_stats_age11$AIC <- as.numeric(fit_stats_age11$AIC)
+fit_stats_age11$deviance <- as.numeric(fit_stats_age11$deviance)
+age11_composite_aic = combine_imputed_descriptives(fit_stats_age11)
+
+
+#age 14
+age14_nvq_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age14_standardised ~ gender +ethnicity +language_used_at_home +highest_NVQ, weights = mcs2_weight")
+age14_income_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age14_standardised ~ gender +ethnicity +language_used_at_home + income_quintiles, weights = mcs2_weight")
+age14_wealth_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age14_standardised ~ gender +ethnicity +language_used_at_home +wealth_quintiles, weights = mcs2_weight")
+age14_occupation_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age14_standardised ~ gender +ethnicity +language_used_at_home +occupational_status, weights = mcs2_weight")
+age14_imd_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age14_standardised ~ gender +ethnicity +language_used_at_home +imd, weights = mcs2_weight")
+
+
+#composite
+AIC_age14 <- data.frame(matrix(lapply(age14CompositeResults, AIC)))
+
+
+names(AIC_age14) <- c("AIC")
+
+deviance_age14 <- data.frame(matrix(lapply(age14CompositeResults, function(x) -logLik(x)[1]*2 )))
+
+names(deviance_age14) <- c("deviance")
+
+fit_stats_age14 <- data.frame(AIC_age14, deviance_age14)
+
+fit_stats_age14$AIC <- as.numeric(fit_stats_age14$AIC)
+fit_stats_age14$deviance <- as.numeric(fit_stats_age14$deviance)
+age14_composite_aic = combine_imputed_descriptives(fit_stats_age14)
+
+#for separate predictors table
+age3_nvq_AIC <- age3_nvq_aic[c(1,3:4),c(2)]
+age3_income_AIC <- age3_income_aic[c(1,3:4),c(2)]
+age3_wealth_AIC <- age3_wealth_aic[c(1,3:4),c(2)]
+age3_occupation_AIC <- age3_occupation_aic[c(1,3:4),c(2)]
+age3_imd_AIC <- age3_imd_aic[c(1,3:4),c(2)]
+age3_composite_AIC = age3_composite_aic[c(1,3:4), c(1)]
+
+
+age3_aic_values <- rbind (age3_nvq_AIC, age3_income_AIC, age3_wealth_AIC, age3_occupation_AIC, age3_imd_AIC, age3_composite_AIC)
+age3_aic_values <- as.data.frame(age3_aic_values)
+names(age3_aic_values) <- c("AIC", "lower", "upper")
+
+age5_nvq_AIC <- age5_nvq_aic[c(1,3:4),c(2)]
+age5_income_AIC <- age5_income_aic[c(1,3:4),c(2)]
+age5_wealth_AIC <- age5_wealth_aic[c(1,3:4),c(2)]
+age5_occupation_AIC <- age5_occupation_aic[c(1,3:4),c(2)]
+age5_imd_AIC <- age5_imd_aic[c(1,3:4),c(2)]
+age5_composite_AIC = age5_composite_aic[c(1,3:4), c(1)]
+
+age5_aic_values <- rbind (age5_nvq_AIC, age5_income_AIC, age5_wealth_AIC, age5_occupation_AIC, age5_imd_AIC, age5_composite_AIC)
+age5_aic_values <- as.data.frame(age5_aic_values)
+names(age5_aic_values) <- c("AIC", "lower", "upper")
+
+age11_nvq_AIC <- age11_nvq_aic[c(1,3:4),c(2)]
+age11_income_AIC <- age11_income_aic[c(1,3:4),c(2)]
+age11_wealth_AIC <- age11_wealth_aic[c(1,3:4),c(2)]
+age11_occupation_AIC <- age11_occupation_aic[c(1,3:4),c(2)]
+age11_imd_AIC <- age11_imd_aic[c(1,3:4),c(2)]
+age11_composite_AIC = age11_composite_aic[c(1,3:4), c(1)]
+
+age11_aic_values <- rbind (age11_nvq_AIC, age11_income_AIC, age11_wealth_AIC, age11_occupation_AIC, age11_imd_AIC, age11_composite_AIC)
+age11_aic_values <- as.data.frame(age11_aic_values)
+names(age11_aic_values) <- c("AIC", "lower", "upper")
+
+age14_nvq_AIC <- age14_nvq_aic[c(1,3:4),c(2)]
+age14_income_AIC <- age14_income_aic[c(1,3:4),c(2)]
+age14_wealth_AIC <- age14_wealth_aic[c(1,3:4),c(2)]
+age14_occupation_AIC <- age14_occupation_aic[c(1,3:4),c(2)]
+age14_imd_AIC <- age14_imd_aic[c(1,3:4),c(2)]
+age14_composite_AIC = age14_composite_aic[c(1,3:4), c(1)]
+
+age14_aic_values <- rbind (age14_nvq_AIC, age14_income_AIC, age14_wealth_AIC, age14_occupation_AIC, age14_imd_AIC, age14_composite_AIC)
+age14_aic_values <- as.data.frame(age14_aic_values)
+names(age14_aic_values) <- c("AIC", "lower", "upper")
+
+
+```
+
+
+format dataframes for table 
+
+```{r}
+
+age3_aic_values = round(age3_aic_values, 2)
+age5_aic_values = round(age5_aic_values, 2)
+age11_aic_values = round(age11_aic_values, 2)
+age14_aic_values = round(age14_aic_values, 2)
+
+age3_aic_values$result = paste0(age3_aic_values$AIC, "[", age3_aic_values$lower, ";", age3_aic_values$upper, "]")
+age5_aic_values$result = paste0(age5_aic_values$AIC, "[", age5_aic_values$lower, ";", age5_aic_values$upper, "]")
+age11_aic_values$result = paste0(age11_aic_values$AIC, "[", age11_aic_values$lower, ";", age11_aic_values$upper, "]")
+age14_aic_values$result = paste0(age14_aic_values$AIC, "[", age14_aic_values$lower, ";", age14_aic_values$upper, "]")
+
+
+#add in column for delta AIC (AIC-minAIC)
+
+age3_aic_values = age3_aic_values %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2)) 
+age3_aic_values$delta_aic[age3_aic_values$delta_aic == 0 ] <- c("AIC*")
+age3_aic_values = age3_aic_values %>%  add_column(Indicator= c("Parent Education", "Income",   
+                                                     "Wealth",  "Occupational Status",
+                                                     "Neighbourhood Deprivation", "Composite SEC"),.before =1) %>% 
+  mutate(age= 3)
+age3_aic_values <- age3_aic_values %>% 
+  select(Indicator, result, delta_aic)
+
+age5_aic_values = age5_aic_values %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2))
+age5_aic_values$delta_aic[age5_aic_values$delta_aic == 0 ] <- c("AIC*")
+age5_aic_values = age5_aic_values %>%  add_column(Indicator= c("Parent Education", "Income",   
+                                                     "Wealth",  "Occupational Status",
+                                                     "Neighbourhood Deprivation", "Composite SEC"),.before =1) %>% 
+  mutate(age=5)
+age5_aic_values <- age5_aic_values %>% 
+  select(Indicator, result, delta_aic)
+
+age11_aic_values = age11_aic_values %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2))
+age11_aic_values$delta_aic[age11_aic_values$delta_aic == 0 ] <- c("AIC*")
+age11_aic_values = age11_aic_values %>%  add_column(Indicator= c("Parent Education", "Income",   
+                                                     "Wealth",  "Occupational Status",
+                                                     "Neighbourhood Deprivation", "Composite SEC"),.before =1) %>% 
+  mutate(age=11)
+age11_aic_values <- age11_aic_values %>% 
+  select(Indicator, result, delta_aic)
+
+
+age14_aic_values = age14_aic_values %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2))
+age14_aic_values$delta_aic[age14_aic_values$delta_aic == 0 ] <- c("AIC*")
+age14_aic_values = age14_aic_values %>%  add_column(Indicator= c("Parent Education", "Income",   
+                                                     "Wealth",  "Occupational Status",
+                                                     "Neighbourhood Deprivation", "Composite SEC"),.before =1) %>% 
+  mutate(age=14)
+age14_aic_values <- age14_aic_values %>% 
+  select(Indicator, result, delta_aic)
+
+
+
+AIC_values = cbind (age3_aic_values, age5_aic_values, age11_aic_values, age14_aic_values)
+AIC_values = AIC_values[, c(1:3, 5:6, 8:9, 11:12)] #select 1 indicator column and rest of results
+```
+
+make table
+
+```{r}
+my_border = border= fp_border(color="black", width=1)
+
+aic_flex<- AIC_values %>% 
+  flextable() %>% 
+
+  #add_header_row(top = TRUE, values = "Partial R2 (%)", colwidths = 5) %>% 
+ #font(fontname = "Times", part="all") %>% 
+  fontsize(size=10, part = "all") %>% 
+  align(j=1, align="left", part="all") %>% 
+  align(j=2:9, align="center", part="all") %>% 
+ color(j=1:9, color="black", part="all") %>% 
+ width(j=1, width=1.3) %>% 
+  width(j=2,  width=1) %>% 
+  width(j=4,  width=1) %>% 
+  width(j=9,  width=1) %>% 
+  width(j=8,  width=1) %>% 
+  width(j=3,  width=0.6) %>% 
+  width(j=5,  width=0.6) %>%
+  width(j=7,  width=0.6) %>%
+  width(j=9,  width=0.6) %>%
+ #line_spacing(i=1:8, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:9, part="all", border=my_border) %>% 
+  hline_bottom(j=1:9,part="body",  border=my_border) %>% 
+  set_header_labels(indicator= "Indicator", result = "AIC", delta_aic = "dAIC", result.1= "AIC", delta_aic.1 = "dAIC", 
+                    result.2 = "AIC", delta_aic.2 = "dAIC", result.3 = "AIC", delta_aic.3 = "dAIC") %>% 
+ # footnote(value=as_paragraph(c("AIC* = best model",  
+#"Values are the mean AIC values across 25 imputed datasets", 
+#"All models adjusted for sex, ethnicity and EAL.")),
+      #     ref_symbols = c(" "), inline=TRUE) %>% 
+ # fontsize(size=8, part="footer") %>% 
+  #font(fontname = "Times New Roman", part="footer") %>% 
+     print( preview = "docx") 
+
+
+
+
+```
+
+
+AIC table for composite vs all indicators simultaneously: 
+
+```{r}
+#all predictors 
+#age 3
+age3_all_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight")
+#age 5
+age5_all_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight")
+#age 11
+age11_all_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight")
+#age 14
+age14_all_aic <- get_stats_on_fit_from_MI(imputed_mcs2, "age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight")
+
+#composite 
+
+#age 3
+AIC_age3 <- data.frame(matrix(lapply(age3CompositeResults, AIC)))
+names(AIC_age3) <- c("AIC")
+
+deviance_age3 <- data.frame(matrix(lapply(age3CompositeResults, function(x) -logLik(x)[1]*2 )))
+
+names(deviance_age3) <- c("deviance")
+
+fit_stats_age3 <- data.frame(AIC_age3, deviance_age3)
+
+fit_stats_age3$AIC <- as.numeric(fit_stats_age3$AIC)
+fit_stats_age3$deviance <- as.numeric(fit_stats_age3$deviance)
+
+
+
+#age 5 
+AIC_age5 <- data.frame(matrix(lapply(age5CompositeResults, AIC)))
+names(AIC_age5) <- c("AIC")
+deviance_age5 <- data.frame(matrix(lapply(age5CompositeResults, function(x) -logLik(x)[1]*2 )))
+names(deviance_age5) <- c("deviance")
+fit_stats_age5 <- data.frame(AIC_age5, deviance_age5)
+fit_stats_age5$AIC <- as.numeric(fit_stats_age5$AIC)
+fit_stats_age5$deviance <- as.numeric(fit_stats_age5$deviance)
+
+
+#age 11
+AIC_age11 <- data.frame(matrix(lapply(age11CompositeResults, AIC)))
+names(AIC_age11) <- c("AIC")
+deviance_age11 <- data.frame(matrix(lapply(age11CompositeResults, function(x) -logLik(x)[1]*2 )))
+names(deviance_age11) <- c("deviance")
+fit_stats_age11 <- data.frame(AIC_age11, deviance_age11)
+fit_stats_age11$AIC <- as.numeric(fit_stats_age11$AIC)
+fit_stats_age11$deviance <- as.numeric(fit_stats_age11$deviance)
+
+#age14
+AIC_age14 <- data.frame(matrix(lapply(age14CompositeResults, AIC)))
+names(AIC_age14) <- c("AIC")
+deviance_age14 <- data.frame(matrix(lapply(age14CompositeResults, function(x) -logLik(x)[1]*2 )))
+names(deviance_age14) <- c("deviance")
+fit_stats_age14 <- data.frame(AIC_age14, deviance_age14)
+fit_stats_age14$AIC <- as.numeric(fit_stats_age14$AIC)
+fit_stats_age14$deviance <- as.numeric(fit_stats_age14$deviance)
+
+
+#combine
+age3_composite_aic = combine_imputed_descriptives(fit_stats_age3)
+age5_composite_aic = combine_imputed_descriptives(fit_stats_age5)
+age11_composite_aic = combine_imputed_descriptives(fit_stats_age11)
+age14_composite_aic = combine_imputed_descriptives(fit_stats_age14)
+
+age3_composite_AIC = age3_composite_aic[c(1,3:4), c(1)]
+age5_composite_AIC = age5_composite_aic[c(1,3:4), c(1)]
+age11_composite_AIC = age11_composite_aic[c(1,3:4), c(1)]
+age14_composite_AIC = age14_composite_aic[c(1,3:4), c(1)]
+
+age3_all_AIC <- age3_all_aic[c(1,3:4),c(2)]
+age5_all_AIC <- age5_all_aic[c(1,3:4),c(2)]
+age11_all_AIC <- age11_all_aic[c(1,3:4),c(2)]
+age14_all_AIC <- age14_all_aic[c(1,3:4),c(2)]
+
+
+age3_AIC_comp_table  <- as.data.frame(rbind(age3_composite_AIC, age3_all_AIC))
+age5_AIC_comp_table  <- as.data.frame(rbind(age5_composite_AIC, age5_all_AIC))
+age11_AIC_comp_table  <- as.data.frame(rbind(age11_composite_AIC, age11_all_AIC))
+age14_AIC_comp_table  <- as.data.frame(rbind(age14_composite_AIC, age14_all_AIC))
+names(age3_AIC_comp_table) <- c("AIC", "lower", "upper")
+names(age5_AIC_comp_table) <- c("AIC", "lower", "upper")
+names(age11_AIC_comp_table) <- c("AIC", "lower", "upper")
+names(age14_AIC_comp_table) <- c("AIC", "lower", "upper")
+
+
+
+age3_AIC_comp_table = round(age3_AIC_comp_table, 2)
+age5_AIC_comp_table = round(age5_AIC_comp_table, 2)
+age11_AIC_comp_table = round(age11_AIC_comp_table, 2)
+age14_AIC_comp_table = round(age14_AIC_comp_table, 2)
+age3_AIC_comp_table$result = paste0(age3_AIC_comp_table$AIC, "[", age3_AIC_comp_table$lower, ";", age3_AIC_comp_table$upper, "]")
+age5_AIC_comp_table$result = paste0(age5_AIC_comp_table$AIC, "[", age5_AIC_comp_table$lower, ";", age5_AIC_comp_table$upper, "]")
+age11_AIC_comp_table$result = paste0(age11_AIC_comp_table$AIC, "[", age11_AIC_comp_table$lower, ";", age11_AIC_comp_table$upper, "]")
+age14_AIC_comp_table$result = paste0(age14_AIC_comp_table$AIC, "[", age14_AIC_comp_table$lower, ";", age14_AIC_comp_table$upper, "]")
+
+
+#add in column for delta AIC (AIC-minAIC)
+
+age3_AIC_comp_table = age3_AIC_comp_table %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2)) 
+age3_AIC_comp_table$delta_aic[age3_AIC_comp_table$delta_aic == 0 ] <- c("AIC*")
+age3_AIC_comp_table = age3_AIC_comp_table %>%  add_column(Indicator= c("SEP composite", "All indicators"),.before =1) %>% 
+  mutate(age= 3)
+age3_AIC_comp_table <- age3_AIC_comp_table %>% 
+  select(Indicator, result, delta_aic)
+
+age5_AIC_comp_table = age5_AIC_comp_table %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2))
+age5_AIC_comp_table$delta_aic[age5_AIC_comp_table$delta_aic == 0 ] <- c("AIC*")
+age5_AIC_comp_table = age5_AIC_comp_table %>%  add_column(Indicator= c("SEP composite", "All indicators"),.before =1) %>% 
+  mutate(age=5)
+age5_AIC_comp_table <- age5_AIC_comp_table %>% 
+  select(Indicator, result, delta_aic)
+
+age11_AIC_comp_table = age11_AIC_comp_table %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2))
+age11_AIC_comp_table$delta_aic[age11_AIC_comp_table$delta_aic == 0 ] <- c("AIC*")
+age11_AIC_comp_table = age11_AIC_comp_table %>%  add_column(Indicator= c("SEP composite", "All indicators"),.before =1) %>% 
+  mutate(age=11)
+age11_AIC_comp_table <- age11_AIC_comp_table %>% 
+  select(Indicator, result, delta_aic)
+
+
+age14_AIC_comp_table = age14_AIC_comp_table %>% 
+  mutate(delta_aic = round(AIC - min(AIC),2))
+age14_AIC_comp_table$delta_aic[age14_AIC_comp_table$delta_aic == 0 ] <- c("AIC*")
+age14_AIC_comp_table = age14_AIC_comp_table %>%  add_column(Indicator= c("SEP composite", "All indicators"),.before =1) %>% 
+  mutate(age=14)
+age14_AIC_comp_table <- age14_AIC_comp_table %>% 
+  select(Indicator, result, delta_aic)
+
+AIC_comp_table = cbind (age3_AIC_comp_table, age5_AIC_comp_table, age11_AIC_comp_table, age14_AIC_comp_table)
+AIC_comp_table = AIC_comp_table[, c(1:3, 5:6, 8:9, 11:12)] #select 1 indicator column and rest of results
+
+```
+
+make the table: 
+
+```{r}
+my_border = border= fp_border(color="black", width=1)
+
+aic_flex<- AIC_comp_table %>% 
+  flextable() %>% 
+
+  #add_header_row(top = TRUE, values = "Partial R2 (%)", colwidths = 5) %>% 
+  #font(fontname = "Times New Roman", part="all") %>% 
+  fontsize(size=10, part = "all") %>% 
+  align(j=1, align="left", part="all") %>% 
+  align(j=2:9, align="center", part="all") %>% 
+ color(j=1:9, color="black", part="all") %>% 
+ width(j=1, width=1.3) %>% 
+  width(j=2,  width=1) %>% 
+  width(j=4,  width=1) %>% 
+  width(j=6,  width=1) %>% 
+  width(j=8,  width=1) %>% 
+  width(j=3,  width=0.6) %>% 
+  width(j=5,  width=0.6) %>%
+  width(j=7,  width=0.6) %>%
+  width(j=9,  width=0.6) %>%
+ line_spacing(i=1:2, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:9, part="all", border=my_border) %>% 
+  hline_bottom(j=1:9,part="body",  border=my_border) %>% 
+  set_header_labels(indicator= "Indicator", result = "AIC", delta_aic = "dAIC", result.1= "AIC", delta_aic.1 = "dAIC", 
+                    result.2 = "AIC", delta_aic.2 = "dAIC", result.3 = "AIC", delta_aic.3 = "dAIC") %>% 
+  #footnote(value=as_paragraph(c("AIC* = best model",  
+#"Values are the mean AIC values across 25 imputed datasets", 
+#"All models adjusted for sex, ethnicity and EAL.")),
+        #   ref_symbols = c(" "), inline=TRUE) %>% 
+ # fontsize(size=8, part="footer") %>% 
+ # font(fontname = "Times New Roman", part="footer") %>% 
+  
+     print( preview = "docx") 
+
+
+
+```
+
+model comparisons 
+
+```{r}
+#3. pool.compare (model with all SES predictors compared to model with one removed in turn. for each age.)####
+#age 3
+#model with all SES predictors included 
+age3_all_predictors<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+#model removing each predictor in turn 
+age3_no_nvq<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age3_no_income<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age3_no_wealth<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
+age3_no_occupation<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
+age3_no_imd<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
+D1(age3_all_predictors, age3_no_nvq )
+D1(age3_all_predictors, age3_no_income)
+D1(age3_all_predictors, age3_no_wealth)
+D1(age3_all_predictors, age3_no_occupation )
+D1(age3_all_predictors, age3_no_imd )
+
+#age 5
+#model with all SES predictors included 
+age5_all_predictors<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+#model removing each predictor in turn 
+age5_no_nvq<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age5_no_income<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age5_no_wealth<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
+age5_no_occupation<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
+age5_no_imd<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
+D1(age5_all_predictors, age5_no_nvq )
+D1(age5_all_predictors, age5_no_income )
+D1(age5_all_predictors, age5_no_wealth)
+D1(age5_all_predictors, age5_no_occupation )
+D1(age5_all_predictors, age5_no_imd) 
+
+#age 11
+#model with all SES predictors included 
+age11_all_predictors<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+#model removing each predictor in turn 
+age11_no_nvq<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age11_no_income<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age11_no_wealth<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
+age11_no_occupation<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
+age11_no_imd<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
+D1(age11_all_predictors, age11_no_nvq )
+D1(age11_all_predictors, age11_no_income )
+D1(age11_all_predictors, age11_no_wealth)
+D1(age11_all_predictors, age11_no_occupation)
+D1(age11_all_predictors, age11_no_imd )
+
+#age 14
+#model with all SES predictors included 
+age14_all_predictors<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+#model removing each predictor in turn 
+age14_no_nvq<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age14_no_income<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age14_no_wealth<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
+age14_no_occupation<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
+age14_no_imd<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
+D1(age14_all_predictors, age14_no_nvq )
+D1(age14_all_predictors, age14_no_income )
+D1(age14_all_predictors, age14_no_wealth)
+D1(age14_all_predictors, age14_no_occupation )
+D1(age14_all_predictors, age14_no_imd)
+
+```
+
+PLOT
+
+```{r}
+#PLOTS
+
+#NVQ
+age3_nvq = age3_nvq %>%  mutate(age = c("Age 3"))
+age5_nvq = age5_nvq %>%  mutate(age = c("Age 5"))
+age11_nvq = age11_nvq %>%  mutate(age = c("Age 11"))
+age14_nvq = age14_nvq %>%  mutate(age = c("Age 14"))
+
+NVQ_plot = rbind(age3_nvq, age5_nvq, age11_nvq, age14_nvq) 
+NVQ_plot = NVQ_plot %>%  select(term, estimate, `2.5 %`, `97.5 %` , age) 
+
+#convert NVQ0 to 0 for reference category 
+NVQ_plot$estimate[which(NVQ_plot$term== "highest_NVQ0")] <-0
+NVQ_plot$`2.5 %`[which(NVQ_plot$term== "highest_NVQ0")] <- 0
+NVQ_plot$`97.5 %`[which(NVQ_plot$term== "highest_NVQ0")] <- 0
+
+names(NVQ_plot) <- c("parent_NVQ" ,  "language" ,    "lower_ci_nvq" ,"upper_ci_nvq", "age")
+NVQ_plot$parent_NVQ = as.factor(NVQ_plot$parent_NVQ)
+NVQ_plot$age = as.factor(NVQ_plot$age)
+
+
+nvq_indicator <- ggplot(data=NVQ_plot, aes(x=parent_NVQ, y=language, group=age)) +
+  geom_line(aes(color=age)) +
+  geom_ribbon(data=NVQ_plot,aes(ymin=lower_ci_nvq,ymax=upper_ci_nvq, fill=age), alpha=0.1) + 
+  geom_point(aes(color=age)) +
+  scale_color_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), 
+                     limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_fill_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), 
+                    limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_x_discrete(labels=c("highest_NVQ0" = "NVQ1", "highest_NVQ2" = "NVQ2",
+                            "highest_NVQ3" = "NVQ3", "highest_NVQ4" = "NVQ4", 
+                            "highest_NVQ5" = "NVQ5")) +
+  theme_classic()+
+  theme(axis.text = element_text(size=14, 
+                                 family = "Times", 
+                                 colour = "black"), 
+        axis.title = element_text(size=16, 
+                                  family = "Times"))+
+  theme(legend.text = element_text(size=20, 
+                                   family="Times"), 
+        legend.title = element_text(size=20, 
+                                    family="Times"))
+
+
+#income 
+#add in ref category 
+age3_income= age3_income %>% add_row(term = "income_quintiles1",  .before=1)
+age3_income[is.na(age3_income)] <- 0
+age5_income= age5_income %>% add_row(term = "income_quintiles1",  .before=1)
+age5_income[is.na(age5_income)] <- 0
+age11_income= age11_income %>% add_row(term = "income_quintiles1",  .before=1)
+age11_income[is.na(age11_income)] <- 0
+age14_income= age14_income %>% add_row(term = "income_quintiles1",  .before=1)
+age14_income[is.na(age14_income)] <- 0
+
+#add age
+age3_income = age3_income %>%  mutate(age = c("Age 3"))
+age5_income = age5_income %>%  mutate(age = c("Age 5"))
+age11_income = age11_income %>%  mutate(age = c("Age 11"))
+age14_income = age14_income %>%  mutate(age = c("Age 14"))
+
+  
+income_plot = rbind(age3_income, age5_income, age11_income, age14_income) 
+income_plot = income_plot %>%  select(term, estimate, `2.5 %`, `97.5 %` , age) 
+names(income_plot) <- c("Income_Quintiles", "language", "lower_ci_income", "upper_ci_income", "age")
+income_plot$Income_Quintiles = as.factor(income_plot$Income_Quintiles)
+income_plot$age = as.factor(income_plot$age)
+
+income_indicator <- ggplot(data=income_plot, aes(x=Income_Quintiles, y=language, group=age)) +
+  geom_line(aes(color=age)) +
+  geom_ribbon(data=income_plot,aes(ymin=lower_ci_income,ymax=upper_ci_income, fill=age), alpha=0.1) + 
+  geom_point(aes(color=age)) +
+  scale_color_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_fill_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_x_discrete(labels=c("income_quintiles1" = "Lowest \n Quintile", 
+                            "income_quintiles2" = "2", "income_quintiles3" = "3", 
+                            "income_quintiles4" = "4", 
+                            "income_quintiles5" = "Highest \n Quintile")) +
+  theme_classic()+
+  theme(axis.text = element_text(size=14, family = "Times",colour = "black"), 
+        axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=20, family="Times"), legend.title = element_text(size=20, family="Times"))
+
+#wealth
+#wealth 
+#add in ref category 
+age3_wealth= age3_wealth %>% add_row(term = "wealth_quintiles1",  .before=1)
+age3_wealth[is.na(age3_wealth)] <- 0
+age5_wealth= age5_wealth %>% add_row(term = "wealth_quintiles1",  .before=1)
+age5_wealth[is.na(age5_wealth)] <- 0
+age11_wealth= age11_wealth %>% add_row(term = "wealth_quintiles1",  .before=1)
+age11_wealth[is.na(age11_wealth)] <- 0
+age14_wealth= age14_wealth %>% add_row(term = "wealth_quintiles1",  .before=1)
+age14_wealth[is.na(age14_wealth)] <- 0
+
+#add age
+age3_wealth = age3_wealth %>%  mutate(age = c("Age 3"))
+age5_wealth = age5_wealth %>%  mutate(age = c("Age 5"))
+age11_wealth = age11_wealth %>%  mutate(age = c("Age 11"))
+age14_wealth = age14_wealth %>%  mutate(age = c("Age 14"))
+
+
+wealth_plot = rbind(age3_wealth, age5_wealth, age11_wealth, age14_wealth) 
+wealth_plot = wealth_plot %>%  select(term, estimate, `2.5 %`, `97.5 %` , age) 
+names(wealth_plot) <- c("wealth", "language", "lower_ci_wealth", "upper_ci_wealth", "age")
+wealth_plot$wealth = as.factor(wealth_plot$wealth)
+wealth_plot$age = as.factor(wealth_plot$age)
+
+#plot
+wealth_indicator <- ggplot(data=wealth_plot, aes(x=wealth, y=language, group=age)) +
+  geom_line(aes(color=age)) +
+  geom_ribbon(data=wealth_plot,aes(ymin=lower_ci_wealth,ymax=upper_ci_wealth, fill=age), alpha=0.1) + 
+  geom_point(aes(color=age)) +
+  scale_color_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_fill_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_x_discrete(labels=c("wealth_quintiles1" = "Lowest \n Quintile", 
+                            "wealth_quintiles2" = "2", "wealth_quintiles3" = "3", 
+                            "wealth_quintiles4" = "4", 
+                            "wealth_quintiles5" = "Highest \n Quintile")) +
+  theme_classic()+
+  theme(axis.text = element_text(size=14, family = "Times",colour = "black"), 
+        axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=20, family="Times"), legend.title = element_text(size=20, family="Times"))
+
+
+#occupation
+occupation_plot <- data.frame(
+  occupational_status = factor(c("Routine", "Intermediate", "Higher managerial"), levels=c("Routine", "Intermediate", "Higher managerial")),
+  language = c(0,  0.22,  0.39 ,
+               0,  0.20 ,0.47  , 
+               0,   0.18, 0.42 ,  
+               0, 0.12, 0.44),
+  lower_ci_occupation = c( 0, 0.17 , 0.36,
+                          0,  0.15, 0.44, 
+                          0,  0.13, 0.38, 
+                          0,  0.06, 0.39),
+  upper_ci_occupation = c(0, 0.26, 0.43, 
+                         0,  0.24, 0.51,
+                        0,   0.23, 0.46,
+                        0,  0.17, 0.49
+  ),
+  age = factor(c("Age 3", "Age 3", "Age 3", 
+                 "Age 5", "Age 5", "Age 5", 
+                 "Age 11", "Age 11", "Age 11",  
+                 "Age 14", "Age 14", "Age 14" 
+  )
+  ))
+
+
+occupation_indicator <- ggplot(data=occupation_plot, aes(x=occupational_status, y=language, group=age)) +
+  geom_line(aes(color=age)) +
+  geom_ribbon(data=occupation_plot,aes(ymin=lower_ci_occupation,ymax=upper_ci_occupation, fill=age),  alpha=0.1 ) + 
+  geom_point(aes(color=age)) +
+  scale_color_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14")) +
+  scale_fill_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  theme_classic()+
+  theme(axis.text = element_text(size=14, family = "Times",colour = "black"), 
+        axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=20, family="Times"), legend.title = element_text(size=20, family="Times"))
+
+
+
+
+
+#imd 
+#add in ref category 
+age3_imd= age3_imd %>% add_row(term = "imd1",  .before=1)
+age3_imd[is.na(age3_imd)] <- 0
+age5_imd= age5_imd %>% add_row(term = "imd1",  .before=1)
+age5_imd[is.na(age5_imd)] <- 0
+age11_imd= age11_imd %>% add_row(term = "imd1",  .before=1)
+age11_imd[is.na(age11_imd)] <- 0
+age14_imd= age14_imd %>% add_row(term = "imd1",  .before=1)
+age14_imd[is.na(age14_imd)] <- 0
+
+#add age
+age3_imd = age3_imd %>%  mutate(age = c("Age 3"))
+age5_imd = age5_imd %>%  mutate(age = c("Age 5"))
+age11_imd = age11_imd %>%  mutate(age = c("Age 11"))
+age14_imd = age14_imd %>%  mutate(age = c("Age 14"))
+
+
+imd_plot = rbind(age3_imd, age5_imd, age11_imd, age14_imd) 
+imd_plot = imd_plot %>%  select(term, estimate, `2.5 %`, `97.5 %` , age) 
+names(imd_plot) <- c("imd_decile", "language", "lower_ci_imd", "upper_ci_imd", "age")
+imd_plot$imd_decile = as.factor(imd_plot$imd_decile)
+imd_plot$age = as.factor(imd_plot$age)
+
+#plot
+imd_indicator = imd_plot %>% 
+  mutate(imd_decile = fct_relevel(imd_decile, 
+              "imd1", "imd2", "imd3", "imd4", "imd5",
+              "imd6", "imd7", "imd8", "imd9", "imd10")) %>%  #reorder age for x axis 
+ggplot(aes(x=imd_decile, y=language, group=age)) +
+  geom_line(aes(color=age)) +
+  geom_ribbon(data=imd_plot,aes(ymin=lower_ci_imd,ymax=upper_ci_imd,fill=age),  alpha=0.1) + 
+  geom_point(aes(color=age)) +
+  scale_color_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14")) +
+  scale_fill_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_x_discrete(labels=c("imd1" = "Most \n Deprived", "imd2" = "2", "imd3" = "3", 
+                            "imd4" = "4", "imd5" = "5", "imd6" = "6", "imd7" = "7", 
+                            "imd8" = "8", "imd9" = "9", "imd10" =" Least \n Deprived" )) +
+  theme_classic()+
+  theme(axis.text = element_text(size=14, family = "Times",colour = "black"), 
+        axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=20, family="Times"), legend.title = element_text(size=20, family="Times"))
+
+
+#composite  - composite into quintiles for this 
+
+#composite regression models 
+age3_model_quintiles <- function(df) {
+  fit <- lm(age3_standardised ~ gender +ethnicity + language_used_at_home + composite_quintiles, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+
+age5_model_quintiles <- function(df) {
+  fit <- lm(age5_standardised ~ gender +ethnicity + language_used_at_home + composite_quintiles, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+
+age11_model_quintiles <- function(df) {
+  fit <- lm(age11_standardised ~ gender +ethnicity + language_used_at_home + composite_quintiles, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+
+age14_model_quintiles <- function(df) {
+  fit <- lm(age14_standardised ~ gender +ethnicity + language_used_at_home + composite_quintiles, 
+            weight= mcs2_weight, data=df)
+  return(fit)
+}
+
+#apple model to imptued data
+age3CompositeQuintileResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                    imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                    imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                    imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                    imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                               age3_model_quintiles)
+age5CompositeQuintileResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                    imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                    imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                    imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                    imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                               age5_model_quintiles)
+age11CompositeQuintileResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                     imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                     imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                     imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                     imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                                age11_model_quintiles)
+age14CompositeQuintileResults <- lapply(list(imputed_data1, imputed_data2, imputed_data3, imputed_data4, imputed_data5,
+                                     imputed_data6, imputed_data7, imputed_data8, imputed_data9, imputed_data10,
+                                     imputed_data11, imputed_data12, imputed_data13, imputed_data14, imputed_data15,
+                                     imputed_data16, imputed_data17, imputed_data18, imputed_data19, imputed_data20,
+                                     imputed_data21, imputed_data22, imputed_data23, imputed_data24, imputed_data25),
+                                age14_model_quintiles)
+
+#pool results
+age3_latentQuintileResults <- summary(pool(as.mira(age3CompositeQuintileResults)),conf.int = TRUE, conf.level = 0.95)
+age5_latentQuintileResults <- summary(pool(as.mira(age5CompositeQuintileResults)),conf.int = TRUE, conf.level = 0.95) 
+age11_latentQuintileResults <- summary(pool(as.mira(age11CompositeQuintileResults)),conf.int = TRUE, conf.level = 0.95) 
+age14_latentQuintileResults <- summary(pool(as.mira(age14CompositeQuintileResults)),conf.int = TRUE, conf.level = 0.95) 
+
+age3_latentQuintileResults <- age3_latentQuintileResults[10:13,]
+age5_latentQuintileResults <- age5_latentQuintileResults[10:13,]
+age11_latentQuintileResults <- age11_latentQuintileResults[10:13,]
+age14_latentQuintileResults <- age14_latentQuintileResults[10:13,]
+
+
+#add in reference category = 0
+age3_latentQuintileResults= age3_latentQuintileResults %>% add_row(term = "composite_quintiles1",  .before=1)
+age3_latentQuintileResults[is.na(age3_latentQuintileResults)] <- 0
+age5_latentQuintileResults= age5_latentQuintileResults %>% add_row(term = "composite_quintiles1",  .before=1)
+age5_latentQuintileResults[is.na(age5_latentQuintileResults)] <- 0
+age11_latentQuintileResults= age11_latentQuintileResults %>% add_row(term = "composite_quintiles1",  .before=1)
+age11_latentQuintileResults[is.na(age11_latentQuintileResults)] <- 0
+age14_latentQuintileResults= age14_latentQuintileResults %>% add_row(term = "composite_quintiles1",  .before=1)
+age14_latentQuintileResults[is.na(age14_latentQuintileResults)] <- 0
+#add column for age
+age3_latentQuintileResults = age3_latentQuintileResults%>%  mutate(age = c("Age 3"))
+age5_latentQuintileResults = age5_latentQuintileResults %>%  mutate(age = c("Age 5"))
+age11_latentQuintileResults = age11_latentQuintileResults %>%  mutate(age = c("Age 11"))
+age14_latentQuintileResults = age14_latentQuintileResults %>%  mutate(age = c("Age 14"))
+
+composite_plot = rbind(age3_latentQuintileResults, age5_latentQuintileResults, age11_latentQuintileResults,age14_latentQuintileResults) 
+composite_plot = composite_plot%>%  select(term, estimate, `2.5 %`, `97.5 %` , age) 
+
+
+
+names(composite_plot) <- c("composite" ,  "language" ,    "lower_ci_composite" ,"upper_ci_composite", "age")
+composite_plot$composite = as.factor(composite_plot$composite)
+composite_plot$age = as.factor(composite_plot$age)
+
+#composite_plot <- data.frame(
+  #composite = factor(c("Lowest \n Quintile", "2", "3", "4", "Highest \n Quintile"), 
+                   #  levels=c("Lowest \n Quintile", "2", "3", "4", "Highest \n Quintile")),
+  #language = c(0,  0.16,0.41, 0.63, 0.77,
+             #  0,0.19 ,0.43, 0.64, 0.89 ,
+              # 0, 0.16, 0.36, 0.52, 0.78,
+              # 0, 0.11, 0.31, 0.48, 0.78
+               
+               
+ # ),
+ # lower_ci_composite = c(0, 0.11 ,0.36, 0.59, 0.71,
+   #                      0, 0.14 ,0.39 ,0.59, 0.85,
+    #                     0,   0.10, 0.30, 0.46, 0.72,
+     #                    0, 0.04 ,0.25, 0.41, 0.73
+  #),
+  #upper_ci_composite = c(0, 0.21, 0.46, 0.68, 0.81,
+   #                      0, 0.24, 0.48, 0.69, 0.94,
+    #                     0, 0.22, 0.41, 0.58, 0.83,
+     #                    0,0.17, 0.36, 0.54, 0.84
+                         
+  #),
+  #age = factor(c("Age 3", "Age 3", "Age 3", "Age 3", "Age 3", 
+   #              "Age 5", "Age 5", "Age 5", "Age 5", "Age 5",
+    #             "Age 11", "Age 11", "Age 11", "Age 11", "Age 11",
+     #            "Age 14", "Age 14", "Age 14", "Age 14", "Age 14"
+  #)
+  #))
+
+
+composite_indicator <- ggplot(data=composite_plot, aes(x=composite, y=language, group=age)) +
+  geom_line(aes(color=age)) +
+  geom_ribbon(data=composite_plot,aes(ymin=lower_ci_composite,ymax=upper_ci_composite, fill=age), alpha=0.1) + 
+  geom_point(aes(color=age)) +
+  scale_color_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_fill_manual(name="Age", values=c("#d7191c", "#fdae61","#31A354", "#2b83ba"), limits=c("Age 3", "Age 5", "Age 11", "Age 14"))+
+  scale_x_discrete(labels=c("composite_quintiles1" = "Lowest \n Quintile", 
+                            "composite_quintiles2" = "2", "composite_quintiles3" = "3", 
+                            "composite_quintiles4" = "4", 
+                            "composite_quintiles5" = "Highest \n Quintile"))+
+  theme_classic()+
+  theme(axis.text = element_text(size=14, family = "Times",colour = "black"), 
+        axis.title = element_text(size=16, family = "Times"))+
+  theme(legend.text = element_text(size=20, family="Times"), legend.title = element_text(size=20, family="Times"))
+  
+nvq_indicator1<- nvq_indicator+ labs( x = "Highest Household Parent Educational Attainment \n (NVQ level)", y = "Vocabulary Score \n (standardised)") + ylim(-0.055, 1.05)
+income_indicator1<-income_indicator+ labs( x = "Income \n(quintiles)", y = "Vocabulary Score \n (standardised)") + ylim(-0.055,1.05)
+wealth_indicator1<-wealth_indicator+ labs( x = "Wealth \n(quintiles)", y = "Vocabulary Score\n (standardised)") + ylim(-0.055, 1.05)
+occupation_indicator1<-occupation_indicator+ labs( x = "Highest Household Occupational Status", y = "Vocabulary Score \n (standardised)") + ylim(-0.055,1.05)
+imd_indicator1<-imd_indicator+ labs( x = "Relative Neighbourhood Deprivation\n (deciles)", y = "Vocabulary Score \n (standardised)") + ylim(-0.055, 1.05)
+composite_indicator1<-composite_indicator+ labs( x = "Composite SEC factor\n (quintiles)", y = "Vocabulary Score \n (standardised)") + ylim(-0.055, 1.05)
+
+plot=ggarrange(nvq_indicator1, income_indicator1, wealth_indicator1, occupation_indicator1, imd_indicator1,composite_indicator1,
+               #labels = c("NVQ", "Income", "Wealth", "Occupational Status", "IMD"), 
+               #label.x=0, label.y=0,
+               #font.label = list(size = 10, color = "black", face="plain" ),
+               ncol =2, nrow=3,  align = c( "hv"),
+               common.legend = TRUE, legend = "right") 
+p = plot + ggtitle("Figure 2: Relationships between SES indicators and language ability at ages 3, 5, 11 and 14")
+p1= p+ theme(plot.title = element_text(face="italic", size=20, family ="Times",hjust = 0.05))
+
+#annotate_figure(combined_plot, top = text_grob("Early Childhood Language", face="bold", size=12))
+
+ggsave("mcs-results.png", plot, width=13, height=14.3, units= "in" ,dpi=300)
+
+
+```
+
+
+r2 plot
+
+```{r}
+#put r2 data into long format for ggplot2
+
+r2_plot_data = pivot_longer(partial_r2_table, !indicator, names_to = "age", values_to = "r2")
+
+#plot
+r2_plot1 <- r2_plot_data %>% 
+  mutate(age = fct_relevel(age, 
+                           "age3", "age5", "age11", "age14"))  %>% #reorder age for x axis 
+  ggplot() +
+  geom_point(mapping=aes(x=age, y=r2,  group= indicator, color=indicator, fill=indicator), 
+             size=5, shape=20, position = position_dodge(width=0.5)) +
+  scale_color_manual(name="Indicator", values=c( "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "black"), 
+                     limits=c("Parent Education", "Income", "Wealth", "Occupational Status", "Relative Neighbourhood Deprivation", "SEC Composite"))+
+  scale_fill_manual(name="Indicator", values=c( "#66C2A5", "#FC8D62", "#8DA0CB", "#E78AC3", "#A6D854", "black" ), 
+                    limits=c("Parent Education", "Income", "Wealth", "Occupational Status", "Relative Neighbourhood Deprivation", "SEC Composite"))+
+  scale_x_discrete(labels = c("age3" = "Age 3", "age5" = "Age 5", "age11" = "Age 11", "age14" = "Age 14")) +
+  theme_classic2()+
+  xlab(label="\n Age of Vocabulary Test") +
+  ylab(label="Partial R squared (%)") +
+    ylim(0,12) + 
+  theme(axis.text = element_text(size=16, family = "Times", colour = "black"), 
+        axis.title = element_text(size=18, family = "Times"))+
+  theme(legend.text = element_text(size=20, family="Times"), 
+        legend.title = element_text(size=20, family="Times"))+
+  geom_vline(xintercept = 1.5:3.5, colour="#E0E0E0") +
+  theme(legend.position = "top") +
+  
+  #ggtitle("Figure 1: Partial" ~ R^2 ~ "values for SEP indicators in ~2001 born cohort") +
+  #theme(plot.title = element_text(face="italic", size=18, family ="Times",hjust = 0.5)) +
+  
+  geom_text(aes(x=age, y=r2, label=format(round(r2, digits=1), nsmall = 1), color=factor(indicator), hjust=0, vjust=1.8),
+            #nudge_x = 0.1,
+            #nudge_y = 0.1,
+            family = "Times New Roman",
+            position = position_dodge(width=0.7))
+
+
+
+ggsave("mcs-r2.png",r2_plot1, width=12.5, height=13, units= "in" ,dpi=300)
+```
+

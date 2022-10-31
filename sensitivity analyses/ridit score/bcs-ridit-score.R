@@ -25,8 +25,10 @@ library(psych)
 library(dummies)
 
 #change order of occupaiton variable back to unemployed, routine (???)
-
-long_format_bcs <- mice::complete(imputed_bcs2, "long", include=TRUE)
+#Load in data and make long format
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-31_bcs_ses_cross_cohort/2022-10-31_bcs_ses_cross_cohort.Rdata")
+bcs_imputation = mi.res
+long_format_bcs <- mice::complete(bcs_imputation, "long", include=TRUE)
 long_format_bcs$occupational_status <- with(long_format_bcs, relevel(occupational_status, ref = "1"))
 long_format_bcs$occupational_status <- as.factor(long_format_bcs$occupational_status)
 imputed_bcs2<-as.mids(long_format_bcs)
@@ -63,9 +65,9 @@ imputed_bcs2_25<- complete(imputed_bcs2,25)
 #imputed dataset 1
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit1 <- as.matrix(toridit(table(imputed_bcs2_1$highest_household_education)))
+bcs_education_ridit1 <- as.matrix(toridit(table(imputed_bcs2_1$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_1 = imputed_bcs2_1 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_1 = imputed_bcs2_1 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_1$education_ridit <- as.numeric(imputed_bcs2_1$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_1$education_ridit[imputed_bcs2_1$education_ridit == 1] <- bcs_education_ridit1[1,]
@@ -76,9 +78,9 @@ imputed_bcs2_1$education_ridit[imputed_bcs2_1$education_ridit == 4] <- bcs_educa
 #imputed dataset 2
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit2 <- as.matrix(toridit(table(imputed_bcs2_2$highest_household_education)))
+bcs_education_ridit2 <- as.matrix(toridit(table(imputed_bcs2_2$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_2 = imputed_bcs2_2 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_2 = imputed_bcs2_2 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_2$education_ridit <- as.numeric(imputed_bcs2_2$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_2$education_ridit[imputed_bcs2_2$education_ridit == 1] <- bcs_education_ridit2[1,]
@@ -89,9 +91,9 @@ imputed_bcs2_2$education_ridit[imputed_bcs2_2$education_ridit == 4] <- bcs_educa
 #imputed dataset 3
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit3 <- as.matrix(toridit(table(imputed_bcs2_3$highest_household_education)))
+bcs_education_ridit3 <- as.matrix(toridit(table(imputed_bcs2_3$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_3 = imputed_bcs2_3 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_3 = imputed_bcs2_3 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_3$education_ridit <- as.numeric(imputed_bcs2_3$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_3$education_ridit[imputed_bcs2_3$education_ridit == 1] <- bcs_education_ridit3[1,]
@@ -103,9 +105,9 @@ imputed_bcs2_3$education_ridit[imputed_bcs2_3$education_ridit == 4] <- bcs_educa
 #imputed dataset 4
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit4 <- as.matrix(toridit(table(imputed_bcs2_4$highest_household_education)))
+bcs_education_ridit4 <- as.matrix(toridit(table(imputed_bcs2_4$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_4 = imputed_bcs2_4 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_4 = imputed_bcs2_4 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_4$education_ridit <- as.numeric(imputed_bcs2_4$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_4$education_ridit[imputed_bcs2_4$education_ridit == 1] <- bcs_education_ridit4[1,]
@@ -116,9 +118,9 @@ imputed_bcs2_4$education_ridit[imputed_bcs2_4$education_ridit == 4] <- bcs_educa
 #imputed dataset 5
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit5 <- as.matrix(toridit(table(imputed_bcs2_5$highest_household_education)))
+bcs_education_ridit5 <- as.matrix(toridit(table(imputed_bcs2_5$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_5 = imputed_bcs2_5 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_5 = imputed_bcs2_5 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_5$education_ridit <- as.numeric(imputed_bcs2_5$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_5$education_ridit[imputed_bcs2_5$education_ridit == 1] <- bcs_education_ridit5[1,]
@@ -129,9 +131,9 @@ imputed_bcs2_5$education_ridit[imputed_bcs2_5$education_ridit == 4] <- bcs_educa
 #imputed dataset 6
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit6 <- as.matrix(toridit(table(imputed_bcs2_6$highest_household_education)))
+bcs_education_ridit6 <- as.matrix(toridit(table(imputed_bcs2_6$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_6 = imputed_bcs2_6 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_6 = imputed_bcs2_6 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_6$education_ridit <- as.numeric(imputed_bcs2_6$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_6$education_ridit[imputed_bcs2_6$education_ridit == 1] <- bcs_education_ridit6[1,]
@@ -142,9 +144,9 @@ imputed_bcs2_6$education_ridit[imputed_bcs2_6$education_ridit == 4] <- bcs_educa
 #imputed dataset 7
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit7 <- as.matrix(toridit(table(imputed_bcs2_7$highest_household_education)))
+bcs_education_ridit7 <- as.matrix(toridit(table(imputed_bcs2_7$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_7 = imputed_bcs2_7 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_7 = imputed_bcs2_7 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_7$education_ridit <- as.numeric(imputed_bcs2_7$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_7$education_ridit[imputed_bcs2_7$education_ridit == 1] <- bcs_education_ridit7[1,]
@@ -156,9 +158,9 @@ imputed_bcs2_7$education_ridit[imputed_bcs2_7$education_ridit == 4] <- bcs_educa
 #imputed dataset 8
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit8 <- as.matrix(toridit(table(imputed_bcs2_8$highest_household_education)))
+bcs_education_ridit8 <- as.matrix(toridit(table(imputed_bcs2_8$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_8 = imputed_bcs2_8 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_8 = imputed_bcs2_8 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_8$education_ridit <- as.numeric(imputed_bcs2_8$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_8$education_ridit[imputed_bcs2_8$education_ridit == 1] <- bcs_education_ridit8[1,]
@@ -169,9 +171,9 @@ imputed_bcs2_8$education_ridit[imputed_bcs2_8$education_ridit == 4] <- bcs_educa
 #imputed dataset 9
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit9 <- as.matrix(toridit(table(imputed_bcs2_9$highest_household_education)))
+bcs_education_ridit9 <- as.matrix(toridit(table(imputed_bcs2_9$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_9 = imputed_bcs2_9 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_9 = imputed_bcs2_9 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_9$education_ridit <- as.numeric(imputed_bcs2_9$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_9$education_ridit[imputed_bcs2_9$education_ridit == 1] <- bcs_education_ridit9[1,]
@@ -182,9 +184,9 @@ imputed_bcs2_9$education_ridit[imputed_bcs2_9$education_ridit == 4] <- bcs_educa
 #imputed dataset 10
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit10 <- as.matrix(toridit(table(imputed_bcs2_10$highest_household_education)))
+bcs_education_ridit10 <- as.matrix(toridit(table(imputed_bcs2_10$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_10 = imputed_bcs2_10 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_10 = imputed_bcs2_10 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_10$education_ridit <- as.numeric(imputed_bcs2_10$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_10$education_ridit[imputed_bcs2_10$education_ridit == 1] <- bcs_education_ridit10[1,]
@@ -195,9 +197,9 @@ imputed_bcs2_10$education_ridit[imputed_bcs2_10$education_ridit == 4] <- bcs_edu
 #imputed dataset 11
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit11 <- as.matrix(toridit(table(imputed_bcs2_11$highest_household_education)))
+bcs_education_ridit11 <- as.matrix(toridit(table(imputed_bcs2_11$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_11 = imputed_bcs2_11 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_11 = imputed_bcs2_11 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_11$education_ridit <- as.numeric(imputed_bcs2_11$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_11$education_ridit[imputed_bcs2_11$education_ridit == 1] <- bcs_education_ridit11[1,]
@@ -209,9 +211,9 @@ imputed_bcs2_11$education_ridit[imputed_bcs2_11$education_ridit == 4] <- bcs_edu
 #imputed dataset 12
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit12 <- as.matrix(toridit(table(imputed_bcs2_12$highest_household_education)))
+bcs_education_ridit12 <- as.matrix(toridit(table(imputed_bcs2_12$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_12 = imputed_bcs2_12 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_12 = imputed_bcs2_12 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_12$education_ridit <- as.numeric(imputed_bcs2_12$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_12$education_ridit[imputed_bcs2_12$education_ridit == 1] <- bcs_education_ridit12[1,]
@@ -222,9 +224,9 @@ imputed_bcs2_12$education_ridit[imputed_bcs2_12$education_ridit == 4] <- bcs_edu
 #imputed dataset 13
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit13 <- as.matrix(toridit(table(imputed_bcs2_13$highest_household_education)))
+bcs_education_ridit13 <- as.matrix(toridit(table(imputed_bcs2_13$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_13 = imputed_bcs2_13 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_13 = imputed_bcs2_13 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_13$education_ridit <- as.numeric(imputed_bcs2_13$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_13$education_ridit[imputed_bcs2_13$education_ridit == 1] <- bcs_education_ridit13[1,]
@@ -235,9 +237,9 @@ imputed_bcs2_13$education_ridit[imputed_bcs2_13$education_ridit == 4] <- bcs_edu
 #imputed dataset 14
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit14 <- as.matrix(toridit(table(imputed_bcs2_14$highest_household_education)))
+bcs_education_ridit14 <- as.matrix(toridit(table(imputed_bcs2_14$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_14 = imputed_bcs2_14 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_14 = imputed_bcs2_14 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_14$education_ridit <- as.numeric(imputed_bcs2_14$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_14$education_ridit[imputed_bcs2_14$education_ridit == 1] <- bcs_education_ridit14[1,]
@@ -248,9 +250,9 @@ imputed_bcs2_14$education_ridit[imputed_bcs2_14$education_ridit == 4] <- bcs_edu
 #imputed dataset 15
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit15 <- as.matrix(toridit(table(imputed_bcs2_15$highest_household_education)))
+bcs_education_ridit15 <- as.matrix(toridit(table(imputed_bcs2_15$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_15 = imputed_bcs2_15 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_15 = imputed_bcs2_15 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_15$education_ridit <- as.numeric(imputed_bcs2_15$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_15$education_ridit[imputed_bcs2_15$education_ridit == 1] <- bcs_education_ridit15[1,]
@@ -261,9 +263,9 @@ imputed_bcs2_15$education_ridit[imputed_bcs2_15$education_ridit == 4] <- bcs_edu
 #imputed dataset 16
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit16 <- as.matrix(toridit(table(imputed_bcs2_16$highest_household_education)))
+bcs_education_ridit16 <- as.matrix(toridit(table(imputed_bcs2_16$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_16 = imputed_bcs2_16 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_16 = imputed_bcs2_16 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_16$education_ridit <- as.numeric(imputed_bcs2_16$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_16$education_ridit[imputed_bcs2_16$education_ridit == 1] <- bcs_education_ridit16[1,]
@@ -274,9 +276,9 @@ imputed_bcs2_16$education_ridit[imputed_bcs2_16$education_ridit == 4] <- bcs_edu
 #imputed dataset 17
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit17 <- as.matrix(toridit(table(imputed_bcs2_17$highest_household_education)))
+bcs_education_ridit17 <- as.matrix(toridit(table(imputed_bcs2_17$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_17 = imputed_bcs2_17 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_17 = imputed_bcs2_17 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_17$education_ridit <- as.numeric(imputed_bcs2_17$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_17$education_ridit[imputed_bcs2_17$education_ridit == 1] <- bcs_education_ridit17[1,]
@@ -287,9 +289,9 @@ imputed_bcs2_17$education_ridit[imputed_bcs2_17$education_ridit == 4] <- bcs_edu
 #imputed dataset 18
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit18 <- as.matrix(toridit(table(imputed_bcs2_18$highest_household_education)))
+bcs_education_ridit18 <- as.matrix(toridit(table(imputed_bcs2_18$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_18 = imputed_bcs2_18 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_18 = imputed_bcs2_18 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_18$education_ridit <- as.numeric(imputed_bcs2_18$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_18$education_ridit[imputed_bcs2_18$education_ridit == 1] <- bcs_education_ridit18[1,]
@@ -300,9 +302,9 @@ imputed_bcs2_18$education_ridit[imputed_bcs2_18$education_ridit == 4] <- bcs_edu
 #imputed dataset 19
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit19 <- as.matrix(toridit(table(imputed_bcs2_19$highest_household_education)))
+bcs_education_ridit19 <- as.matrix(toridit(table(imputed_bcs2_19$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_19 = imputed_bcs2_19 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_19 = imputed_bcs2_19 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_19$education_ridit <- as.numeric(imputed_bcs2_19$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_19$education_ridit[imputed_bcs2_19$education_ridit == 1] <- bcs_education_ridit19[1,]
@@ -313,9 +315,9 @@ imputed_bcs2_19$education_ridit[imputed_bcs2_19$education_ridit == 4] <- bcs_edu
 #imputed dataset 20
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit20 <- as.matrix(toridit(table(imputed_bcs2_20$highest_household_education)))
+bcs_education_ridit20 <- as.matrix(toridit(table(imputed_bcs2_20$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_20 = imputed_bcs2_20 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_20 = imputed_bcs2_20 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_20$education_ridit <- as.numeric(imputed_bcs2_20$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_20$education_ridit[imputed_bcs2_20$education_ridit == 1] <- bcs_education_ridit20[1,]
@@ -326,9 +328,9 @@ imputed_bcs2_20$education_ridit[imputed_bcs2_20$education_ridit == 4] <- bcs_edu
 #imputed dataset 21
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit21 <- as.matrix(toridit(table(imputed_bcs2_21$highest_household_education)))
+bcs_education_ridit21 <- as.matrix(toridit(table(imputed_bcs2_21$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_21 = imputed_bcs2_21 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_21 = imputed_bcs2_21 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_21$education_ridit <- as.numeric(imputed_bcs2_21$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_21$education_ridit[imputed_bcs2_21$education_ridit == 1] <- bcs_education_ridit21[1,]
@@ -339,9 +341,9 @@ imputed_bcs2_21$education_ridit[imputed_bcs2_21$education_ridit == 4] <- bcs_edu
 #imputed dataset 22
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit22 <- as.matrix(toridit(table(imputed_bcs2_22$highest_household_education)))
+bcs_education_ridit22 <- as.matrix(toridit(table(imputed_bcs2_22$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_22 = imputed_bcs2_22 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_22 = imputed_bcs2_22 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_22$education_ridit <- as.numeric(imputed_bcs2_22$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_22$education_ridit[imputed_bcs2_22$education_ridit == 1] <- bcs_education_ridit22[1,]
@@ -352,9 +354,9 @@ imputed_bcs2_22$education_ridit[imputed_bcs2_22$education_ridit == 4] <- bcs_edu
 #imputed dataset 23
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit23 <- as.matrix(toridit(table(imputed_bcs2_23$highest_household_education)))
+bcs_education_ridit23 <- as.matrix(toridit(table(imputed_bcs2_23$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_23 = imputed_bcs2_23 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_23 = imputed_bcs2_23 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_23$education_ridit <- as.numeric(imputed_bcs2_23$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_23$education_ridit[imputed_bcs2_23$education_ridit == 1] <- bcs_education_ridit23[1,]
@@ -365,9 +367,9 @@ imputed_bcs2_23$education_ridit[imputed_bcs2_23$education_ridit == 4] <- bcs_edu
 #imputed dataset 24
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit24 <- as.matrix(toridit(table(imputed_bcs2_24$highest_household_education)))
+bcs_education_ridit24 <- as.matrix(toridit(table(imputed_bcs2_24$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_24 = imputed_bcs2_24 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_24 = imputed_bcs2_24 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_24$education_ridit <- as.numeric(imputed_bcs2_24$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_24$education_ridit[imputed_bcs2_24$education_ridit == 1] <- bcs_education_ridit24[1,]
@@ -378,9 +380,9 @@ imputed_bcs2_24$education_ridit[imputed_bcs2_24$education_ridit == 4] <- bcs_edu
 #imputed dataset 25
 #get count data 
 #then convert to ridit score with toridit()
-bcs_education_ridit25 <- as.matrix(toridit(table(imputed_bcs2_25$highest_household_education)))
+bcs_education_ridit25 <- as.matrix(toridit(table(imputed_bcs2_25$highestEd1)))
 #add ridit score to dataset as new variable 
-imputed_bcs2_25 = imputed_bcs2_25 %>% mutate(education_ridit = highest_household_education) 
+imputed_bcs2_25 = imputed_bcs2_25 %>% mutate(education_ridit = highestEd1) 
 imputed_bcs2_25$education_ridit <- as.numeric(imputed_bcs2_25$education_ridit)
 #recode so is replaced with the ridit scores
 imputed_bcs2_25$education_ridit[imputed_bcs2_25$education_ridit == 1] <- bcs_education_ridit25[1,]
@@ -394,275 +396,57 @@ imputed_bcs2_25$education_ridit[imputed_bcs2_25$education_ridit == 4] <- bcs_edu
 #late childhood imputed datasets 1-25
 #adolescent imputed datasets 1-25
 
-#imputed dataset 1
-bcs_early_edRidit1 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_early_edRidit2 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_early_edRidit3 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_early_edRidit4 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_early_edRidit5 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_early_edRidit6 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_early_edRidit7 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_early_edRidit8 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_early_edRidit9 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_early_edRidit10 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_early_edRidit11 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_early_edRidit12 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_early_edRidit13 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_early_edRidit14 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_early_edRidit15 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_early_edRidit16 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_early_edRidit17 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_early_edRidit18 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_early_edRidit19 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_early_edRidit20 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_early_edRidit21 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_early_edRidit22 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_early_edRidit23 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_early_edRidit24 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_early_edRidit25 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=imputed_bcs2_25)
+#education regression models with education ridit as predictor variable.
+#Regression models over each imputed dataset 
+age5_educationModel <- function(df) {
+  fit <- lm(
+    standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  education_ridit, weights = weight, data=df)
+  return(fit)
+}
+
+age10_educationModel <- function(df) {
+  fit <- lm(
+    standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=df)
+  return(fit)
+}
+
+age16_educationModel <- function(df) {
+  fit <- lm(
+    standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16 +  education_ridit, weights = weight, data=df)
+  return(fit)
+}
 
 
-#late childhood education
-#imputed dataset 1
-bcs_late_edRidit1 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_late_edRidit2 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_late_edRidit3 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_late_edRidit4 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_late_edRidit5 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_late_edRidit6 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_late_edRidit7 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_late_edRidit8 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_late_edRidit9 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_late_edRidit10 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_late_edRidit11 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_late_edRidit12 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_late_edRidit13 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_late_edRidit14 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_late_edRidit15 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_late_edRidit16 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_late_edRidit17 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_late_edRidit18 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_late_edRidit19 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_late_edRidit20 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_late_edRidit21 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_late_edRidit22 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_late_edRidit23 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_late_edRidit24 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_late_edRidit25 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  education_ridit, weights = weight, data=imputed_bcs2_25)
+
+age5educationResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                    imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                    imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                    imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                    imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                               age5_educationModel)
+
+age10educationResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                     imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                     imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                     imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                     imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                age10_educationModel)
+
+age16educationResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                     imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                     imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                     imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                     imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                age16_educationModel)
+
+#Pool Results 
+
+age5_educationResults <- summary(pool(as.mira(age5educationResults)),conf.int = TRUE, conf.level = 0.95) 
+age10_educationResults <- summary(pool(as.mira(age10educationResults)),conf.int = TRUE, conf.level = 0.95) 
+age16_educationResults <- summary(pool(as.mira(age16educationResults)),conf.int = TRUE, conf.level = 0.95) 
 
 
-#adolescent education
 
-#imputed dataset 1
-bcs_adolescent_edRidit1 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_adolescent_edRidit2 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_adolescent_edRidit3 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_adolescent_edRidit4 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_adolescent_edRidit5 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_adolescent_edRidit6 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_adolescent_edRidit7 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_adolescent_edRidit8 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_adolescent_edRidit9 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_adolescent_edRidit10 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_adolescent_edRidit11 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_adolescent_edRidit12 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_adolescent_edRidit13 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_adolescent_edRidit14 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_adolescent_edRidit15 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_adolescent_edRidit16 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_adolescent_edRidit17 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_adolescent_edRidit18 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_adolescent_edRidit19 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_adolescent_edRidit20 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_adolescent_edRidit21 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_adolescent_edRidit22 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_adolescent_edRidit23 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_adolescent_edRidit24 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_adolescent_edRidit25 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  education_ridit, weights = weight, data=imputed_bcs2_25)
-
-
-#pool results
-
-#early language
-early_education_ridit <- summary(pool(as.mira(list(bcs_early_edRidit1,bcs_early_edRidit2, bcs_early_edRidit3, bcs_early_edRidit4, bcs_early_edRidit5, 
-                                                   bcs_early_edRidit6, bcs_early_edRidit7, bcs_early_edRidit8, bcs_early_edRidit9, bcs_early_edRidit10, 
-                                                   bcs_early_edRidit11, bcs_early_edRidit12, bcs_early_edRidit13, bcs_early_edRidit14, bcs_early_edRidit15, 
-                                                   bcs_early_edRidit16, bcs_early_edRidit17, bcs_early_edRidit18, bcs_early_edRidit19, bcs_early_edRidit20, 
-                                                   bcs_early_edRidit21, bcs_early_edRidit22, bcs_early_edRidit23, bcs_early_edRidit24, bcs_early_edRidit25))))
-round(early_education_ridit,2)
-#age 3 confidence intervals 
-lower_early_education_ridit = summary(pool(as.mira(list(bcs_early_edRidit1,bcs_early_edRidit2, bcs_early_edRidit3, bcs_early_edRidit4, bcs_early_edRidit5, 
-                                                        bcs_early_edRidit6, bcs_early_edRidit7, bcs_early_edRidit8, bcs_early_edRidit9, bcs_early_edRidit10, 
-                                                        bcs_early_edRidit11, bcs_early_edRidit12, bcs_early_edRidit13, bcs_early_edRidit14, bcs_early_edRidit15, 
-                                                        bcs_early_edRidit16, bcs_early_edRidit17, bcs_early_edRidit18, bcs_early_edRidit19, bcs_early_edRidit20, 
-                                                        bcs_early_edRidit21, bcs_early_edRidit22, bcs_early_edRidit23, bcs_early_edRidit24, bcs_early_edRidit25))))$estimate-(
-                                                          summary(pool(as.mira(list(bcs_early_edRidit1,bcs_early_edRidit2, bcs_early_edRidit3, bcs_early_edRidit4, bcs_early_edRidit5, 
-                                                                                    bcs_early_edRidit6, bcs_early_edRidit7, bcs_early_edRidit8, bcs_early_edRidit9, bcs_early_edRidit10, 
-                                                                                    bcs_early_edRidit11, bcs_early_edRidit12, bcs_early_edRidit13, bcs_early_edRidit14, bcs_early_edRidit15, 
-                                                                                    bcs_early_edRidit16, bcs_early_edRidit17, bcs_early_edRidit18, bcs_early_edRidit19, bcs_early_edRidit20, 
-                                                                                    bcs_early_edRidit21, bcs_early_edRidit22, bcs_early_edRidit23, bcs_early_edRidit24, bcs_early_edRidit25))))$std.error*1.96)
-upper_early_education_ridit = summary(pool(as.mira(list(bcs_early_edRidit1,bcs_early_edRidit2, bcs_early_edRidit3, bcs_early_edRidit4, bcs_early_edRidit5, 
-                                                        bcs_early_edRidit6, bcs_early_edRidit7, bcs_early_edRidit8, bcs_early_edRidit9, bcs_early_edRidit10, 
-                                                        bcs_early_edRidit11, bcs_early_edRidit12, bcs_early_edRidit13, bcs_early_edRidit14, bcs_early_edRidit15, 
-                                                        bcs_early_edRidit16, bcs_early_edRidit17, bcs_early_edRidit18, bcs_early_edRidit19, bcs_early_edRidit20, 
-                                                        bcs_early_edRidit21, bcs_early_edRidit22, bcs_early_edRidit23, bcs_early_edRidit24, bcs_early_edRidit25))))$estimate+(
-                                                          summary(pool(as.mira(list(bcs_early_edRidit1,bcs_early_edRidit2, bcs_early_edRidit3, bcs_early_edRidit4, bcs_early_edRidit5, 
-                                                                                    bcs_early_edRidit6, bcs_early_edRidit7, bcs_early_edRidit8, bcs_early_edRidit9, bcs_early_edRidit10, 
-                                                                                    bcs_early_edRidit11, bcs_early_edRidit12, bcs_early_edRidit13, bcs_early_edRidit14, bcs_early_edRidit15, 
-                                                                                    bcs_early_edRidit16, bcs_early_edRidit17, bcs_early_edRidit18, bcs_early_edRidit19, bcs_early_edRidit20, 
-                                                                                    bcs_early_edRidit21, bcs_early_edRidit22, bcs_early_edRidit23, bcs_early_edRidit24, bcs_early_edRidit25))))$std.error*1.96)
-round(lower_early_education_ridit,2)
-round(upper_early_education_ridit,2)
-early_education_r2 = as.data.frame(pool.r.squared(as.mira(list(bcs_early_edRidit1,bcs_early_edRidit2, bcs_early_edRidit3, bcs_early_edRidit4, bcs_early_edRidit5, 
-                                    bcs_early_edRidit6, bcs_early_edRidit7, bcs_early_edRidit8, bcs_early_edRidit9, bcs_early_edRidit10, 
-                                    bcs_early_edRidit11, bcs_early_edRidit12, bcs_early_edRidit13, bcs_early_edRidit14, bcs_early_edRidit15, 
-                                    bcs_early_edRidit16, bcs_early_edRidit17, bcs_early_edRidit18, bcs_early_edRidit19, bcs_early_edRidit20,
-                                    bcs_early_edRidit21, bcs_early_edRidit22, bcs_early_edRidit23, bcs_early_edRidit24, bcs_early_edRidit25))))
-
-
-#late language
-late_education_ridit <- summary(pool(as.mira(list(bcs_late_edRidit1,bcs_late_edRidit2, bcs_late_edRidit3, bcs_late_edRidit4, bcs_late_edRidit5, 
-                                                  bcs_late_edRidit6, bcs_late_edRidit7, bcs_late_edRidit8, bcs_late_edRidit9, bcs_late_edRidit10, 
-                                                  bcs_late_edRidit11, bcs_late_edRidit12, bcs_late_edRidit13, bcs_late_edRidit14, bcs_late_edRidit15, 
-                                                  bcs_late_edRidit16, bcs_late_edRidit17, bcs_late_edRidit18, bcs_late_edRidit19, bcs_late_edRidit20, 
-                                                  bcs_late_edRidit21, bcs_late_edRidit22, bcs_late_edRidit23, bcs_late_edRidit24, bcs_late_edRidit25))))
-round(late_education_ridit,2)
-#age 3 confidence intervals 
-lower_late_education_ridit = summary(pool(as.mira(list(bcs_late_edRidit1,bcs_late_edRidit2, bcs_late_edRidit3, bcs_late_edRidit4, bcs_late_edRidit5, 
-                                                       bcs_late_edRidit6, bcs_late_edRidit7, bcs_late_edRidit8, bcs_late_edRidit9, bcs_late_edRidit10, 
-                                                       bcs_late_edRidit11, bcs_late_edRidit12, bcs_late_edRidit13, bcs_late_edRidit14, bcs_late_edRidit15, 
-                                                       bcs_late_edRidit16, bcs_late_edRidit17, bcs_late_edRidit18, bcs_late_edRidit19, bcs_late_edRidit20, 
-                                                       bcs_late_edRidit21, bcs_late_edRidit22, bcs_late_edRidit23, bcs_late_edRidit24, bcs_late_edRidit25))))$estimate-(
-                                                         summary(pool(as.mira(list(bcs_late_edRidit1,bcs_late_edRidit2, bcs_late_edRidit3, bcs_late_edRidit4, bcs_late_edRidit5, 
-                                                                                   bcs_late_edRidit6, bcs_late_edRidit7, bcs_late_edRidit8, bcs_late_edRidit9, bcs_late_edRidit10, 
-                                                                                   bcs_late_edRidit11, bcs_late_edRidit12, bcs_late_edRidit13, bcs_late_edRidit14, bcs_late_edRidit15, 
-                                                                                   bcs_late_edRidit16, bcs_late_edRidit17, bcs_late_edRidit18, bcs_late_edRidit19, bcs_late_edRidit20, 
-                                                                                   bcs_late_edRidit21, bcs_late_edRidit22, bcs_late_edRidit23, bcs_late_edRidit24, bcs_late_edRidit25))))$std.error*1.96)
-upper_late_education_ridit = summary(pool(as.mira(list(bcs_late_edRidit1,bcs_late_edRidit2, bcs_late_edRidit3, bcs_late_edRidit4, bcs_late_edRidit5, 
-                                                       bcs_late_edRidit6, bcs_late_edRidit7, bcs_late_edRidit8, bcs_late_edRidit9, bcs_late_edRidit10, 
-                                                       bcs_late_edRidit11, bcs_late_edRidit12, bcs_late_edRidit13, bcs_late_edRidit14, bcs_late_edRidit15, 
-                                                       bcs_late_edRidit16, bcs_late_edRidit17, bcs_late_edRidit18, bcs_late_edRidit19, bcs_late_edRidit20, 
-                                                       bcs_late_edRidit21, bcs_late_edRidit22, bcs_late_edRidit23, bcs_late_edRidit24, bcs_late_edRidit25))))$estimate+(
-                                                         summary(pool(as.mira(list(bcs_late_edRidit1,bcs_late_edRidit2, bcs_late_edRidit3, bcs_late_edRidit4, bcs_late_edRidit5, 
-                                                                                   bcs_late_edRidit6, bcs_late_edRidit7, bcs_late_edRidit8, bcs_late_edRidit9, bcs_late_edRidit10, 
-                                                                                   bcs_late_edRidit11, bcs_late_edRidit12, bcs_late_edRidit13, bcs_late_edRidit14, bcs_late_edRidit15, 
-                                                                                   bcs_late_edRidit16, bcs_late_edRidit17, bcs_late_edRidit18, bcs_late_edRidit19, bcs_late_edRidit20, 
-                                                                                   bcs_late_edRidit21, bcs_late_edRidit22, bcs_late_edRidit23, bcs_late_edRidit24, bcs_late_edRidit25))))$std.error*1.96)
-round(lower_late_education_ridit,2)
-round(upper_late_education_ridit,2)
-late_education_r2 = as.data.frame(pool.r.squared(as.mira(list(bcs_late_edRidit1,bcs_late_edRidit2, bcs_late_edRidit3, bcs_late_edRidit4, bcs_late_edRidit5, 
-                                    bcs_late_edRidit6, bcs_late_edRidit7, bcs_late_edRidit8, bcs_late_edRidit9, bcs_late_edRidit10, 
-                                    bcs_late_edRidit11, bcs_late_edRidit12, bcs_late_edRidit13, bcs_late_edRidit14, bcs_late_edRidit15, 
-                                    bcs_late_edRidit16, bcs_late_edRidit17, bcs_late_edRidit18, bcs_late_edRidit19, bcs_late_edRidit20,
-                                    bcs_late_edRidit21, bcs_late_edRidit22, bcs_late_edRidit23, bcs_late_edRidit24, bcs_late_edRidit25))))
-
-#adolescent language
-adolescent_education_ridit <- summary(pool(as.mira(list(bcs_adolescent_edRidit1,bcs_adolescent_edRidit2, bcs_adolescent_edRidit3, bcs_adolescent_edRidit4, bcs_adolescent_edRidit5, 
-                                                        bcs_adolescent_edRidit6, bcs_adolescent_edRidit7, bcs_adolescent_edRidit8, bcs_adolescent_edRidit9, bcs_adolescent_edRidit10, 
-                                                        bcs_adolescent_edRidit11, bcs_adolescent_edRidit12, bcs_adolescent_edRidit13, bcs_adolescent_edRidit14, bcs_adolescent_edRidit15, 
-                                                        bcs_adolescent_edRidit16, bcs_adolescent_edRidit17, bcs_adolescent_edRidit18, bcs_adolescent_edRidit19, bcs_adolescent_edRidit20, 
-                                                        bcs_adolescent_edRidit21, bcs_adolescent_edRidit22, bcs_adolescent_edRidit23, bcs_adolescent_edRidit24, bcs_adolescent_edRidit25))))
-round(adolescent_education_ridit,2)
-#age 3 confidence intervals 
-lower_adolescent_education_ridit = summary(pool(as.mira(list(bcs_adolescent_edRidit1,bcs_adolescent_edRidit2, bcs_adolescent_edRidit3, bcs_adolescent_edRidit4, bcs_adolescent_edRidit5, 
-                                                             bcs_adolescent_edRidit6, bcs_adolescent_edRidit7, bcs_adolescent_edRidit8, bcs_adolescent_edRidit9, bcs_adolescent_edRidit10, 
-                                                             bcs_adolescent_edRidit11, bcs_adolescent_edRidit12, bcs_adolescent_edRidit13, bcs_adolescent_edRidit14, bcs_adolescent_edRidit15, 
-                                                             bcs_adolescent_edRidit16, bcs_adolescent_edRidit17, bcs_adolescent_edRidit18, bcs_adolescent_edRidit19, bcs_adolescent_edRidit20, 
-                                                             bcs_adolescent_edRidit21, bcs_adolescent_edRidit22, bcs_adolescent_edRidit23, bcs_adolescent_edRidit24, bcs_adolescent_edRidit25))))$estimate-(
-                                                               summary(pool(as.mira(list(bcs_adolescent_edRidit1,bcs_adolescent_edRidit2, bcs_adolescent_edRidit3, bcs_adolescent_edRidit4, bcs_adolescent_edRidit5, 
-                                                                                         bcs_adolescent_edRidit6, bcs_adolescent_edRidit7, bcs_adolescent_edRidit8, bcs_adolescent_edRidit9, bcs_adolescent_edRidit10, 
-                                                                                         bcs_adolescent_edRidit11, bcs_adolescent_edRidit12, bcs_adolescent_edRidit13, bcs_adolescent_edRidit14, bcs_adolescent_edRidit15, 
-                                                                                         bcs_adolescent_edRidit16, bcs_adolescent_edRidit17, bcs_adolescent_edRidit18, bcs_adolescent_edRidit19, bcs_adolescent_edRidit20, 
-                                                                                         bcs_adolescent_edRidit21, bcs_adolescent_edRidit22, bcs_adolescent_edRidit23, bcs_adolescent_edRidit24, bcs_adolescent_edRidit25))))$std.error*1.96)
-upper_adolescent_education_ridit = summary(pool(as.mira(list(bcs_adolescent_edRidit1,bcs_adolescent_edRidit2, bcs_adolescent_edRidit3, bcs_adolescent_edRidit4, bcs_adolescent_edRidit5, 
-                                                             bcs_adolescent_edRidit6, bcs_adolescent_edRidit7, bcs_adolescent_edRidit8, bcs_adolescent_edRidit9, bcs_adolescent_edRidit10, 
-                                                             bcs_adolescent_edRidit11, bcs_adolescent_edRidit12, bcs_adolescent_edRidit13, bcs_adolescent_edRidit14, bcs_adolescent_edRidit15, 
-                                                             bcs_adolescent_edRidit16, bcs_adolescent_edRidit17, bcs_adolescent_edRidit18, bcs_adolescent_edRidit19, bcs_adolescent_edRidit20, 
-                                                             bcs_adolescent_edRidit21, bcs_adolescent_edRidit22, bcs_adolescent_edRidit23, bcs_adolescent_edRidit24, bcs_adolescent_edRidit25))))$estimate+(
-                                                               summary(pool(as.mira(list(bcs_adolescent_edRidit1,bcs_adolescent_edRidit2, bcs_adolescent_edRidit3, bcs_adolescent_edRidit4, bcs_adolescent_edRidit5, 
-                                                                                         bcs_adolescent_edRidit6, bcs_adolescent_edRidit7, bcs_adolescent_edRidit8, bcs_adolescent_edRidit9, bcs_adolescent_edRidit10, 
-                                                                                         bcs_adolescent_edRidit11, bcs_adolescent_edRidit12, bcs_adolescent_edRidit13, bcs_adolescent_edRidit14, bcs_adolescent_edRidit15, 
-                                                                                         bcs_adolescent_edRidit16, bcs_adolescent_edRidit17, bcs_adolescent_edRidit18, bcs_adolescent_edRidit19, bcs_adolescent_edRidit20, 
-                                                                                         bcs_adolescent_edRidit21, bcs_adolescent_edRidit22, bcs_adolescent_edRidit23, bcs_adolescent_edRidit24, bcs_adolescent_edRidit25))))$std.error*1.96)
-round(lower_adolescent_education_ridit,2)
-round(upper_adolescent_education_ridit,2)
-adolescent_education_r2 = as.data.frame(pool.r.squared(as.mira(list(bcs_adolescent_edRidit1,bcs_adolescent_edRidit2, bcs_adolescent_edRidit3, bcs_adolescent_edRidit4, bcs_adolescent_edRidit5, 
-                                    bcs_adolescent_edRidit6, bcs_adolescent_edRidit7, bcs_adolescent_edRidit8, bcs_adolescent_edRidit9, bcs_adolescent_edRidit10, 
-                                    bcs_adolescent_edRidit11, bcs_adolescent_edRidit12, bcs_adolescent_edRidit13, bcs_adolescent_edRidit14, bcs_adolescent_edRidit15, 
-                                    bcs_adolescent_edRidit16, bcs_adolescent_edRidit17, bcs_adolescent_edRidit18, bcs_adolescent_edRidit19, bcs_adolescent_edRidit20,
-                                    bcs_adolescent_edRidit21, bcs_adolescent_edRidit22, bcs_adolescent_edRidit23, bcs_adolescent_edRidit24, bcs_adolescent_edRidit25))))
 
 
 #OCCUPATIONAL STATUS ####
@@ -1029,482 +813,539 @@ imputed_bcs2_25$occupation_ridit[imputed_bcs2_25$occupation_ridit == 4] <- bcs_o
 #late childhood imputed datasets 1-25
 #adolescent imputed datasets 1-25
 
+#occupation regression models with occupation ridit as predictor variable.
+#Regression models over each imputed dataset 
+age5_occupationModel <- function(df) {
+  fit <- lm(
+    standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=df)
+  return(fit)
+}
+
+age10_occupationModel <- function(df) {
+  fit <- lm(
+    standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=df)
+  return(fit)
+}
+
+age16_occupationModel <- function(df) {
+  fit <- lm(
+    standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16 +  occupation_ridit, weights = weight, data=df)
+  return(fit)
+}
+
+
+
+age5occupationResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                     imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                     imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                     imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                     imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                age5_occupationModel)
+
+age10occupationResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                      imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                      imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                      imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                      imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                 age10_occupationModel)
+
+age16occupationResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                      imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                      imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                      imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                      imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                 age16_occupationModel)
+
+#Pool Results 
+
+age5_occupationResults <- summary(pool(as.mira(age5occupationResults)),conf.int = TRUE, conf.level = 0.95) 
+age10_occupationResults <- summary(pool(as.mira(age10occupationResults)),conf.int = TRUE, conf.level = 0.95) 
+age16_occupationResults <- summary(pool(as.mira(age16occupationResults)),conf.int = TRUE, conf.level = 0.95) 
+
+
+
+
+
+#calculate ridit scores. income  ####
 #imputed dataset 1
-bcs_early_ocRidit1 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_1)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit1 <- as.matrix(toridit(table(imputed_bcs2_1$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_1 = imputed_bcs2_1 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_1$income_ridit <- as.numeric(imputed_bcs2_1$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_1$income_ridit[imputed_bcs2_1$income_ridit == 1] <- bcs_income_ridit1[1,]
+imputed_bcs2_1$income_ridit[imputed_bcs2_1$income_ridit == 2] <- bcs_income_ridit1[2,]
+imputed_bcs2_1$income_ridit[imputed_bcs2_1$income_ridit == 3] <- bcs_income_ridit1[3,]
+imputed_bcs2_1$income_ridit[imputed_bcs2_1$income_ridit == 4] <- bcs_income_ridit1[4,]
+
 #imputed dataset 2
-bcs_early_ocRidit2 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_2)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit2 <- as.matrix(toridit(table(imputed_bcs2_2$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_2 = imputed_bcs2_2 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_2$income_ridit <- as.numeric(imputed_bcs2_2$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_2$income_ridit[imputed_bcs2_2$income_ridit == 1] <- bcs_income_ridit2[1,]
+imputed_bcs2_2$income_ridit[imputed_bcs2_2$income_ridit == 2] <- bcs_income_ridit2[2,]
+imputed_bcs2_2$income_ridit[imputed_bcs2_2$income_ridit == 3] <- bcs_income_ridit2[3,]
+imputed_bcs2_2$income_ridit[imputed_bcs2_2$income_ridit == 4] <- bcs_income_ridit2[4,]
+
 #imputed dataset 3
-bcs_early_ocRidit3 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_3)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit3 <- as.matrix(toridit(table(imputed_bcs2_3$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_3 = imputed_bcs2_3 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_3$income_ridit <- as.numeric(imputed_bcs2_3$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_3$income_ridit[imputed_bcs2_3$income_ridit == 1] <- bcs_income_ridit3[1,]
+imputed_bcs2_3$income_ridit[imputed_bcs2_3$income_ridit == 2] <- bcs_income_ridit3[2,]
+imputed_bcs2_3$income_ridit[imputed_bcs2_3$income_ridit == 3] <- bcs_income_ridit3[3,]
+imputed_bcs2_3$income_ridit[imputed_bcs2_3$income_ridit == 4] <- bcs_income_ridit3[4,]
+
+
 #imputed dataset 4
-bcs_early_ocRidit4 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_4)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit4 <- as.matrix(toridit(table(imputed_bcs2_4$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_4 = imputed_bcs2_4 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_4$income_ridit <- as.numeric(imputed_bcs2_4$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_4$income_ridit[imputed_bcs2_4$income_ridit == 1] <- bcs_income_ridit4[1,]
+imputed_bcs2_4$income_ridit[imputed_bcs2_4$income_ridit == 2] <- bcs_income_ridit4[2,]
+imputed_bcs2_4$income_ridit[imputed_bcs2_4$income_ridit == 3] <- bcs_income_ridit4[3,]
+imputed_bcs2_4$income_ridit[imputed_bcs2_4$income_ridit == 4] <- bcs_income_ridit4[4,]
+
 #imputed dataset 5
-bcs_early_ocRidit5 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_5)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit5 <- as.matrix(toridit(table(imputed_bcs2_5$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_5 = imputed_bcs2_5 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_5$income_ridit <- as.numeric(imputed_bcs2_5$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_5$income_ridit[imputed_bcs2_5$income_ridit == 1] <- bcs_income_ridit5[1,]
+imputed_bcs2_5$income_ridit[imputed_bcs2_5$income_ridit == 2] <- bcs_income_ridit5[2,]
+imputed_bcs2_5$income_ridit[imputed_bcs2_5$income_ridit == 3] <- bcs_income_ridit5[3,]
+imputed_bcs2_5$income_ridit[imputed_bcs2_5$income_ridit == 4] <- bcs_income_ridit5[4,]
+
 #imputed dataset 6
-bcs_early_ocRidit6 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_6)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit6 <- as.matrix(toridit(table(imputed_bcs2_6$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_6 = imputed_bcs2_6 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_6$income_ridit <- as.numeric(imputed_bcs2_6$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_6$income_ridit[imputed_bcs2_6$income_ridit == 1] <- bcs_income_ridit6[1,]
+imputed_bcs2_6$income_ridit[imputed_bcs2_6$income_ridit == 2] <- bcs_income_ridit6[2,]
+imputed_bcs2_6$income_ridit[imputed_bcs2_6$income_ridit == 3] <- bcs_income_ridit6[3,]
+imputed_bcs2_6$income_ridit[imputed_bcs2_6$income_ridit == 4] <- bcs_income_ridit6[4,]
+
 #imputed dataset 7
-bcs_early_ocRidit7 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_7)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit7 <- as.matrix(toridit(table(imputed_bcs2_7$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_7 = imputed_bcs2_7 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_7$income_ridit <- as.numeric(imputed_bcs2_7$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_7$income_ridit[imputed_bcs2_7$income_ridit == 1] <- bcs_income_ridit7[1,]
+imputed_bcs2_7$income_ridit[imputed_bcs2_7$income_ridit == 2] <- bcs_income_ridit7[2,]
+imputed_bcs2_7$income_ridit[imputed_bcs2_7$income_ridit == 3] <- bcs_income_ridit7[3,]
+imputed_bcs2_7$income_ridit[imputed_bcs2_7$income_ridit == 4] <- bcs_income_ridit7[4,]
+
+
 #imputed dataset 8
-bcs_early_ocRidit8 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_8)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit8 <- as.matrix(toridit(table(imputed_bcs2_8$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_8 = imputed_bcs2_8 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_8$income_ridit <- as.numeric(imputed_bcs2_8$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_8$income_ridit[imputed_bcs2_8$income_ridit == 1] <- bcs_income_ridit8[1,]
+imputed_bcs2_8$income_ridit[imputed_bcs2_8$income_ridit == 2] <- bcs_income_ridit8[2,]
+imputed_bcs2_8$income_ridit[imputed_bcs2_8$income_ridit == 3] <- bcs_income_ridit8[3,]
+imputed_bcs2_8$income_ridit[imputed_bcs2_8$income_ridit == 4] <- bcs_income_ridit8[4,]
+
 #imputed dataset 9
-bcs_early_ocRidit9 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_9)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit9 <- as.matrix(toridit(table(imputed_bcs2_9$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_9 = imputed_bcs2_9 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_9$income_ridit <- as.numeric(imputed_bcs2_9$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_9$income_ridit[imputed_bcs2_9$income_ridit == 1] <- bcs_income_ridit9[1,]
+imputed_bcs2_9$income_ridit[imputed_bcs2_9$income_ridit == 2] <- bcs_income_ridit9[2,]
+imputed_bcs2_9$income_ridit[imputed_bcs2_9$income_ridit == 3] <- bcs_income_ridit9[3,]
+imputed_bcs2_9$income_ridit[imputed_bcs2_9$income_ridit == 4] <- bcs_income_ridit9[4,]
+
 #imputed dataset 10
-bcs_early_ocRidit10 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_10)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit10 <- as.matrix(toridit(table(imputed_bcs2_10$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_10 = imputed_bcs2_10 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_10$income_ridit <- as.numeric(imputed_bcs2_10$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_10$income_ridit[imputed_bcs2_10$income_ridit == 1] <- bcs_income_ridit10[1,]
+imputed_bcs2_10$income_ridit[imputed_bcs2_10$income_ridit == 2] <- bcs_income_ridit10[2,]
+imputed_bcs2_10$income_ridit[imputed_bcs2_10$income_ridit == 3] <- bcs_income_ridit10[3,]
+imputed_bcs2_10$income_ridit[imputed_bcs2_10$income_ridit == 4] <- bcs_income_ridit10[4,]
+
 #imputed dataset 11
-bcs_early_ocRidit11 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_11)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit11 <- as.matrix(toridit(table(imputed_bcs2_11$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_11 = imputed_bcs2_11 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_11$income_ridit <- as.numeric(imputed_bcs2_11$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_11$income_ridit[imputed_bcs2_11$income_ridit == 1] <- bcs_income_ridit11[1,]
+imputed_bcs2_11$income_ridit[imputed_bcs2_11$income_ridit == 2] <- bcs_income_ridit11[2,]
+imputed_bcs2_11$income_ridit[imputed_bcs2_11$income_ridit == 3] <- bcs_income_ridit11[3,]
+imputed_bcs2_11$income_ridit[imputed_bcs2_11$income_ridit == 4] <- bcs_income_ridit11[4,]
+
+
 #imputed dataset 12
-bcs_early_ocRidit12 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_12)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit12 <- as.matrix(toridit(table(imputed_bcs2_12$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_12 = imputed_bcs2_12 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_12$income_ridit <- as.numeric(imputed_bcs2_12$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_12$income_ridit[imputed_bcs2_12$income_ridit == 1] <- bcs_income_ridit12[1,]
+imputed_bcs2_12$income_ridit[imputed_bcs2_12$income_ridit == 2] <- bcs_income_ridit12[2,]
+imputed_bcs2_12$income_ridit[imputed_bcs2_12$income_ridit == 3] <- bcs_income_ridit12[3,]
+imputed_bcs2_12$income_ridit[imputed_bcs2_12$income_ridit == 4] <- bcs_income_ridit12[4,]
+
 #imputed dataset 13
-bcs_early_ocRidit13 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_13)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit13 <- as.matrix(toridit(table(imputed_bcs2_13$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_13 = imputed_bcs2_13 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_13$income_ridit <- as.numeric(imputed_bcs2_13$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_13$income_ridit[imputed_bcs2_13$income_ridit == 1] <- bcs_income_ridit13[1,]
+imputed_bcs2_13$income_ridit[imputed_bcs2_13$income_ridit == 2] <- bcs_income_ridit13[2,]
+imputed_bcs2_13$income_ridit[imputed_bcs2_13$income_ridit == 3] <- bcs_income_ridit13[3,]
+imputed_bcs2_13$income_ridit[imputed_bcs2_13$income_ridit == 4] <- bcs_income_ridit13[4,]
+
 #imputed dataset 14
-bcs_early_ocRidit14 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_14)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit14 <- as.matrix(toridit(table(imputed_bcs2_14$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_14 = imputed_bcs2_14 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_14$income_ridit <- as.numeric(imputed_bcs2_14$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_14$income_ridit[imputed_bcs2_14$income_ridit == 1] <- bcs_income_ridit14[1,]
+imputed_bcs2_14$income_ridit[imputed_bcs2_14$income_ridit == 2] <- bcs_income_ridit14[2,]
+imputed_bcs2_14$income_ridit[imputed_bcs2_14$income_ridit == 3] <- bcs_income_ridit14[3,]
+imputed_bcs2_14$income_ridit[imputed_bcs2_14$income_ridit == 4] <- bcs_income_ridit14[4,]
+
 #imputed dataset 15
-bcs_early_ocRidit15 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_15)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit15 <- as.matrix(toridit(table(imputed_bcs2_15$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_15 = imputed_bcs2_15 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_15$income_ridit <- as.numeric(imputed_bcs2_15$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_15$income_ridit[imputed_bcs2_15$income_ridit == 1] <- bcs_income_ridit15[1,]
+imputed_bcs2_15$income_ridit[imputed_bcs2_15$income_ridit == 2] <- bcs_income_ridit15[2,]
+imputed_bcs2_15$income_ridit[imputed_bcs2_15$income_ridit == 3] <- bcs_income_ridit15[3,]
+imputed_bcs2_15$income_ridit[imputed_bcs2_15$income_ridit == 4] <- bcs_income_ridit15[4,]
+
 #imputed dataset 16
-bcs_early_ocRidit16 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_16)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit16 <- as.matrix(toridit(table(imputed_bcs2_16$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_16 = imputed_bcs2_16 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_16$income_ridit <- as.numeric(imputed_bcs2_16$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_16$income_ridit[imputed_bcs2_16$income_ridit == 1] <- bcs_income_ridit16[1,]
+imputed_bcs2_16$income_ridit[imputed_bcs2_16$income_ridit == 2] <- bcs_income_ridit16[2,]
+imputed_bcs2_16$income_ridit[imputed_bcs2_16$income_ridit == 3] <- bcs_income_ridit16[3,]
+imputed_bcs2_16$income_ridit[imputed_bcs2_16$income_ridit == 4] <- bcs_income_ridit16[4,]
+
 #imputed dataset 17
-bcs_early_ocRidit17 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_17)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit17 <- as.matrix(toridit(table(imputed_bcs2_17$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_17 = imputed_bcs2_17 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_17$income_ridit <- as.numeric(imputed_bcs2_17$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_17$income_ridit[imputed_bcs2_17$income_ridit == 1] <- bcs_income_ridit17[1,]
+imputed_bcs2_17$income_ridit[imputed_bcs2_17$income_ridit == 2] <- bcs_income_ridit17[2,]
+imputed_bcs2_17$income_ridit[imputed_bcs2_17$income_ridit == 3] <- bcs_income_ridit17[3,]
+imputed_bcs2_17$income_ridit[imputed_bcs2_17$income_ridit == 4] <- bcs_income_ridit17[4,]
+
 #imputed dataset 18
-bcs_early_ocRidit18 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_18)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit18 <- as.matrix(toridit(table(imputed_bcs2_18$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_18 = imputed_bcs2_18 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_18$income_ridit <- as.numeric(imputed_bcs2_18$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_18$income_ridit[imputed_bcs2_18$income_ridit == 1] <- bcs_income_ridit18[1,]
+imputed_bcs2_18$income_ridit[imputed_bcs2_18$income_ridit == 2] <- bcs_income_ridit18[2,]
+imputed_bcs2_18$income_ridit[imputed_bcs2_18$income_ridit == 3] <- bcs_income_ridit18[3,]
+imputed_bcs2_18$income_ridit[imputed_bcs2_18$income_ridit == 4] <- bcs_income_ridit18[4,]
+
 #imputed dataset 19
-bcs_early_ocRidit19 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_19)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit19 <- as.matrix(toridit(table(imputed_bcs2_19$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_19 = imputed_bcs2_19 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_19$income_ridit <- as.numeric(imputed_bcs2_19$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_19$income_ridit[imputed_bcs2_19$income_ridit == 1] <- bcs_income_ridit19[1,]
+imputed_bcs2_19$income_ridit[imputed_bcs2_19$income_ridit == 2] <- bcs_income_ridit19[2,]
+imputed_bcs2_19$income_ridit[imputed_bcs2_19$income_ridit == 3] <- bcs_income_ridit19[3,]
+imputed_bcs2_19$income_ridit[imputed_bcs2_19$income_ridit == 4] <- bcs_income_ridit19[4,]
+
 #imputed dataset 20
-bcs_early_ocRidit20 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_20)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit20 <- as.matrix(toridit(table(imputed_bcs2_20$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_20 = imputed_bcs2_20 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_20$income_ridit <- as.numeric(imputed_bcs2_20$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_20$income_ridit[imputed_bcs2_20$income_ridit == 1] <- bcs_income_ridit20[1,]
+imputed_bcs2_20$income_ridit[imputed_bcs2_20$income_ridit == 2] <- bcs_income_ridit20[2,]
+imputed_bcs2_20$income_ridit[imputed_bcs2_20$income_ridit == 3] <- bcs_income_ridit20[3,]
+imputed_bcs2_20$income_ridit[imputed_bcs2_20$income_ridit == 4] <- bcs_income_ridit20[4,]
+
 #imputed dataset 21
-bcs_early_ocRidit21 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_21)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit21 <- as.matrix(toridit(table(imputed_bcs2_21$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_21 = imputed_bcs2_21 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_21$income_ridit <- as.numeric(imputed_bcs2_21$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_21$income_ridit[imputed_bcs2_21$income_ridit == 1] <- bcs_income_ridit21[1,]
+imputed_bcs2_21$income_ridit[imputed_bcs2_21$income_ridit == 2] <- bcs_income_ridit21[2,]
+imputed_bcs2_21$income_ridit[imputed_bcs2_21$income_ridit == 3] <- bcs_income_ridit21[3,]
+imputed_bcs2_21$income_ridit[imputed_bcs2_21$income_ridit == 4] <- bcs_income_ridit21[4,]
+
 #imputed dataset 22
-bcs_early_ocRidit22 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_22)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit22 <- as.matrix(toridit(table(imputed_bcs2_22$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_22 = imputed_bcs2_22 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_22$income_ridit <- as.numeric(imputed_bcs2_22$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_22$income_ridit[imputed_bcs2_22$income_ridit == 1] <- bcs_income_ridit22[1,]
+imputed_bcs2_22$income_ridit[imputed_bcs2_22$income_ridit == 2] <- bcs_income_ridit22[2,]
+imputed_bcs2_22$income_ridit[imputed_bcs2_22$income_ridit == 3] <- bcs_income_ridit22[3,]
+imputed_bcs2_22$income_ridit[imputed_bcs2_22$income_ridit == 4] <- bcs_income_ridit22[4,]
+
 #imputed dataset 23
-bcs_early_ocRidit23 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_23)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit23 <- as.matrix(toridit(table(imputed_bcs2_23$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_23 = imputed_bcs2_23 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_23$income_ridit <- as.numeric(imputed_bcs2_23$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_23$income_ridit[imputed_bcs2_23$income_ridit == 1] <- bcs_income_ridit23[1,]
+imputed_bcs2_23$income_ridit[imputed_bcs2_23$income_ridit == 2] <- bcs_income_ridit23[2,]
+imputed_bcs2_23$income_ridit[imputed_bcs2_23$income_ridit == 3] <- bcs_income_ridit23[3,]
+imputed_bcs2_23$income_ridit[imputed_bcs2_23$income_ridit == 4] <- bcs_income_ridit23[4,]
+
 #imputed dataset 24
-bcs_early_ocRidit24 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_24)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit24 <- as.matrix(toridit(table(imputed_bcs2_24$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_24 = imputed_bcs2_24 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_24$income_ridit <- as.numeric(imputed_bcs2_24$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_24$income_ridit[imputed_bcs2_24$income_ridit == 1] <- bcs_income_ridit24[1,]
+imputed_bcs2_24$income_ridit[imputed_bcs2_24$income_ridit == 2] <- bcs_income_ridit24[2,]
+imputed_bcs2_24$income_ridit[imputed_bcs2_24$income_ridit == 3] <- bcs_income_ridit24[3,]
+imputed_bcs2_24$income_ridit[imputed_bcs2_24$income_ridit == 4] <- bcs_income_ridit24[4,]
+
 #imputed dataset 25
-bcs_early_ocRidit25 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5+  occupation_ridit, weights = weight, data=imputed_bcs2_25)
+#get count data 
+#then convert to ridit score with toridit()
+bcs_income_ridit25 <- as.matrix(toridit(table(imputed_bcs2_25$oecd_quintiles)))
+#add ridit score to dataset as new variable 
+imputed_bcs2_25 = imputed_bcs2_25 %>% mutate(income_ridit = oecd_quintiles) 
+imputed_bcs2_25$income_ridit <- as.numeric(imputed_bcs2_25$income_ridit)
+#recode so is replaced with the ridit scores
+imputed_bcs2_25$income_ridit[imputed_bcs2_25$income_ridit == 1] <- bcs_income_ridit25[1,]
+imputed_bcs2_25$income_ridit[imputed_bcs2_25$income_ridit == 2] <- bcs_income_ridit25[2,]
+imputed_bcs2_25$income_ridit[imputed_bcs2_25$income_ridit == 3] <- bcs_income_ridit25[3,]
+imputed_bcs2_25$income_ridit[imputed_bcs2_25$income_ridit == 4] <- bcs_income_ridit25[4,]
 
 
-#late childhood education
-#imputed dataset 1
-bcs_late_ocRidit1 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_late_ocRidit2 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_late_ocRidit3 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_late_ocRidit4 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_late_ocRidit5 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_late_ocRidit6 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_late_ocRidit7 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_late_ocRidit8 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_late_ocRidit9 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_late_ocRidit10 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_late_ocRidit11 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_late_ocRidit12 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_late_ocRidit13 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_late_ocRidit14 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_late_ocRidit15 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_late_ocRidit16 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_late_ocRidit17 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_late_ocRidit18 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_late_ocRidit19 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_late_ocRidit20 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_late_ocRidit21 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_late_ocRidit22 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_late_ocRidit23 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_late_ocRidit24 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_late_ocRidit25 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10+  occupation_ridit, weights = weight, data=imputed_bcs2_25)
+#income regression models with income ridit as predictor variable.
+#Regression models over each imputed dataset 
+age5_IncomeModel <- function(df) {
+  fit <- lm(
+    standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  income_ridit, weights = weight, data=df)
+  return(fit)
+}
+
+age10_IncomeModel <- function(df) {
+  fit <- lm(
+    standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10+  income_ridit, weights = weight, data=df)
+  return(fit)
+}
+
+age16_IncomeModel <- function(df) {
+  fit <- lm(
+    standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16 +  income_ridit, weights = weight, data=df)
+  return(fit)
+}
 
 
-#adolescent education 
 
-#imputed dataset 1
-bcs_adolescent_ocRidit1 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_adolescent_ocRidit2 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_adolescent_ocRidit3 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_adolescent_ocRidit4 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_adolescent_ocRidit5 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_adolescent_ocRidit6 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_adolescent_ocRidit7 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_adolescent_ocRidit8 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_adolescent_ocRidit9 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_adolescent_ocRidit10 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_adolescent_ocRidit11 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_adolescent_ocRidit12 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_adolescent_ocRidit13 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_adolescent_ocRidit14 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_adolescent_ocRidit15 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_adolescent_ocRidit16 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_adolescent_ocRidit17 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_adolescent_ocRidit18 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_adolescent_ocRidit19 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_adolescent_ocRidit20 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_adolescent_ocRidit21 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_adolescent_ocRidit22 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_adolescent_ocRidit23 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_adolescent_ocRidit24 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_adolescent_ocRidit25 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16+  occupation_ridit, weights = weight, data=imputed_bcs2_25)
+age5incomeResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                 imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                 imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                 imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                 imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                            age5_IncomeModel)
 
+age10incomeResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                  imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                  imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                  imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                  imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                             age10_IncomeModel)
 
-#pool results ####
+age16incomeResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                  imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                  imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                  imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                  imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                             age16_IncomeModel)
 
-#early language
-early_occupation_ridit <- summary(pool(as.mira(list(bcs_early_ocRidit1,bcs_early_ocRidit2, bcs_early_ocRidit3, bcs_early_ocRidit4, bcs_early_ocRidit5, 
-                                                    bcs_early_ocRidit6, bcs_early_ocRidit7, bcs_early_ocRidit8, bcs_early_ocRidit9, bcs_early_ocRidit10, 
-                                                    bcs_early_ocRidit11, bcs_early_ocRidit12, bcs_early_ocRidit13, bcs_early_ocRidit14, bcs_early_ocRidit15, 
-                                                    bcs_early_ocRidit16, bcs_early_ocRidit17, bcs_early_ocRidit18, bcs_early_ocRidit19, bcs_early_ocRidit20, 
-                                                    bcs_early_ocRidit21, bcs_early_ocRidit22, bcs_early_ocRidit23, bcs_early_ocRidit24, bcs_early_ocRidit25))))
-round(early_occupation_ridit,2)
-#age 3 confidence intervals 
-lower_early_occupation_ridit = summary(pool(as.mira(list(bcs_early_ocRidit1,bcs_early_ocRidit2, bcs_early_ocRidit3, bcs_early_ocRidit4, bcs_early_ocRidit5, 
-                                                         bcs_early_ocRidit6, bcs_early_ocRidit7, bcs_early_ocRidit8, bcs_early_ocRidit9, bcs_early_ocRidit10, 
-                                                         bcs_early_ocRidit11, bcs_early_ocRidit12, bcs_early_ocRidit13, bcs_early_ocRidit14, bcs_early_ocRidit15, 
-                                                         bcs_early_ocRidit16, bcs_early_ocRidit17, bcs_early_ocRidit18, bcs_early_ocRidit19, bcs_early_ocRidit20, 
-                                                         bcs_early_ocRidit21, bcs_early_ocRidit22, bcs_early_ocRidit23, bcs_early_ocRidit24, bcs_early_ocRidit25))))$estimate-(
-                                                           summary(pool(as.mira(list(bcs_early_ocRidit1,bcs_early_ocRidit2, bcs_early_ocRidit3, bcs_early_ocRidit4, bcs_early_ocRidit5, 
-                                                                                     bcs_early_ocRidit6, bcs_early_ocRidit7, bcs_early_ocRidit8, bcs_early_ocRidit9, bcs_early_ocRidit10, 
-                                                                                     bcs_early_ocRidit11, bcs_early_ocRidit12, bcs_early_ocRidit13, bcs_early_ocRidit14, bcs_early_ocRidit15, 
-                                                                                     bcs_early_ocRidit16, bcs_early_ocRidit17, bcs_early_ocRidit18, bcs_early_ocRidit19, bcs_early_ocRidit20, 
-                                                                                     bcs_early_ocRidit21, bcs_early_ocRidit22, bcs_early_ocRidit23, bcs_early_ocRidit24, bcs_early_ocRidit25))))$std.error*1.96)
-upper_early_occupation_ridit = summary(pool(as.mira(list(bcs_early_ocRidit1,bcs_early_ocRidit2, bcs_early_ocRidit3, bcs_early_ocRidit4, bcs_early_ocRidit5, 
-                                                         bcs_early_ocRidit6, bcs_early_ocRidit7, bcs_early_ocRidit8, bcs_early_ocRidit9, bcs_early_ocRidit10, 
-                                                         bcs_early_ocRidit11, bcs_early_ocRidit12, bcs_early_ocRidit13, bcs_early_ocRidit14, bcs_early_ocRidit15, 
-                                                         bcs_early_ocRidit16, bcs_early_ocRidit17, bcs_early_ocRidit18, bcs_early_ocRidit19, bcs_early_ocRidit20, 
-                                                         bcs_early_ocRidit21, bcs_early_ocRidit22, bcs_early_ocRidit23, bcs_early_ocRidit24, bcs_early_ocRidit25))))$estimate+(
-                                                           summary(pool(as.mira(list(bcs_early_ocRidit1,bcs_early_ocRidit2, bcs_early_ocRidit3, bcs_early_ocRidit4, bcs_early_ocRidit5, 
-                                                                                     bcs_early_ocRidit6, bcs_early_ocRidit7, bcs_early_ocRidit8, bcs_early_ocRidit9, bcs_early_ocRidit10, 
-                                                                                     bcs_early_ocRidit11, bcs_early_ocRidit12, bcs_early_ocRidit13, bcs_early_ocRidit14, bcs_early_ocRidit15, 
-                                                                                     bcs_early_ocRidit16, bcs_early_ocRidit17, bcs_early_ocRidit18, bcs_early_ocRidit19, bcs_early_ocRidit20, 
-                                                                                     bcs_early_ocRidit21, bcs_early_ocRidit22, bcs_early_ocRidit23, bcs_early_ocRidit24, bcs_early_ocRidit25))))$std.error*1.96)
-round(lower_early_occupation_ridit,2)
-round(upper_early_occupation_ridit,2)
-early_occupation_r2 = as.data.frame(pool.r.squared(as.mira(list(bcs_early_ocRidit1,bcs_early_ocRidit2, bcs_early_ocRidit3, bcs_early_ocRidit4, bcs_early_ocRidit5, 
-                                    bcs_early_ocRidit6, bcs_early_ocRidit7, bcs_early_ocRidit8, bcs_early_ocRidit9, bcs_early_ocRidit10, 
-                                    bcs_early_ocRidit11, bcs_early_ocRidit12, bcs_early_ocRidit13, bcs_early_ocRidit14, bcs_early_ocRidit15, 
-                                    bcs_early_ocRidit16, bcs_early_ocRidit17, bcs_early_ocRidit18, bcs_early_ocRidit19, bcs_early_ocRidit20,
-                                    bcs_early_ocRidit21, bcs_early_ocRidit22, bcs_early_ocRidit23, bcs_early_ocRidit24, bcs_early_ocRidit25))))
+#Pool Results 
 
-
-#late language
-late_occupation_ridit <- summary(pool(as.mira(list(bcs_late_ocRidit1,bcs_late_ocRidit2, bcs_late_ocRidit3, bcs_late_ocRidit4, bcs_late_ocRidit5, 
-                                                   bcs_late_ocRidit6, bcs_late_ocRidit7, bcs_late_ocRidit8, bcs_late_ocRidit9, bcs_late_ocRidit10, 
-                                                   bcs_late_ocRidit11, bcs_late_ocRidit12, bcs_late_ocRidit13, bcs_late_ocRidit14, bcs_late_ocRidit15, 
-                                                   bcs_late_ocRidit16, bcs_late_ocRidit17, bcs_late_ocRidit18, bcs_late_ocRidit19, bcs_late_ocRidit20, 
-                                                   bcs_late_ocRidit21, bcs_late_ocRidit22, bcs_late_ocRidit23, bcs_late_ocRidit24, bcs_late_ocRidit25))))
-round(late_occupation_ridit,2)
-#age 3 confidence intervals 
-lower_late_occupation_ridit = summary(pool(as.mira(list(bcs_late_ocRidit1,bcs_late_ocRidit2, bcs_late_ocRidit3, bcs_late_ocRidit4, bcs_late_ocRidit5, 
-                                                        bcs_late_ocRidit6, bcs_late_ocRidit7, bcs_late_ocRidit8, bcs_late_ocRidit9, bcs_late_ocRidit10, 
-                                                        bcs_late_ocRidit11, bcs_late_ocRidit12, bcs_late_ocRidit13, bcs_late_ocRidit14, bcs_late_ocRidit15, 
-                                                        bcs_late_ocRidit16, bcs_late_ocRidit17, bcs_late_ocRidit18, bcs_late_ocRidit19, bcs_late_ocRidit20, 
-                                                        bcs_late_ocRidit21, bcs_late_ocRidit22, bcs_late_ocRidit23, bcs_late_ocRidit24, bcs_late_ocRidit25))))$estimate-(
-                                                          summary(pool(as.mira(list(bcs_late_ocRidit1,bcs_late_ocRidit2, bcs_late_ocRidit3, bcs_late_ocRidit4, bcs_late_ocRidit5, 
-                                                                                    bcs_late_ocRidit6, bcs_late_ocRidit7, bcs_late_ocRidit8, bcs_late_ocRidit9, bcs_late_ocRidit10, 
-                                                                                    bcs_late_ocRidit11, bcs_late_ocRidit12, bcs_late_ocRidit13, bcs_late_ocRidit14, bcs_late_ocRidit15, 
-                                                                                    bcs_late_ocRidit16, bcs_late_ocRidit17, bcs_late_ocRidit18, bcs_late_ocRidit19, bcs_late_ocRidit20, 
-                                                                                    bcs_late_ocRidit21, bcs_late_ocRidit22, bcs_late_ocRidit23, bcs_late_ocRidit24, bcs_late_ocRidit25))))$std.error*1.96)
-upper_late_occupation_ridit = summary(pool(as.mira(list(bcs_late_ocRidit1,bcs_late_ocRidit2, bcs_late_ocRidit3, bcs_late_ocRidit4, bcs_late_ocRidit5, 
-                                                        bcs_late_ocRidit6, bcs_late_ocRidit7, bcs_late_ocRidit8, bcs_late_ocRidit9, bcs_late_ocRidit10, 
-                                                        bcs_late_ocRidit11, bcs_late_ocRidit12, bcs_late_ocRidit13, bcs_late_ocRidit14, bcs_late_ocRidit15, 
-                                                        bcs_late_ocRidit16, bcs_late_ocRidit17, bcs_late_ocRidit18, bcs_late_ocRidit19, bcs_late_ocRidit20, 
-                                                        bcs_late_ocRidit21, bcs_late_ocRidit22, bcs_late_ocRidit23, bcs_late_ocRidit24, bcs_late_ocRidit25))))$estimate+(
-                                                          summary(pool(as.mira(list(bcs_late_ocRidit1,bcs_late_ocRidit2, bcs_late_ocRidit3, bcs_late_ocRidit4, bcs_late_ocRidit5, 
-                                                                                    bcs_late_ocRidit6, bcs_late_ocRidit7, bcs_late_ocRidit8, bcs_late_ocRidit9, bcs_late_ocRidit10, 
-                                                                                    bcs_late_ocRidit11, bcs_late_ocRidit12, bcs_late_ocRidit13, bcs_late_ocRidit14, bcs_late_ocRidit15, 
-                                                                                    bcs_late_ocRidit16, bcs_late_ocRidit17, bcs_late_ocRidit18, bcs_late_ocRidit19, bcs_late_ocRidit20, 
-                                                                                    bcs_late_ocRidit21, bcs_late_ocRidit22, bcs_late_ocRidit23, bcs_late_ocRidit24, bcs_late_ocRidit25))))$std.error*1.96)
-round(lower_late_occupation_ridit,2)
-round(upper_late_occupation_ridit,2)
-late_occupation_r2 = as.data.frame(pool.r.squared(as.mira(list(bcs_late_ocRidit1,bcs_late_ocRidit2, bcs_late_ocRidit3, bcs_late_ocRidit4, bcs_late_ocRidit5, 
-                                    bcs_late_ocRidit6, bcs_late_ocRidit7, bcs_late_ocRidit8, bcs_late_ocRidit9, bcs_late_ocRidit10, 
-                                    bcs_late_ocRidit11, bcs_late_ocRidit12, bcs_late_ocRidit13, bcs_late_ocRidit14, bcs_late_ocRidit15, 
-                                    bcs_late_ocRidit16, bcs_late_ocRidit17, bcs_late_ocRidit18, bcs_late_ocRidit19, bcs_late_ocRidit20,
-                                    bcs_late_ocRidit21, bcs_late_ocRidit22, bcs_late_ocRidit23, bcs_late_ocRidit24, bcs_late_ocRidit25))))
-
-#adolescent language
-adolescent_occupation_ridit <- summary(pool(as.mira(list(bcs_adolescent_ocRidit1,bcs_adolescent_ocRidit2, bcs_adolescent_ocRidit3, bcs_adolescent_ocRidit4, bcs_adolescent_ocRidit5, 
-                                                         bcs_adolescent_ocRidit6, bcs_adolescent_ocRidit7, bcs_adolescent_ocRidit8, bcs_adolescent_ocRidit9, bcs_adolescent_ocRidit10, 
-                                                         bcs_adolescent_ocRidit11, bcs_adolescent_ocRidit12, bcs_adolescent_ocRidit13, bcs_adolescent_ocRidit14, bcs_adolescent_ocRidit15, 
-                                                         bcs_adolescent_ocRidit16, bcs_adolescent_ocRidit17, bcs_adolescent_ocRidit18, bcs_adolescent_ocRidit19, bcs_adolescent_ocRidit20, 
-                                                         bcs_adolescent_ocRidit21, bcs_adolescent_ocRidit22, bcs_adolescent_ocRidit23, bcs_adolescent_ocRidit24, bcs_adolescent_ocRidit25))))
-round(adolescent_occupation_ridit,2)
-#age 3 confidence intervals 
-lower_adolescent_occupation_ridit = summary(pool(as.mira(list(bcs_adolescent_ocRidit1,bcs_adolescent_ocRidit2, bcs_adolescent_ocRidit3, bcs_adolescent_ocRidit4, bcs_adolescent_ocRidit5, 
-                                                              bcs_adolescent_ocRidit6, bcs_adolescent_ocRidit7, bcs_adolescent_ocRidit8, bcs_adolescent_ocRidit9, bcs_adolescent_ocRidit10, 
-                                                              bcs_adolescent_ocRidit11, bcs_adolescent_ocRidit12, bcs_adolescent_ocRidit13, bcs_adolescent_ocRidit14, bcs_adolescent_ocRidit15, 
-                                                              bcs_adolescent_ocRidit16, bcs_adolescent_ocRidit17, bcs_adolescent_ocRidit18, bcs_adolescent_ocRidit19, bcs_adolescent_ocRidit20, 
-                                                              bcs_adolescent_ocRidit21, bcs_adolescent_ocRidit22, bcs_adolescent_ocRidit23, bcs_adolescent_ocRidit24, bcs_adolescent_ocRidit25))))$estimate-(
-                                                                summary(pool(as.mira(list(bcs_adolescent_ocRidit1,bcs_adolescent_ocRidit2, bcs_adolescent_ocRidit3, bcs_adolescent_ocRidit4, bcs_adolescent_ocRidit5, 
-                                                                                          bcs_adolescent_ocRidit6, bcs_adolescent_ocRidit7, bcs_adolescent_ocRidit8, bcs_adolescent_ocRidit9, bcs_adolescent_ocRidit10, 
-                                                                                          bcs_adolescent_ocRidit11, bcs_adolescent_ocRidit12, bcs_adolescent_ocRidit13, bcs_adolescent_ocRidit14, bcs_adolescent_ocRidit15, 
-                                                                                          bcs_adolescent_ocRidit16, bcs_adolescent_ocRidit17, bcs_adolescent_ocRidit18, bcs_adolescent_ocRidit19, bcs_adolescent_ocRidit20, 
-                                                                                          bcs_adolescent_ocRidit21, bcs_adolescent_ocRidit22, bcs_adolescent_ocRidit23, bcs_adolescent_ocRidit24, bcs_adolescent_ocRidit25))))$std.error*1.96)
-upper_adolescent_occupation_ridit = summary(pool(as.mira(list(bcs_adolescent_ocRidit1,bcs_adolescent_ocRidit2, bcs_adolescent_ocRidit3, bcs_adolescent_ocRidit4, bcs_adolescent_ocRidit5, 
-                                                              bcs_adolescent_ocRidit6, bcs_adolescent_ocRidit7, bcs_adolescent_ocRidit8, bcs_adolescent_ocRidit9, bcs_adolescent_ocRidit10, 
-                                                              bcs_adolescent_ocRidit11, bcs_adolescent_ocRidit12, bcs_adolescent_ocRidit13, bcs_adolescent_ocRidit14, bcs_adolescent_ocRidit15, 
-                                                              bcs_adolescent_ocRidit16, bcs_adolescent_ocRidit17, bcs_adolescent_ocRidit18, bcs_adolescent_ocRidit19, bcs_adolescent_ocRidit20, 
-                                                              bcs_adolescent_ocRidit21, bcs_adolescent_ocRidit22, bcs_adolescent_ocRidit23, bcs_adolescent_ocRidit24, bcs_adolescent_ocRidit25))))$estimate+(
-                                                                summary(pool(as.mira(list(bcs_adolescent_ocRidit1,bcs_adolescent_ocRidit2, bcs_adolescent_ocRidit3, bcs_adolescent_ocRidit4, bcs_adolescent_ocRidit5, 
-                                                                                          bcs_adolescent_ocRidit6, bcs_adolescent_ocRidit7, bcs_adolescent_ocRidit8, bcs_adolescent_ocRidit9, bcs_adolescent_ocRidit10, 
-                                                                                          bcs_adolescent_ocRidit11, bcs_adolescent_ocRidit12, bcs_adolescent_ocRidit13, bcs_adolescent_ocRidit14, bcs_adolescent_ocRidit15, 
-                                                                                          bcs_adolescent_ocRidit16, bcs_adolescent_ocRidit17, bcs_adolescent_ocRidit18, bcs_adolescent_ocRidit19, bcs_adolescent_ocRidit20, 
-                                                                                          bcs_adolescent_ocRidit21, bcs_adolescent_ocRidit22, bcs_adolescent_ocRidit23, bcs_adolescent_ocRidit24, bcs_adolescent_ocRidit25))))$std.error*1.96)
-round(lower_adolescent_occupation_ridit,2)
-round(upper_adolescent_occupation_ridit,2)
-adolescent_occupation_r2 = as.data.frame(pool.r.squared(as.mira(list(bcs_adolescent_ocRidit1,bcs_adolescent_ocRidit2, bcs_adolescent_ocRidit3, bcs_adolescent_ocRidit4, bcs_adolescent_ocRidit5, 
-                                    bcs_adolescent_ocRidit6, bcs_adolescent_ocRidit7, bcs_adolescent_ocRidit8, bcs_adolescent_ocRidit9, bcs_adolescent_ocRidit10, 
-                                    bcs_adolescent_ocRidit11, bcs_adolescent_ocRidit12, bcs_adolescent_ocRidit13, bcs_adolescent_ocRidit14, bcs_adolescent_ocRidit15, 
-                                    bcs_adolescent_ocRidit16, bcs_adolescent_ocRidit17, bcs_adolescent_ocRidit18, bcs_adolescent_ocRidit19, bcs_adolescent_ocRidit20,
-                                    bcs_adolescent_ocRidit21, bcs_adolescent_ocRidit22, bcs_adolescent_ocRidit23, bcs_adolescent_ocRidit24, bcs_adolescent_ocRidit25))))
-
+age5_incomeResults <- summary(pool(as.mira(age5incomeResults)),conf.int = TRUE, conf.level = 0.95) 
+age10_incomeResults <- summary(pool(as.mira(age10incomeResults)),conf.int = TRUE, conf.level = 0.95) 
+age16_incomeResults <- summary(pool(as.mira(age16incomeResults)),conf.int = TRUE, conf.level = 0.95) 
 
 
 #confounders only models to get Partial R2 for ridits. ####
 
-#imputed dataset 1
-bcs_early_confounders1 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_early_confounders2 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_early_confounders3 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_early_confounders4 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_early_confounders5 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_early_confounders6 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_early_confounders7 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_early_confounders8 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_early_confounders9 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_early_confounders10 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_early_confounders11 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_early_confounders12 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_early_confounders13 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_early_confounders14 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_early_confounders15 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_early_confounders16 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_early_confounders17 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_early_confounders18 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_early_confounders19 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_early_confounders20 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_early_confounders21 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_early_confounders22 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_early_confounders23 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_early_confounders24 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_early_confounders25 <- lm(standardised_vocab5 ~ gender + ethnicity +  EAL + standardised_age5, weights = weight, data=imputed_bcs2_25)
+#confounders regression models with confounders ridit as predictor variable.
+#Regression models over each imputed dataset 
+age5_confoundersModel <- function(df) {
+  fit <- lm(
+    standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5  , weights = weight, data=df)
+  return(fit)
+}
 
+age10_confoundersModel <- function(df) {
+  fit <- lm(
+    standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10, weights = weight, data=df)
+  return(fit)
+}
 
-#late childhood 
-#imputed dataset 1
-bcs_late_confounders1 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_late_confounders2 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_late_confounders3 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_late_confounders4 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_late_confounders5 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_late_confounders6 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_late_confounders7 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_late_confounders8 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_late_confounders9 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_late_confounders10 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_late_confounders11 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_late_confounders12 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_late_confounders13 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_late_confounders14 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_late_confounders15 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_late_confounders16 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_late_confounders17 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_late_confounders18 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_late_confounders19 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_late_confounders20 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_late_confounders21 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_late_confounders22 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_late_confounders23 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_late_confounders24 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_late_confounders25 <- lm(standardised_vocab10 ~ gender + ethnicity +  EAL + standardised_age10, weights = weight, data=imputed_bcs2_25)
-
-
-#adolescent
-
-#imputed dataset 1
-bcs_adolescent_confounders1 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_1)
-#imputed dataset 2
-bcs_adolescent_confounders2 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_2)
-#imputed dataset 3
-bcs_adolescent_confounders3 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_3)
-#imputed dataset 4
-bcs_adolescent_confounders4 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_4)
-#imputed dataset 5
-bcs_adolescent_confounders5 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_5)
-#imputed dataset 6
-bcs_adolescent_confounders6 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_6)
-#imputed dataset 7
-bcs_adolescent_confounders7 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_7)
-#imputed dataset 8
-bcs_adolescent_confounders8 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_8)
-#imputed dataset 9
-bcs_adolescent_confounders9 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_9)
-#imputed dataset 10
-bcs_adolescent_confounders10 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_10)
-#imputed dataset 11
-bcs_adolescent_confounders11 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_11)
-#imputed dataset 12
-bcs_adolescent_confounders12 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_12)
-#imputed dataset 13
-bcs_adolescent_confounders13 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_13)
-#imputed dataset 14
-bcs_adolescent_confounders14 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_14)
-#imputed dataset 15
-bcs_adolescent_confounders15 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_15)
-#imputed dataset 16
-bcs_adolescent_confounders16 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_16)
-#imputed dataset 17
-bcs_adolescent_confounders17 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_17)
-#imputed dataset 18
-bcs_adolescent_confounders18 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_18)
-#imputed dataset 19
-bcs_adolescent_confounders19 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_19)
-#imputed dataset 20
-bcs_adolescent_confounders20 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_20)
-#imputed dataset 21
-bcs_adolescent_confounders21 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_21)
-#imputed dataset 22
-bcs_adolescent_confounders22 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_22)
-#imputed dataset 23
-bcs_adolescent_confounders23 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_23)
-#imputed dataset 24
-bcs_adolescent_confounders24 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_24)
-#imputed dataset 25
-bcs_adolescent_confounders25 <- lm(standardised_vocab16 ~ gender + ethnicity +  EAL + standardised_age16, weights = weight, data=imputed_bcs2_25)
-
-#r squared values 
-
-early_confounders = as.data.frame(pool.r.squared(as.mira(list(bcs_early_confounders1,bcs_early_confounders2, bcs_early_confounders3, bcs_early_confounders4, bcs_early_confounders5, 
-                                    bcs_early_confounders6, bcs_early_confounders7, bcs_early_confounders8, bcs_early_confounders9, bcs_early_confounders10, 
-                                    bcs_early_confounders11, bcs_early_confounders12, bcs_early_confounders13, bcs_early_confounders14, bcs_early_confounders15, 
-                                    bcs_early_confounders16, bcs_early_confounders17, bcs_early_confounders18, bcs_early_confounders19, bcs_early_confounders20,
-                                    bcs_early_confounders21, bcs_early_confounders22, bcs_early_confounders23, bcs_early_confounders24, bcs_early_confounders25))))
+age16_confoundersModel <- function(df) {
+  fit <- lm(
+    standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16, weights = weight, data=df)
+  return(fit)
+}
 
 
 
+age5confoundersResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                      imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                      imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                      imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                      imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                 age5_confoundersModel)
 
-late_confounders = as.data.frame(pool.r.squared(as.mira(list(bcs_late_confounders1,bcs_late_confounders2, bcs_late_confounders3, bcs_late_confounders4, bcs_late_confounders5, 
-                                    bcs_late_confounders6, bcs_late_confounders7, bcs_late_confounders8, bcs_late_confounders9, bcs_late_confounders10, 
-                                    bcs_late_confounders11, bcs_late_confounders12, bcs_late_confounders13, bcs_late_confounders14, bcs_late_confounders15, 
-                                    bcs_late_confounders16, bcs_late_confounders17, bcs_late_confounders18, bcs_late_confounders19, bcs_late_confounders20,
-                                    bcs_late_confounders21, bcs_late_confounders22, bcs_late_confounders23, bcs_late_confounders24, bcs_late_confounders25))))
+age10confoundersResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                       imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                       imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                       imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                       imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                  age10_confoundersModel)
+
+age16confoundersResults <- lapply(list(imputed_bcs2_1, imputed_bcs2_2, imputed_bcs2_3, imputed_bcs2_4, imputed_bcs2_5, 
+                                       imputed_bcs2_6, imputed_bcs2_7, imputed_bcs2_8, imputed_bcs2_9, imputed_bcs2_10, 
+                                       imputed_bcs2_11, imputed_bcs2_12, imputed_bcs2_13, imputed_bcs2_14, imputed_bcs2_15,
+                                       imputed_bcs2_16, imputed_bcs2_17, imputed_bcs2_18, imputed_bcs2_19, imputed_bcs2_20, 
+                                       imputed_bcs2_21, imputed_bcs2_22, imputed_bcs2_23, imputed_bcs2_24, imputed_bcs2_25),
+                                  age16_confoundersModel)
+
+#Pool Results 
+
+age5_confoundersResults <- summary(pool(as.mira(age5confoundersResults)),conf.int = TRUE, conf.level = 0.95) 
+age10_confoundersResults <- summary(pool(as.mira(age10confoundersResults)),conf.int = TRUE, conf.level = 0.95) 
+age16_confoundersResults <- summary(pool(as.mira(age16confoundersResults)),conf.int = TRUE, conf.level = 0.95) 
 
 
+#R2 for ridits
+#Education 
+early_education_r2 = as.data.frame(pool.r.squared(as.mira(age5educationResults)))*100
+late_education_r2 = as.data.frame(pool.r.squared(as.mira(age10educationResults)))*100
+adolescent_education_r2 = as.data.frame(pool.r.squared(as.mira(age16educationResults)))*100
 
-adolescent_confounders =as.data.frame(pool.r.squared(as.mira(list(bcs_adolescent_confounders1,bcs_adolescent_confounders2, bcs_adolescent_confounders3, bcs_adolescent_confounders4, bcs_adolescent_confounders5, 
-                                    bcs_adolescent_confounders6, bcs_adolescent_confounders7, bcs_adolescent_confounders8, bcs_adolescent_confounders9, bcs_adolescent_confounders10, 
-                                    bcs_adolescent_confounders11, bcs_adolescent_confounders12, bcs_adolescent_confounders13, bcs_adolescent_confounders14, bcs_adolescent_confounders15, 
-                                    bcs_adolescent_confounders16, bcs_adolescent_confounders17, bcs_adolescent_confounders18, bcs_adolescent_confounders19, bcs_adolescent_confounders20,
-                                    bcs_adolescent_confounders21, bcs_adolescent_confounders22, bcs_adolescent_confounders23, bcs_adolescent_confounders24, bcs_adolescent_confounders25))))
+#Occupation 
+early_occupation_r2 = as.data.frame(pool.r.squared(as.mira(age5occupationResults)))*100
+late_occupation_r2 = as.data.frame(pool.r.squared(as.mira(age10occupationResults)))*100
+adolescent_occupation_r2 = as.data.frame(pool.r.squared(as.mira(age16occupationResults)))*100
 
+#Income
+early_income_r2 = as.data.frame(pool.r.squared(as.mira(age5incomeResults)))*100
+late_income_r2 = as.data.frame(pool.r.squared(as.mira(age10incomeResults)))*100
+adolescent_income_r2 = as.data.frame(pool.r.squared(as.mira(age16incomeResults)))*100
 
+#Confounders
+early_confounders = as.data.frame(pool.r.squared(as.mira(age5confoundersResults)))*100
+late_confounders = as.data.frame(pool.r.squared(as.mira(age10confoundersResults)))*100
+adolescent_confounders = as.data.frame(pool.r.squared(as.mira(age16confoundersResults)))*100
 
 #partial r2s
 #education
 early_childhood_ed_partial = early_education_r2 - early_confounders
-early_childhood_ed_partial*100
+early_childhood_ed_partial
 
 late_childhood_ed_partial = late_education_r2 - late_confounders
-late_childhood_ed_partial*100
+late_childhood_ed_partial
 
 adolescent_ed_partial = adolescent_education_r2 - adolescent_confounders
-adolescent_ed_partial*100
+adolescent_ed_partial
 
 #occupation
 early_childhood_oc_partial = early_occupation_r2 - early_confounders
-early_childhood_oc_partial*100
+early_childhood_oc_partial
 
 late_childhood_oc_partial = late_occupation_r2 - late_confounders
-late_childhood_oc_partial*100
+late_childhood_oc_partial
 
 adolescent_oc_partial = adolescent_occupation_r2 - adolescent_confounders
-adolescent_oc_partial*100
+adolescent_oc_partial
+
+#income
+early_childhood_income_partial = early_income_r2 - early_confounders
+early_childhood_income_partial
+
+late_childhood_income_partial = late_income_r2 - late_confounders
+late_childhood_income_partial
+
+adolescent_income_partial = adolescent_income_r2 - adolescent_confounders
+adolescent_income_partial
