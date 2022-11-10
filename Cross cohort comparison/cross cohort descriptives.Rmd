@@ -530,7 +530,7 @@ BCSgender = bcs_cohort %>% select(bcsid, a0255)
 BCSgender = na.omit(BCSgender)
 BCSgender$a0255 = as.factor(BCSgender$a0255)
 BCSsex = table(BCSgender$a0255)
-BCScohort_sex = as.data.frame(round(prop.table(sex),4)*100)
+BCScohort_sex = as.data.frame(round(prop.table(BCSsex),4)*100)
   
 BCScohort_sex = as_tibble(BCScohort_sex) %>% 
   rename("Proportion (%) or \n Mean(±SD) [95% CIs]" = Freq) %>% 
@@ -615,6 +615,17 @@ BCScohort_income = as_tibble(BCScohort_income) %>%
                           ), .before = 1)  %>% 
   select(-Var1)
 
+descriptivesCohortBCS = rbind(BCScohort_vocabAge5, 
+BCScohort_vocabAge10, BCScohort_vocabAge16, 
+BCScohort_sex, BCScohort_ethnicity, BCScohort_eal,
+BCScohort_education, BCScohort_income, BCScohort_occupation) %>% 
+
+  add_row(Variable = "Vocabulary", .before = 1) %>%  #add in rows to divide table up 
+  add_row(Variable = "Demographics", .before = 5) %>% 
+  add_row(Variable = "Socioeconomic Circumstances", .before = 12)
+    
+descriptivesCohortBCS [is.na(descriptivesCohortBCS )] <- " "
+
 ```
 
 
@@ -636,7 +647,7 @@ imputed_table = imputed_table %>% select(!Var)
 my_border = border= fp_border(color="black", width=1)
 imputedTable <- imputed_table %>% 
   flextable() %>% 
-  font(fontname = "Times New Roman", part="all") %>% #
+  #font(fontname = "Times", part="all") %>% #
   fontsize(size=10, part = "all") %>% #
   align(j=1, align="left", part="all") %>% 
   align(j=2:3, align="center", part="all") %>% 
@@ -653,15 +664,15 @@ imputedTable <- imputed_table %>%
   #set_header_labels(Variable= "Variable", `Full Cohort` = "Whole Cohort \n (N= 19243)", 
                 #    `Analytical Sample` = "Analytical Sample (N=17,070)") %>% 
   add_header_row(values = c(" ", "Proportion (%) or \n Mean(±SD) [95% CIs]" ), colwidths = c(1, 2)) %>% 
-  font(fontname = "Times New Roman", part="header") %>% 
+  #font(fontname = "Times", part="header") %>% 
   align(align="center", part="header") %>% 
   hline_top(j = 2:3, part = "all", border = my_border)  %>% 
-  font(fontname = "Times New Roman", part = "footer") %>% 
+  #font(fontname = "Times ", part = "footer") %>% 
   fontsize(size = 9, part = "footer") %>% 
   italic(part = "footer", italic = TRUE) %>% 
   align(align="left", part="footer") %>% 
   #add_header_lines(values = c("Table 2: Descriptive Statistics for Analytical Sample (N = 17, 070) and Whole MCS2001 Cohort (N=19,243)")) %>% 
-  font(fontname = "Times New Roman", part = "header") %>% 
+  #font(fontname = "Times ", part = "header") %>% 
   fontsize(size = 12, part = "header") %>% 
   italic(part = "header", italic = TRUE)
   
@@ -672,8 +683,1012 @@ imputedTable <- imputed_table %>%
 
 
 
+#MCS imputed vs cohort comparison 
+```{r}
+fullDescriptivesMCS = cbind(descriptivesCohortMCS, MCSdescriptivesTable)
+names(fullDescriptivesMCS) = c("Variable" , "Full Cohort", "Var", "Analytical Sample")
+fullDescriptivesMCS = fullDescriptivesMCS %>% select(!Var)
+#put into table
+#define border
+my_border = border= fp_border(color="black", width=1)
+full_descriptivesMCS <- fullDescriptivesMCS %>% 
+  flextable() %>% 
+  #font(fontname = "Times New Roman", part="all") %>% #
+  fontsize(size=10, part = "all") %>% #
+  align(j=1, align="left", part="all") %>% 
+  align(j=2:3, align="center", part="all") %>% 
+  color(j=1:3, color="black", part="all") %>% 
+  width(j=1, width=2) %>% 
+  width(j=2:3, width=1.8) %>% 
+  line_spacing(j=2:3, space=1.5) %>% 
+  line_spacing(j=1, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:3, part="all", border=my_border) %>% 
+  hline_bottom(j=1:3,part="body",  border=my_border) %>% 
+  bold(j = 1, i = c(1,6,18), bold = TRUE) %>% 
+  italic(j = 1, i = c(1,6,18), italic = TRUE) %>% 
+  set_header_labels(Variable= "Variable", `Full Cohort` = "Whole Cohort \n (N= 19243)", 
+                    `Analytical Sample` = "Analytical Sample (N=17,070)") %>% 
+  add_header_row(values = c(" ", "Proportion (%) or \n Mean(±SD) [95% CIs]" ), colwidths = c(1, 2)) %>% 
+  #font(fontname = "Times New Roman", part="header") %>% 
+ # align(align="center", part="header") %>% 
+  hline_top(j = 2:3, part = "all", border = my_border)  %>% 
+  #font(fontname = "Times New Roman", part = "footer") %>% 
+  fontsize(size = 9, part = "footer") %>% 
+  italic(part = "footer", italic = TRUE) %>% 
+  #align(align="left", part="footer") %>% 
+  add_header_lines(values = c("Table 2: Descriptive Statistics for Analytical Sample (N = 17, 070) and Whole MCS2001 Cohort (N=19,243)")) %>% 
+  #font(fontname = "Times New Roman", part = "header") %>% 
+  #fontsize(size = 12, part = "header") %>% 
+  italic(part = "header", italic = TRUE)
+  
+
+ print(full_descriptivesMCS, preview = "docx") 
+```
+
+
+#BCS imputed vs cohort comparison 
+```{r}
+fullDescriptivesBCS = cbind(descriptivesCohortBCS, BCSdescriptivesTable)
+names(fullDescriptivesBCS) = c("Variable" , "Full Cohort", "Var", "Analytical Sample")
+fullDescriptivesBCS = fullDescriptivesBCS %>% select(!Var)
+#put into table
+#define border
+my_border = border= fp_border(color="black", width=1)
+full_descriptivesBCS <- fullDescriptivesBCS %>% 
+  flextable() %>% 
+  #font(fontname = "Times New Roman", part="all") %>% #
+  fontsize(size=10, part = "all") %>% #
+  align(j=1, align="left", part="all") %>% 
+  align(j=2:3, align="center", part="all") %>% 
+  color(j=1:3, color="black", part="all") %>% 
+  width(j=1, width=2) %>% 
+  width(j=2:3, width=1.8) %>% 
+  line_spacing(j=2:3, space=1.5) %>% 
+  line_spacing(j=1, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:3, part="all", border=my_border) %>% 
+  hline_bottom(j=1:3,part="body",  border=my_border) %>% 
+  bold(j = 1, i = c(1,6,18), bold = TRUE) %>% 
+  italic(j = 1, i = c(1,6,18), italic = TRUE) %>% 
+  set_header_labels(Variable= "Variable", `Full Cohort` = "Whole Cohort \n (N= 19243)", 
+                    `Analytical Sample` = "Analytical Sample (N=17,070)") %>% 
+  add_header_row(values = c(" ", "Proportion (%) or \n Mean(±SD) [95% CIs]" ), colwidths = c(1, 2)) %>% 
+  #font(fontname = "Times New Roman", part="header") %>% 
+ # align(align="center", part="header") %>% 
+  hline_top(j = 2:3, part = "all", border = my_border)  %>% 
+  #font(fontname = "Times New Roman", part = "footer") %>% 
+  fontsize(size = 9, part = "footer") %>% 
+  italic(part = "footer", italic = TRUE) %>% 
+  #align(align="left", part="footer") %>% 
+  add_header_lines(values = c("Table 2: Descriptive Statistics for Analytical Sample (N = 17, 070) and Whole MCS2001 Cohort (N=19,243)")) %>% 
+  #font(fontname = "Times New Roman", part = "header") %>% 
+  #fontsize(size = 12, part = "header") %>% 
+  italic(part = "header", italic = TRUE)
+  
+
+ print(full_descriptivesBCS, preview = "docx") 
+```
+
+
+#### LANGUAGE IN EACH SEC GROUP ####
+
+
+```{r}
+#MCS
+# MCS_NVQ ####
+#separate out each MCS_NVQ group
+
+MCS_NVQ1 <- filter(mcs_long, highested1 == "1") 
+MCS_NVQ2 <- filter(mcs_long, highested1 == "2") 
+MCS_NVQ3 <- filter(mcs_long, highested1 == "3") 
+MCS_NVQ4 <- filter(mcs_long, highested1 == "4") 
 
 
 
+#calculate mean per group across imputed datasets: age 5
+
+age5_MCS_NVQ1 <- weighted_descriptives_imputed_datasets(MCS_NVQ1, age5_vocab)
+age5_MCS_NVQ2 <- weighted_descriptives_imputed_datasets(MCS_NVQ2, age5_vocab)
+age5_MCS_NVQ3 <- weighted_descriptives_imputed_datasets(MCS_NVQ3, age5_vocab)
+age5_MCS_NVQ4 <- weighted_descriptives_imputed_datasets(MCS_NVQ4, age5_vocab)
+
+#combine descriptives across datasets to give poooled value: age 5
+
+age5_MCS_NVQ1_combined <- combine_imputed_descriptives(age5_MCS_NVQ1)
+age5_MCS_NVQ2_combined <- combine_imputed_descriptives(age5_MCS_NVQ2)
+age5_MCS_NVQ3_combined <- combine_imputed_descriptives(age5_MCS_NVQ3)
+age5_MCS_NVQ4_combined <- combine_imputed_descriptives(age5_MCS_NVQ4)
+
+#calculate mean per group across imputed datasets: age 11
+
+age11_MCS_NVQ1 <- weighted_descriptives_imputed_datasets(MCS_NVQ1, age11_vocab)
+age11_MCS_NVQ2 <- weighted_descriptives_imputed_datasets(MCS_NVQ2, age11_vocab)
+age11_MCS_NVQ3 <- weighted_descriptives_imputed_datasets(MCS_NVQ3, age11_vocab)
+age11_MCS_NVQ4 <- weighted_descriptives_imputed_datasets(MCS_NVQ4, age11_vocab)
+
+#combine descriptives across datasets to give poooled value: age 11
+
+age11_MCS_NVQ1_combined <- combine_imputed_descriptives(age11_MCS_NVQ1)
+age11_MCS_NVQ2_combined <- combine_imputed_descriptives(age11_MCS_NVQ2)
+age11_MCS_NVQ3_combined <- combine_imputed_descriptives(age11_MCS_NVQ3)
+age11_MCS_NVQ4_combined <- combine_imputed_descriptives(age11_MCS_NVQ4)
 
 
+#calculate mean per group across imputed datasets: age 14
+
+age14_MCS_NVQ1 <- weighted_descriptives_imputed_datasets(MCS_NVQ1, age14_vocab)
+age14_MCS_NVQ2 <- weighted_descriptives_imputed_datasets(MCS_NVQ2, age14_vocab)
+age14_MCS_NVQ3 <- weighted_descriptives_imputed_datasets(MCS_NVQ3, age14_vocab)
+age14_MCS_NVQ4 <- weighted_descriptives_imputed_datasets(MCS_NVQ4, age14_vocab)
+
+#combine descriptives across datasets to give poooled value: age 14
+
+age14_MCS_NVQ1_combined <- combine_imputed_descriptives(age14_MCS_NVQ1)
+age14_MCS_NVQ2_combined <- combine_imputed_descriptives(age14_MCS_NVQ2)
+age14_MCS_NVQ3_combined <- combine_imputed_descriptives(age14_MCS_NVQ3)
+age14_MCS_NVQ4_combined <- combine_imputed_descriptives(age14_MCS_NVQ4)
+
+
+
+#INCOME####
+#separate out each MCS_income quintile
+MCS_income1 <- filter(mcs_long, income_quintiles == "1") 
+MCS_income2 <- filter(mcs_long, income_quintiles == "2") 
+MCS_income3 <- filter(mcs_long, income_quintiles == "3") 
+MCS_income4 <- filter(mcs_long, income_quintiles == "4") 
+MCS_income5 <- filter(mcs_long, income_quintiles == "5")
+
+
+#calculate mean per group across imputed datasets: age 5
+age5_MCS_income1 <- weighted_descriptives_imputed_datasets(MCS_income1, age5_vocab)
+age5_MCS_income2 <- weighted_descriptives_imputed_datasets(MCS_income2, age5_vocab)
+age5_MCS_income3 <- weighted_descriptives_imputed_datasets(MCS_income3, age5_vocab)
+age5_MCS_income4 <- weighted_descriptives_imputed_datasets(MCS_income4, age5_vocab)
+age5_MCS_income5 <- weighted_descriptives_imputed_datasets(MCS_income5, age5_vocab)
+#combine descriptives across datasets to give poooled value: age 5
+age5_MCS_income1_combined <- combine_imputed_descriptives(age5_MCS_income1)
+age5_MCS_income2_combined <- combine_imputed_descriptives(age5_MCS_income2)
+age5_MCS_income3_combined <- combine_imputed_descriptives(age5_MCS_income3)
+age5_MCS_income4_combined <- combine_imputed_descriptives(age5_MCS_income4)
+age5_MCS_income5_combined <- combine_imputed_descriptives(age5_MCS_income5)
+
+#calculate mean per group across imputed datasets: age 11
+age11_MCS_income1 <- weighted_descriptives_imputed_datasets(MCS_income1, age11_vocab)
+age11_MCS_income2 <- weighted_descriptives_imputed_datasets(MCS_income2, age11_vocab)
+age11_MCS_income3 <- weighted_descriptives_imputed_datasets(MCS_income3, age11_vocab)
+age11_MCS_income4 <- weighted_descriptives_imputed_datasets(MCS_income4, age11_vocab)
+age11_MCS_income5 <- weighted_descriptives_imputed_datasets(MCS_income5, age11_vocab)
+#combine descriptives across datasets to give poooled value: age 11
+age11_MCS_income1_combined <- combine_imputed_descriptives(age11_MCS_income1)
+age11_MCS_income2_combined <- combine_imputed_descriptives(age11_MCS_income2)
+age11_MCS_income3_combined <- combine_imputed_descriptives(age11_MCS_income3)
+age11_MCS_income4_combined <- combine_imputed_descriptives(age11_MCS_income4)
+age11_MCS_income5_combined <- combine_imputed_descriptives(age11_MCS_income5)
+
+#calculate mean per group across imputed datasets: age 14
+age14_MCS_income1 <- weighted_descriptives_imputed_datasets(MCS_income1, age14_vocab)
+age14_MCS_income2 <- weighted_descriptives_imputed_datasets(MCS_income2, age14_vocab)
+age14_MCS_income3 <- weighted_descriptives_imputed_datasets(MCS_income3, age14_vocab)
+age14_MCS_income4 <- weighted_descriptives_imputed_datasets(MCS_income4, age14_vocab)
+age14_MCS_income5 <- weighted_descriptives_imputed_datasets(MCS_income5, age14_vocab)
+#combine descriptives across datasets to give poooled value: age 14
+age14_MCS_income1_combined <- combine_imputed_descriptives(age14_MCS_income1)
+age14_MCS_income2_combined <- combine_imputed_descriptives(age14_MCS_income2)
+age14_MCS_income3_combined <- combine_imputed_descriptives(age14_MCS_income3)
+age14_MCS_income4_combined <- combine_imputed_descriptives(age14_MCS_income4)
+age14_MCS_income5_combined <- combine_imputed_descriptives(age14_MCS_income5)
+
+
+#OCCUPATIONAL CLASS####
+#separate out each MCS_occupation groups
+MCS_occupation1 <- filter(mcs_long, occupational_status == "1") 
+MCS_occupation2 <- filter(mcs_long, occupational_status == "2") 
+MCS_occupation3 <- filter(mcs_long, occupational_status == "3") 
+MCS_occupation4 <- filter(mcs_long, occupational_status == "4") 
+
+
+#calculate mean per group across imputed datasets: age 5
+age5_MCS_occupation1 <- weighted_descriptives_imputed_datasets(MCS_occupation1, age5_vocab)
+age5_MCS_occupation2 <- weighted_descriptives_imputed_datasets(MCS_occupation2, age5_vocab)
+age5_MCS_occupation3 <- weighted_descriptives_imputed_datasets(MCS_occupation3, age5_vocab)
+age5_MCS_occupation4 <- weighted_descriptives_imputed_datasets(MCS_occupation4, age5_vocab)
+
+#combine descriptives across datasets to give poooled value: age 5
+age5_MCS_occupation1_combined <- combine_imputed_descriptives(age5_MCS_occupation1)
+age5_MCS_occupation2_combined <- combine_imputed_descriptives(age5_MCS_occupation2)
+age5_MCS_occupation3_combined <- combine_imputed_descriptives(age5_MCS_occupation3)
+age5_MCS_occupation4_combined <- combine_imputed_descriptives(age5_MCS_occupation4)
+
+#calculate mean per group across imputed datasets: age 11
+age11_MCS_occupation1 <- weighted_descriptives_imputed_datasets(MCS_occupation1, age11_vocab)
+age11_MCS_occupation2 <- weighted_descriptives_imputed_datasets(MCS_occupation2, age11_vocab)
+age11_MCS_occupation3 <- weighted_descriptives_imputed_datasets(MCS_occupation3, age11_vocab)
+age11_MCS_occupation4 <- weighted_descriptives_imputed_datasets(MCS_occupation4, age11_vocab)
+
+#combine descriptives across datasets to give poooled value: age 11
+age11_MCS_occupation1_combined <- combine_imputed_descriptives(age11_MCS_occupation1)
+age11_MCS_occupation2_combined <- combine_imputed_descriptives(age11_MCS_occupation2)
+age11_MCS_occupation3_combined <- combine_imputed_descriptives(age11_MCS_occupation3)
+age11_MCS_occupation4_combined <- combine_imputed_descriptives(age11_MCS_occupation4)
+
+#calculate mean per group across imputed datasets: age 14
+age14_MCS_occupation1 <- weighted_descriptives_imputed_datasets(MCS_occupation1, age14_vocab)
+age14_MCS_occupation2 <- weighted_descriptives_imputed_datasets(MCS_occupation2, age14_vocab)
+age14_MCS_occupation3 <- weighted_descriptives_imputed_datasets(MCS_occupation3, age14_vocab)
+age14_MCS_occupation4 <- weighted_descriptives_imputed_datasets(MCS_occupation4, age14_vocab)
+
+#combine descriptives across datasets to give poooled value: age 14
+age14_MCS_occupation1_combined <- combine_imputed_descriptives(age14_MCS_occupation1)
+age14_MCS_occupation2_combined <- combine_imputed_descriptives(age14_MCS_occupation2)
+age14_MCS_occupation3_combined <- combine_imputed_descriptives(age14_MCS_occupation3)
+age14_MCS_occupation4_combined <- combine_imputed_descriptives(age14_MCS_occupation4)
+
+
+```
+
+now we want to put these results into one results table. 
+first we need to prepare our data. 
+to do this we will first put all descriptives into one dataframe, age 5 into another and so on.
+
+```{r}
+
+
+#age 5 
+
+#MCS_nvq
+
+age5_MCS_nvq1 <- slice_head(age5_MCS_NVQ1_combined)
+row.names(age5_MCS_nvq1) <- c("age5_MCS_nvq1")
+age5_MCS_nvq2 <- slice_head(age5_MCS_NVQ2_combined)
+row.names(age5_MCS_nvq2) <- c("age5_MCS_nvq2")
+age5_MCS_nvq3 <- slice_head(age5_MCS_NVQ3_combined)
+row.names(age5_MCS_nvq3) <- c("age5_MCS_nvq3")
+age5_MCS_nvq4 <- slice_head(age5_MCS_NVQ4_combined)
+row.names(age5_MCS_nvq4) <- c("age5_MCS_nvq4")
+
+
+#MCS_income
+age5_MCS_income1 <- slice_head(age5_MCS_income1_combined)
+row.names(age5_MCS_income1) <- c("age5_MCS_income1")
+age5_MCS_income2 <- slice_head(age5_MCS_income2_combined)
+row.names(age5_MCS_income2) <- c("age5_MCS_income2")
+age5_MCS_income3 <- slice_head(age5_MCS_income3_combined)
+row.names(age5_MCS_income3) <- c("age5_MCS_income3")
+age5_MCS_income4 <- slice_head(age5_MCS_income4_combined)
+row.names(age5_MCS_income4) <- c("age5_MCS_income4")
+age5_MCS_income5 <- slice_head(age5_MCS_income5_combined)
+row.names(age5_MCS_income5) <- c("age5_MCS_income5")
+
+
+#MCS_occupation
+age5_MCS_occupation1 <- slice_head(age5_MCS_occupation1_combined)
+row.names(age5_MCS_occupation1) <- c("age5_MCS_occupation1")
+age5_MCS_occupation2 <- slice_head(age5_MCS_occupation2_combined)
+row.names(age5_MCS_occupation2) <- c("age5_MCS_occupation2")
+age5_MCS_occupation3 <- slice_head(age5_MCS_occupation3_combined)
+row.names(age5_MCS_occupation3) <- c("age5_MCS_occupation3")
+age5_MCS_occupation4 <- slice_head(age5_MCS_occupation4_combined)
+row.names(age5_MCS_occupation4) <- c("age5_MCS_occupation4")
+
+
+MCS_age5_descriptives <- rbind(age5_MCS_nvq1, age5_MCS_nvq2, age5_MCS_nvq3,age5_MCS_nvq4,
+                           age5_MCS_income1, age5_MCS_income2, age5_MCS_income3, age5_MCS_income4, age5_MCS_income5,
+                           age5_MCS_occupation1, age5_MCS_occupation2, age5_MCS_occupation3, age5_MCS_occupation4
+                           )
+
+
+#prepare data for table
+
+MCS_age5_descriptives$Mean <- round(MCS_age5_descriptives$Mean, 2)
+MCS_age5_descriptives$SD <- round(MCS_age5_descriptives$SD,2)
+MCS_age5_descriptives$lower <- round(MCS_age5_descriptives$lower,2)
+MCS_age5_descriptives$upper<- round(MCS_age5_descriptives$upper,2)
+MCS_age5_descriptives$mean_sd = paste0(MCS_age5_descriptives$Mean, "(", MCS_age5_descriptives$SD, ")")
+MCS_age5_descriptives$conf_int = paste0("[", MCS_age5_descriptives$lower, ";", MCS_age5_descriptives$upper, "]")
+
+MCSage5_descriptive_statistics <- MCS_age5_descriptives %>% 
+  select(mean_sd, conf_int)
+
+MCSage5_descriptive_statistics$descriptives <- paste0(MCSage5_descriptive_statistics$mean_sd,",", MCSage5_descriptive_statistics$conf_int)
+
+#age 11
+
+#MCS_nvq
+
+age11_MCS_nvq1 <- slice_head(age11_MCS_NVQ1_combined)
+row.names(age11_MCS_nvq1) <- c("age11_MCS_nvq1")
+age11_MCS_nvq2 <- slice_head(age11_MCS_NVQ2_combined)
+row.names(age11_MCS_nvq2) <- c("age11_MCS_nvq2")
+age11_MCS_nvq3 <- slice_head(age11_MCS_NVQ3_combined)
+row.names(age11_MCS_nvq3) <- c("age11_MCS_nvq3")
+age11_MCS_nvq4 <- slice_head(age11_MCS_NVQ4_combined)
+row.names(age11_MCS_nvq4) <- c("age11_MCS_nvq4")
+
+#MCS_income
+age11_MCS_income1 <- slice_head(age11_MCS_income1_combined)
+row.names(age11_MCS_income1) <- c("age11_MCS_income1")
+age11_MCS_income2 <- slice_head(age11_MCS_income2_combined)
+row.names(age11_MCS_income2) <- c("age11_MCS_income2")
+age11_MCS_income3 <- slice_head(age11_MCS_income3_combined)
+row.names(age11_MCS_income3) <- c("age11_MCS_income3")
+age11_MCS_income4 <- slice_head(age11_MCS_income4_combined)
+row.names(age11_MCS_income4) <- c("age11_MCS_income4")
+age11_MCS_income5 <- slice_head(age11_MCS_income5_combined)
+row.names(age11_MCS_income5) <- c("age11_MCS_income5")
+
+
+
+#MCS_occupation
+age11_MCS_occupation1 <- slice_head(age11_MCS_occupation1_combined)
+row.names(age11_MCS_occupation1) <- c("age11_MCS_occupation1")
+age11_MCS_occupation2 <- slice_head(age11_MCS_occupation2_combined)
+row.names(age11_MCS_occupation2) <- c("age11_MCS_occupation2")
+age11_MCS_occupation3 <- slice_head(age11_MCS_occupation3_combined)
+row.names(age11_MCS_occupation3) <- c("age11_MCS_occupation3")
+age11_MCS_occupation4 <- slice_head(age11_MCS_occupation4_combined)
+row.names(age11_MCS_occupation4) <- c("age11_MCS_occupation4")
+
+
+
+MCS_age11_descriptives <- rbind(age11_MCS_nvq1, age11_MCS_nvq2, age11_MCS_nvq3,age11_MCS_nvq4,
+                            age11_MCS_income1, age11_MCS_income2, age11_MCS_income3, age11_MCS_income4, age11_MCS_income5,
+                            age11_MCS_occupation1, age11_MCS_occupation2, age11_MCS_occupation3, age11_MCS_occupation4
+                            )
+
+
+#prepare data for table
+
+MCS_age11_descriptives$Mean <- round(MCS_age11_descriptives$Mean, 2)
+MCS_age11_descriptives$SD <- round(MCS_age11_descriptives$SD,2)
+MCS_age11_descriptives$lower <- round(MCS_age11_descriptives$lower,2)
+MCS_age11_descriptives$upper<- round(MCS_age11_descriptives$upper,2)
+MCS_age11_descriptives$mean_sd = paste0(MCS_age11_descriptives$Mean, "(", MCS_age11_descriptives$SD, ")")
+MCS_age11_descriptives$conf_int = paste0("[", MCS_age11_descriptives$lower, ";", MCS_age11_descriptives$upper, "]")
+
+MCSage11_descriptive_statistics <- MCS_age11_descriptives %>% 
+  select(mean_sd, conf_int)
+
+MCSage11_descriptive_statistics$descriptives <- paste0(MCSage11_descriptive_statistics$mean_sd,",", MCSage11_descriptive_statistics$conf_int)
+
+
+#age 14
+
+#MCS_nvq
+
+age14_MCS_nvq1 <- slice_head(age14_MCS_NVQ1_combined)
+row.names(age14_MCS_nvq1) <- c("age14_MCS_nvq1")
+age14_MCS_nvq2 <- slice_head(age14_MCS_NVQ2_combined)
+row.names(age14_MCS_nvq2) <- c("age14_MCS_nvq2")
+age14_MCS_nvq3 <- slice_head(age14_MCS_NVQ3_combined)
+row.names(age14_MCS_nvq3) <- c("age14_MCS_nvq3")
+age14_MCS_nvq4 <- slice_head(age14_MCS_NVQ4_combined)
+row.names(age14_MCS_nvq4) <- c("age14_MCS_nvq4")
+
+
+#MCS_income
+age14_MCS_income1 <- slice_head(age14_MCS_income1_combined)
+row.names(age14_MCS_income1) <- c("age14_MCS_income1")
+age14_MCS_income2 <- slice_head(age14_MCS_income2_combined)
+row.names(age14_MCS_income2) <- c("age14_MCS_income2")
+age14_MCS_income3 <- slice_head(age14_MCS_income3_combined)
+row.names(age14_MCS_income3) <- c("age14_MCS_income3")
+age14_MCS_income4 <- slice_head(age14_MCS_income4_combined)
+row.names(age14_MCS_income4) <- c("age14_MCS_income4")
+age14_MCS_income5 <- slice_head(age14_MCS_income5_combined)
+row.names(age14_MCS_income5) <- c("age14_MCS_income5")
+
+
+
+#MCS_occupation
+age14_MCS_occupation1 <- slice_head(age14_MCS_occupation1_combined)
+row.names(age14_MCS_occupation1) <- c("age14_MCS_occupation1")
+age14_MCS_occupation2 <- slice_head(age14_MCS_occupation2_combined)
+row.names(age14_MCS_occupation2) <- c("age14_MCS_occupation2")
+age14_MCS_occupation3 <- slice_head(age14_MCS_occupation3_combined)
+row.names(age14_MCS_occupation3) <- c("age14_MCS_occupation3")
+age14_MCS_occupation4 <- slice_head(age14_MCS_occupation4_combined)
+row.names(age14_MCS_occupation4) <- c("age14_MCS_occupation4")
+
+
+
+MCS_age14_descriptives <- rbind(age14_MCS_nvq1, age14_MCS_nvq2, age14_MCS_nvq3,age14_MCS_nvq4,
+                            age14_MCS_income1, age14_MCS_income2, age14_MCS_income3, age14_MCS_income4, age14_MCS_income5,
+                            age14_MCS_occupation1, age14_MCS_occupation2, age14_MCS_occupation3, age14_MCS_occupation4
+                            )
+
+
+#prepare data for table
+
+MCS_age14_descriptives$Mean <- round(MCS_age14_descriptives$Mean, 2)
+MCS_age14_descriptives$SD <- round(MCS_age14_descriptives$SD,2)
+MCS_age14_descriptives$lower <- round(MCS_age14_descriptives$lower,2)
+MCS_age14_descriptives$upper<- round(MCS_age14_descriptives$upper,2)
+MCS_age14_descriptives$mean_sd = paste0(MCS_age14_descriptives$Mean, "(", MCS_age14_descriptives$SD, ")")
+MCS_age14_descriptives$conf_int = paste0("[", MCS_age14_descriptives$lower, ";", MCS_age14_descriptives$upper, "]")
+
+MCSage14_descriptive_statistics <- MCS_age14_descriptives %>% 
+  select(mean_sd, conf_int)
+
+MCSage14_descriptive_statistics$descriptives <- paste0(MCSage14_descriptive_statistics$mean_sd,",", MCSage14_descriptive_statistics$conf_int)
+
+```
+
+now that we have 4 datasets with descriptives for each age, we want to pull out the relevant stats to start to formulate our table.
+our dataframes are called:
+  *age3_descriptive_statistics
+*age5_descriptive_statistics
+*age11_descriptive_statistics
+*age14_descriptive_statistics
+
+
+```{r}
+#first of all, we just need the column called "descriptives" from each age dataframe. 
+
+
+MCSage5_descriptive_statistics$indicator <- c("Parent Education: No /low level qualifications", "Parent Education:O levels/GCSEs grades A*-C ",
+                                           "Parent Education: Post 16 education", "Parent Education: University level",
+                                           "Income \n  (quntile 1)", "Income \n  (quntile 2)", "Income \n  (quntile 3)",
+                                           "Income \n  (quntile 4)", "Income \n  (quntile 5)", 
+                                           "Occupational Status \n (Unemployed)", 
+                                           "Occupational Status \n (Routine)", "Occupational Status \n (Intermediate)",
+                                           "Occupational Status \n (higher managerial)"
+)
+
+
+MCSage11_descriptive_statistics$indicator <- c("Parent Education: No /low level qualifications", "Parent Education:O levels/GCSEs grades A*-C ",
+                                            "Parent Education: Post 16 education", "Parent Education: University level",
+                                            "Income \n  (quntile 1)", "Income \n  (quntile 2)", "Income \n  (quntile 3)",
+                                            "Income \n  (quntile 4)", "Income \n  (quntile 5)", 
+                                            "Occupational Status \n (Unemployed)", 
+                                            "Occupational Status \n (Routine)", "Occupational Status \n (Intermediate)",
+                                            "Occupational Status \n (higher managerial)"
+)
+
+
+MCSage14_descriptive_statistics$indicator  <- c("Parent Education: No /low level qualifications", "Parent Education:O levels/GCSEs grades A*-C ",
+                                             "Parent Education: Post 16 education", "Parent Education: University level",
+                                             "Income \n  (quntile 1)", "Income \n  (quntile 2)", "Income \n  (quntile 3)",
+                                             "Income \n  (quntile 4)", "Income \n  (quntile 5)", 
+                                             "Occupational Status \n (Unemployed)", 
+                                             "Occupational Status \n (Routine)", "Occupational Status \n (Intermediate)",
+                                             "Occupational Status \n (higher managerial)"
+)
+
+
+
+MCSnew_descriptives_age5 <- MCSage5_descriptive_statistics %>% 
+  select(indicator,descriptives) 
+MCSnew_descriptives_age11 <- MCSage11_descriptive_statistics %>% 
+  select(indicator,descriptives) 
+MCSnew_descriptives_age14 <- MCSage14_descriptive_statistics %>% 
+  select(indicator, descriptives)
+
+
+#row.names(MCSnew_descriptives_age5) <- c(1:30)
+#row.names(MCSnew_descriptives_age11) <- c(1:30)
+#row.names(MCSnew_descriptives_age14) <- c(1:30)
+
+
+names(MCSnew_descriptives_age5) <- c("Indicator", "Age5")
+names(MCSnew_descriptives_age11) <- c( "Indicator", "Age11")
+names(MCSnew_descriptives_age14) <- c( "Indicator", "Age14")
+
+
+#put this into one dataframe
+
+MCSlang_descriptives1 = data.frame(MCSnew_descriptives_age5, MCSnew_descriptives_age11, MCSnew_descriptives_age14)
+MCSlanguage_descriptives = MCSlang_descriptives1 %>% 
+  select(Indicator, Age5, Age11, Age14) %>% 
+  add_row(Indicator = "Parent Education", .before = 1) %>%  #add in rows to divide table up 
+  add_row(Indicator = "Income", .before = 8) %>% 
+  add_row(Indicator = "Occupational Status", .before = 20) 
+MCSlanguage_descriptives [is.na(MCSlanguage_descriptives )] <- " "
+
+
+
+```
+
+
+Create table with Flextabls
+```{r}
+
+#put into table
+#define border
+my_border = border= fp_border(color="black", width=1)
+MCSlanguage_sesDescriptives <- MCSlanguage_descriptives %>% 
+  flextable() %>% 
+  font(fontname = "Times New Roman", part="all") %>% #
+  fontsize(size=10, part = "all") %>% #
+  align(j=1, align="left", part="all") %>% 
+  align(j=1:4, align="center", part="all") %>% 
+  color(j=1:4, color="black", part="all") %>% 
+  width(j=1, width=2) %>% 
+  width(j=2:4, width=1.8) %>% 
+  line_spacing(j=2:4, space=1.5) %>% 
+  line_spacing(j=1, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:4, part="all", border=my_border) %>% 
+  hline_bottom(j=1:4,part="body",  border=my_border) %>% 
+  set_header_labels(`Indicator`= "SEC Indicator", `Age3` = "Age 3 Vocabulary", 
+                    `Age5` = "Age 5 Vocabulary", `Age11` = "Age 11 Vocabulary", 
+                    `Age14` = "Age 14 Vocabulary") %>% 
+  add_header_row(values = c(" ", "Proportion (%) or Mean(±SD) [95% CIs]" ), colwidths = c(1,3)) %>% 
+  font(fontname = "Times New Roman", part="header") %>% 
+  align(align="center", part="header") %>% 
+  hline_top(j = 2:4, part = "all", border = my_border)  %>% 
+  font(fontname = "Times New Roman", part = "footer") %>% 
+  fontsize(size = 9, part = "footer") %>% 
+  italic(part = "footer", italic = TRUE) %>% 
+  align(align="left", part="footer") %>% 
+  #add_header_lines(values = c("Table 2: Descriptive Statistics for Analytical Sample (N = 17, 070) and Whole MCS2001 Cohort (N=19,243)")) %>% 
+  font(fontname = "Times New Roman", part = "header") %>% 
+  fontsize(size = 12, part = "header") %>% 
+  italic(part = "header", italic = TRUE)
+
+
+print(MCSlanguage_sesDescriptives, preview = "docx") 
+
+
+```
+
+BCS cohort
+```{r}
+
+#BCS
+# BCS_NVQ ####
+#separate out each BCS_NVQ group
+
+BCS_NVQ1 <- filter(bcs_long, highestEd1 == "1") 
+BCS_NVQ2 <- filter(bcs_long, highestEd1 == "2") 
+BCS_NVQ3 <- filter(bcs_long, highestEd1 == "3") 
+BCS_NVQ4 <- filter(bcs_long, highestEd1 == "4") 
+
+
+
+#calculate mean per group across imputed datasets: age 5
+
+age5_BCS_NVQ1 <- weighted_descriptives_imputed_datasets(BCS_NVQ1, age5_vocab)
+age5_BCS_NVQ2 <- weighted_descriptives_imputed_datasets(BCS_NVQ2, age5_vocab)
+age5_BCS_NVQ3 <- weighted_descriptives_imputed_datasets(BCS_NVQ3, age5_vocab)
+age5_BCS_NVQ4 <- weighted_descriptives_imputed_datasets(BCS_NVQ4, age5_vocab)
+
+#combine descriptives across datasets to give poooled value: age 5
+
+age5_BCS_NVQ1_combined <- combine_imputed_descriptives(age5_BCS_NVQ1)
+age5_BCS_NVQ2_combined <- combine_imputed_descriptives(age5_BCS_NVQ2)
+age5_BCS_NVQ3_combined <- combine_imputed_descriptives(age5_BCS_NVQ3)
+age5_BCS_NVQ4_combined <- combine_imputed_descriptives(age5_BCS_NVQ4)
+
+#calculate mean per group across imputed datasets: age 11
+
+age11_BCS_NVQ1 <- weighted_descriptives_imputed_datasets(BCS_NVQ1, age10_vocab)
+age11_BCS_NVQ2 <- weighted_descriptives_imputed_datasets(BCS_NVQ2, age10_vocab)
+age11_BCS_NVQ3 <- weighted_descriptives_imputed_datasets(BCS_NVQ3, age10_vocab)
+age11_BCS_NVQ4 <- weighted_descriptives_imputed_datasets(BCS_NVQ4, age10_vocab)
+
+#combine descriptives across datasets to give poooled value: age 11
+
+age11_BCS_NVQ1_combined <- combine_imputed_descriptives(age11_BCS_NVQ1)
+age11_BCS_NVQ2_combined <- combine_imputed_descriptives(age11_BCS_NVQ2)
+age11_BCS_NVQ3_combined <- combine_imputed_descriptives(age11_BCS_NVQ3)
+age11_BCS_NVQ4_combined <- combine_imputed_descriptives(age11_BCS_NVQ4)
+
+
+#calculate mean per group across imputed datasets: age 14
+
+age14_BCS_NVQ1 <- weighted_descriptives_imputed_datasets(BCS_NVQ1, age16_vocab)
+age14_BCS_NVQ2 <- weighted_descriptives_imputed_datasets(BCS_NVQ2, age16_vocab)
+age14_BCS_NVQ3 <- weighted_descriptives_imputed_datasets(BCS_NVQ3, age16_vocab)
+age14_BCS_NVQ4 <- weighted_descriptives_imputed_datasets(BCS_NVQ4, age16_vocab)
+
+#combine descriptives across datasets to give poooled value: age 14
+
+age14_BCS_NVQ1_combined <- combine_imputed_descriptives(age14_BCS_NVQ1)
+age14_BCS_NVQ2_combined <- combine_imputed_descriptives(age14_BCS_NVQ2)
+age14_BCS_NVQ3_combined <- combine_imputed_descriptives(age14_BCS_NVQ3)
+age14_BCS_NVQ4_combined <- combine_imputed_descriptives(age14_BCS_NVQ4)
+
+
+
+#INCOME####
+#separate out each BCS_income quintile
+BCS_income1 <- filter(bcs_long, oecd_quintiles == "1") 
+BCS_income2 <- filter(bcs_long, oecd_quintiles == "2") 
+BCS_income3 <- filter(bcs_long, oecd_quintiles == "3") 
+BCS_income4 <- filter(bcs_long, oecd_quintiles == "4") 
+BCS_income5 <- filter(bcs_long, oecd_quintiles == "5")
+
+
+#calculate mean per group across imputed datasets: age 5
+age5_BCS_income1 <- weighted_descriptives_imputed_datasets(BCS_income1, age5_vocab)
+age5_BCS_income2 <- weighted_descriptives_imputed_datasets(BCS_income2, age5_vocab)
+age5_BCS_income3 <- weighted_descriptives_imputed_datasets(BCS_income3, age5_vocab)
+age5_BCS_income4 <- weighted_descriptives_imputed_datasets(BCS_income4, age5_vocab)
+age5_BCS_income5 <- weighted_descriptives_imputed_datasets(BCS_income5, age5_vocab)
+#combine descriptives across datasets to give poooled value: age 5
+age5_BCS_income1_combined <- combine_imputed_descriptives(age5_BCS_income1)
+age5_BCS_income2_combined <- combine_imputed_descriptives(age5_BCS_income2)
+age5_BCS_income3_combined <- combine_imputed_descriptives(age5_BCS_income3)
+age5_BCS_income4_combined <- combine_imputed_descriptives(age5_BCS_income4)
+age5_BCS_income5_combined <- combine_imputed_descriptives(age5_BCS_income5)
+
+#calculate mean per group across imputed datasets: age 11
+age11_BCS_income1 <- weighted_descriptives_imputed_datasets(BCS_income1, age10_vocab)
+age11_BCS_income2 <- weighted_descriptives_imputed_datasets(BCS_income2, age10_vocab)
+age11_BCS_income3 <- weighted_descriptives_imputed_datasets(BCS_income3, age10_vocab)
+age11_BCS_income4 <- weighted_descriptives_imputed_datasets(BCS_income4, age10_vocab)
+age11_BCS_income5 <- weighted_descriptives_imputed_datasets(BCS_income5, age10_vocab)
+#combine descriptives across datasets to give poooled value: age 11
+age11_BCS_income1_combined <- combine_imputed_descriptives(age11_BCS_income1)
+age11_BCS_income2_combined <- combine_imputed_descriptives(age11_BCS_income2)
+age11_BCS_income3_combined <- combine_imputed_descriptives(age11_BCS_income3)
+age11_BCS_income4_combined <- combine_imputed_descriptives(age11_BCS_income4)
+age11_BCS_income5_combined <- combine_imputed_descriptives(age11_BCS_income5)
+
+#calculate mean per group across imputed datasets: age 14
+age14_BCS_income1 <- weighted_descriptives_imputed_datasets(BCS_income1, age16_vocab)
+age14_BCS_income2 <- weighted_descriptives_imputed_datasets(BCS_income2, age16_vocab)
+age14_BCS_income3 <- weighted_descriptives_imputed_datasets(BCS_income3, age16_vocab)
+age14_BCS_income4 <- weighted_descriptives_imputed_datasets(BCS_income4, age16_vocab)
+age14_BCS_income5 <- weighted_descriptives_imputed_datasets(BCS_income5, age16_vocab)
+#combine descriptives across datasets to give poooled value: age 14
+age14_BCS_income1_combined <- combine_imputed_descriptives(age14_BCS_income1)
+age14_BCS_income2_combined <- combine_imputed_descriptives(age14_BCS_income2)
+age14_BCS_income3_combined <- combine_imputed_descriptives(age14_BCS_income3)
+age14_BCS_income4_combined <- combine_imputed_descriptives(age14_BCS_income4)
+age14_BCS_income5_combined <- combine_imputed_descriptives(age14_BCS_income5)
+
+
+#OCCUPATIONAL CLASS####
+#separate out each BCS_occupation groups
+BCS_occupation1 <- filter(bcs_long, occupational_status == "1") 
+BCS_occupation2 <- filter(bcs_long, occupational_status == "2") 
+BCS_occupation3 <- filter(bcs_long, occupational_status == "3") 
+BCS_occupation4 <- filter(bcs_long, occupational_status == "4") 
+
+
+#calculate mean per group across imputed datasets: age 5
+age5_BCS_occupation1 <- weighted_descriptives_imputed_datasets(BCS_occupation1, age5_vocab)
+age5_BCS_occupation2 <- weighted_descriptives_imputed_datasets(BCS_occupation2, age5_vocab)
+age5_BCS_occupation3 <- weighted_descriptives_imputed_datasets(BCS_occupation3, age5_vocab)
+age5_BCS_occupation4 <- weighted_descriptives_imputed_datasets(BCS_occupation4, age5_vocab)
+
+#combine descriptives across datasets to give poooled value: age 5
+age5_BCS_occupation1_combined <- combine_imputed_descriptives(age5_BCS_occupation1)
+age5_BCS_occupation2_combined <- combine_imputed_descriptives(age5_BCS_occupation2)
+age5_BCS_occupation3_combined <- combine_imputed_descriptives(age5_BCS_occupation3)
+age5_BCS_occupation4_combined <- combine_imputed_descriptives(age5_BCS_occupation4)
+
+#calculate mean per group across imputed datasets: age 11
+age11_BCS_occupation1 <- weighted_descriptives_imputed_datasets(BCS_occupation1, age10_vocab)
+age11_BCS_occupation2 <- weighted_descriptives_imputed_datasets(BCS_occupation2, age10_vocab)
+age11_BCS_occupation3 <- weighted_descriptives_imputed_datasets(BCS_occupation3, age10_vocab)
+age11_BCS_occupation4 <- weighted_descriptives_imputed_datasets(BCS_occupation4, age10_vocab)
+
+#combine descriptives across datasets to give poooled value: age 11
+age11_BCS_occupation1_combined <- combine_imputed_descriptives(age11_BCS_occupation1)
+age11_BCS_occupation2_combined <- combine_imputed_descriptives(age11_BCS_occupation2)
+age11_BCS_occupation3_combined <- combine_imputed_descriptives(age11_BCS_occupation3)
+age11_BCS_occupation4_combined <- combine_imputed_descriptives(age11_BCS_occupation4)
+
+#calculate mean per group across imputed datasets: age 14
+age14_BCS_occupation1 <- weighted_descriptives_imputed_datasets(BCS_occupation1, age16_vocab)
+age14_BCS_occupation2 <- weighted_descriptives_imputed_datasets(BCS_occupation2, age16_vocab)
+age14_BCS_occupation3 <- weighted_descriptives_imputed_datasets(BCS_occupation3, age16_vocab)
+age14_BCS_occupation4 <- weighted_descriptives_imputed_datasets(BCS_occupation4, age16_vocab)
+
+#combine descriptives across datasets to give poooled value: age 14
+age14_BCS_occupation1_combined <- combine_imputed_descriptives(age14_BCS_occupation1)
+age14_BCS_occupation2_combined <- combine_imputed_descriptives(age14_BCS_occupation2)
+age14_BCS_occupation3_combined <- combine_imputed_descriptives(age14_BCS_occupation3)
+age14_BCS_occupation4_combined <- combine_imputed_descriptives(age14_BCS_occupation4)
+
+
+```
+
+now we want to put these results into one results table. 
+first we need to prepare our data. 
+to do this we will first put all descriptives into one dataframe, age 5 into another and so on.
+
+```{r}
+
+#age 5 
+
+#BCS_nvq
+
+age5_BCS_nvq1 <- slice_head(age5_BCS_NVQ1_combined)
+row.names(age5_BCS_nvq1) <- c("age5_BCS_nvq1")
+age5_BCS_nvq2 <- slice_head(age5_BCS_NVQ2_combined)
+row.names(age5_BCS_nvq2) <- c("age5_BCS_nvq2")
+age5_BCS_nvq3 <- slice_head(age5_BCS_NVQ3_combined)
+row.names(age5_BCS_nvq3) <- c("age5_BCS_nvq3")
+age5_BCS_nvq4 <- slice_head(age5_BCS_NVQ4_combined)
+row.names(age5_BCS_nvq4) <- c("age5_BCS_nvq4")
+
+
+#BCS_income
+age5_BCS_income1 <- slice_head(age5_BCS_income1_combined)
+row.names(age5_BCS_income1) <- c("age5_BCS_income1")
+age5_BCS_income2 <- slice_head(age5_BCS_income2_combined)
+row.names(age5_BCS_income2) <- c("age5_BCS_income2")
+age5_BCS_income3 <- slice_head(age5_BCS_income3_combined)
+row.names(age5_BCS_income3) <- c("age5_BCS_income3")
+age5_BCS_income4 <- slice_head(age5_BCS_income4_combined)
+row.names(age5_BCS_income4) <- c("age5_BCS_income4")
+age5_BCS_income5 <- slice_head(age5_BCS_income5_combined)
+row.names(age5_BCS_income5) <- c("age5_BCS_income5")
+
+
+#BCS_occupation
+age5_BCS_occupation1 <- slice_head(age5_BCS_occupation1_combined)
+row.names(age5_BCS_occupation1) <- c("age5_BCS_occupation1")
+age5_BCS_occupation2 <- slice_head(age5_BCS_occupation2_combined)
+row.names(age5_BCS_occupation2) <- c("age5_BCS_occupation2")
+age5_BCS_occupation3 <- slice_head(age5_BCS_occupation3_combined)
+row.names(age5_BCS_occupation3) <- c("age5_BCS_occupation3")
+age5_BCS_occupation4 <- slice_head(age5_BCS_occupation4_combined)
+row.names(age5_BCS_occupation4) <- c("age5_BCS_occupation4")
+
+
+BCS_age5_descriptives <- rbind(age5_BCS_nvq1, age5_BCS_nvq2, age5_BCS_nvq3,age5_BCS_nvq4,
+                               age5_BCS_income1, age5_BCS_income2, age5_BCS_income3, age5_BCS_income4, age5_BCS_income5,
+                               age5_BCS_occupation1, age5_BCS_occupation2, age5_BCS_occupation3, age5_BCS_occupation4
+)
+
+
+#prepare data for table
+
+BCS_age5_descriptives$Mean <- round(BCS_age5_descriptives$Mean, 2)
+BCS_age5_descriptives$SD <- round(BCS_age5_descriptives$SD,2)
+BCS_age5_descriptives$lower <- round(BCS_age5_descriptives$lower,2)
+BCS_age5_descriptives$upper<- round(BCS_age5_descriptives$upper,2)
+BCS_age5_descriptives$mean_sd = paste0(BCS_age5_descriptives$Mean, "(", BCS_age5_descriptives$SD, ")")
+BCS_age5_descriptives$conf_int = paste0("[", BCS_age5_descriptives$lower, ";", BCS_age5_descriptives$upper, "]")
+
+BCSage5_descriptive_statistics <- BCS_age5_descriptives %>% 
+  select(mean_sd, conf_int)
+
+BCSage5_descriptive_statistics$descriptives <- paste0(BCSage5_descriptive_statistics$mean_sd,",", BCSage5_descriptive_statistics$conf_int)
+
+#age 11
+
+#BCS_nvq
+
+age11_BCS_nvq1 <- slice_head(age11_BCS_NVQ1_combined)
+row.names(age11_BCS_nvq1) <- c("age11_BCS_nvq1")
+age11_BCS_nvq2 <- slice_head(age11_BCS_NVQ2_combined)
+row.names(age11_BCS_nvq2) <- c("age11_BCS_nvq2")
+age11_BCS_nvq3 <- slice_head(age11_BCS_NVQ3_combined)
+row.names(age11_BCS_nvq3) <- c("age11_BCS_nvq3")
+age11_BCS_nvq4 <- slice_head(age11_BCS_NVQ4_combined)
+row.names(age11_BCS_nvq4) <- c("age11_BCS_nvq4")
+
+#BCS_income
+age11_BCS_income1 <- slice_head(age11_BCS_income1_combined)
+row.names(age11_BCS_income1) <- c("age11_BCS_income1")
+age11_BCS_income2 <- slice_head(age11_BCS_income2_combined)
+row.names(age11_BCS_income2) <- c("age11_BCS_income2")
+age11_BCS_income3 <- slice_head(age11_BCS_income3_combined)
+row.names(age11_BCS_income3) <- c("age11_BCS_income3")
+age11_BCS_income4 <- slice_head(age11_BCS_income4_combined)
+row.names(age11_BCS_income4) <- c("age11_BCS_income4")
+age11_BCS_income5 <- slice_head(age11_BCS_income5_combined)
+row.names(age11_BCS_income5) <- c("age11_BCS_income5")
+
+
+
+#BCS_occupation
+age11_BCS_occupation1 <- slice_head(age11_BCS_occupation1_combined)
+row.names(age11_BCS_occupation1) <- c("age11_BCS_occupation1")
+age11_BCS_occupation2 <- slice_head(age11_BCS_occupation2_combined)
+row.names(age11_BCS_occupation2) <- c("age11_BCS_occupation2")
+age11_BCS_occupation3 <- slice_head(age11_BCS_occupation3_combined)
+row.names(age11_BCS_occupation3) <- c("age11_BCS_occupation3")
+age11_BCS_occupation4 <- slice_head(age11_BCS_occupation4_combined)
+row.names(age11_BCS_occupation4) <- c("age11_BCS_occupation4")
+
+
+
+BCS_age11_descriptives <- rbind(age11_BCS_nvq1, age11_BCS_nvq2, age11_BCS_nvq3,age11_BCS_nvq4,
+                                age11_BCS_income1, age11_BCS_income2, age11_BCS_income3, age11_BCS_income4, age11_BCS_income5,
+                                age11_BCS_occupation1, age11_BCS_occupation2, age11_BCS_occupation3, age11_BCS_occupation4
+)
+
+
+#prepare data for table
+
+BCS_age11_descriptives$Mean <- round(BCS_age11_descriptives$Mean, 2)
+BCS_age11_descriptives$SD <- round(BCS_age11_descriptives$SD,2)
+BCS_age11_descriptives$lower <- round(BCS_age11_descriptives$lower,2)
+BCS_age11_descriptives$upper<- round(BCS_age11_descriptives$upper,2)
+BCS_age11_descriptives$mean_sd = paste0(BCS_age11_descriptives$Mean, "(", BCS_age11_descriptives$SD, ")")
+BCS_age11_descriptives$conf_int = paste0("[", BCS_age11_descriptives$lower, ";", BCS_age11_descriptives$upper, "]")
+
+BCSage11_descriptive_statistics <- BCS_age11_descriptives %>% 
+  select(mean_sd, conf_int)
+
+BCSage11_descriptive_statistics$descriptives <- paste0(BCSage11_descriptive_statistics$mean_sd,",", BCSage11_descriptive_statistics$conf_int)
+
+
+#age 14
+
+#BCS_nvq
+
+age14_BCS_nvq1 <- slice_head(age14_BCS_NVQ1_combined)
+row.names(age14_BCS_nvq1) <- c("age14_BCS_nvq1")
+age14_BCS_nvq2 <- slice_head(age14_BCS_NVQ2_combined)
+row.names(age14_BCS_nvq2) <- c("age14_BCS_nvq2")
+age14_BCS_nvq3 <- slice_head(age14_BCS_NVQ3_combined)
+row.names(age14_BCS_nvq3) <- c("age14_BCS_nvq3")
+age14_BCS_nvq4 <- slice_head(age14_BCS_NVQ4_combined)
+row.names(age14_BCS_nvq4) <- c("age14_BCS_nvq4")
+
+
+#BCS_income
+age14_BCS_income1 <- slice_head(age14_BCS_income1_combined)
+row.names(age14_BCS_income1) <- c("age14_BCS_income1")
+age14_BCS_income2 <- slice_head(age14_BCS_income2_combined)
+row.names(age14_BCS_income2) <- c("age14_BCS_income2")
+age14_BCS_income3 <- slice_head(age14_BCS_income3_combined)
+row.names(age14_BCS_income3) <- c("age14_BCS_income3")
+age14_BCS_income4 <- slice_head(age14_BCS_income4_combined)
+row.names(age14_BCS_income4) <- c("age14_BCS_income4")
+age14_BCS_income5 <- slice_head(age14_BCS_income5_combined)
+row.names(age14_BCS_income5) <- c("age14_BCS_income5")
+
+
+
+#BCS_occupation
+age14_BCS_occupation1 <- slice_head(age14_BCS_occupation1_combined)
+row.names(age14_BCS_occupation1) <- c("age14_BCS_occupation1")
+age14_BCS_occupation2 <- slice_head(age14_BCS_occupation2_combined)
+row.names(age14_BCS_occupation2) <- c("age14_BCS_occupation2")
+age14_BCS_occupation3 <- slice_head(age14_BCS_occupation3_combined)
+row.names(age14_BCS_occupation3) <- c("age14_BCS_occupation3")
+age14_BCS_occupation4 <- slice_head(age14_BCS_occupation4_combined)
+row.names(age14_BCS_occupation4) <- c("age14_BCS_occupation4")
+
+
+
+BCS_age14_descriptives <- rbind(age14_BCS_nvq1, age14_BCS_nvq2, age14_BCS_nvq3,age14_BCS_nvq4,
+                                age14_BCS_income1, age14_BCS_income2, age14_BCS_income3, age14_BCS_income4, age14_BCS_income5,
+                                age14_BCS_occupation1, age14_BCS_occupation2, age14_BCS_occupation3, age14_BCS_occupation4
+)
+
+
+#prepare data for table
+
+BCS_age14_descriptives$Mean <- round(BCS_age14_descriptives$Mean, 2)
+BCS_age14_descriptives$SD <- round(BCS_age14_descriptives$SD,2)
+BCS_age14_descriptives$lower <- round(BCS_age14_descriptives$lower,2)
+BCS_age14_descriptives$upper<- round(BCS_age14_descriptives$upper,2)
+BCS_age14_descriptives$mean_sd = paste0(BCS_age14_descriptives$Mean, "(", BCS_age14_descriptives$SD, ")")
+BCS_age14_descriptives$conf_int = paste0("[", BCS_age14_descriptives$lower, ";", BCS_age14_descriptives$upper, "]")
+
+BCSage14_descriptive_statistics <- BCS_age14_descriptives %>% 
+  select(mean_sd, conf_int)
+
+BCSage14_descriptive_statistics$descriptives <- paste0(BCSage14_descriptive_statistics$mean_sd,",", BCSage14_descriptive_statistics$conf_int)
+
+```
+
+now that we have 4 datasets with descriptives for each age, we want to pull out the relevant stats to start to formulate our table.
+our dataframes are called:
+  *age3_descriptive_statistics
+*age5_descriptive_statistics
+*age11_descriptive_statistics
+*age14_descriptive_statistics
+
+
+```{r}
+
+#first of all, we just need the column called "descriptives" from each age dataframe. 
+
+
+BCSage5_descriptive_statistics$indicator <- c("Parent Education: No /low level qualifications", "Parent Education:O levels/GCSEs grades A*-C ",
+                                              "Parent Education: Post 16 education", "Parent Education: University level",
+                                              "Income \n  (quntile 1)", "Income \n  (quntile 2)", "Income \n  (quntile 3)",
+                                              "Income \n  (quntile 4)", "Income \n  (quntile 5)", 
+                                              "Occupational Status \n (Unemployed)", 
+                                              "Occupational Status \n (Routine)", "Occupational Status \n (Intermediate)",
+                                              "Occupational Status \n (higher managerial)"
+)
+
+
+BCSage11_descriptive_statistics$indicator <- c("Parent Education: No /low level qualifications", "Parent Education:O levels/GCSEs grades A*-C ",
+                                               "Parent Education: Post 16 education", "Parent Education: University level",
+                                               "Income \n  (quntile 1)", "Income \n  (quntile 2)", "Income \n  (quntile 3)",
+                                               "Income \n  (quntile 4)", "Income \n  (quntile 5)", 
+                                               "Occupational Status \n (Unemployed)", 
+                                               "Occupational Status \n (Routine)", "Occupational Status \n (Intermediate)",
+                                               "Occupational Status \n (higher managerial)"
+)
+
+
+BCSage14_descriptive_statistics$indicator  <- c("Parent Education: No /low level qualifications", "Parent Education:O levels/GCSEs grades A*-C ",
+                                                "Parent Education: Post 16 education", "Parent Education: University level",
+                                                "Income \n  (quntile 1)", "Income \n  (quntile 2)", "Income \n  (quntile 3)",
+                                                "Income \n  (quntile 4)", "Income \n  (quntile 5)", 
+                                                "Occupational Status \n (Unemployed)", 
+                                                "Occupational Status \n (Routine)", "Occupational Status \n (Intermediate)",
+                                                "Occupational Status \n (higher managerial)"
+)
+
+
+
+BCSnew_descriptives_age5 <- BCSage5_descriptive_statistics %>% 
+  select(indicator,descriptives) 
+BCSnew_descriptives_age11 <- BCSage11_descriptive_statistics %>% 
+  select(indicator,descriptives) 
+BCSnew_descriptives_age14 <- BCSage14_descriptive_statistics %>% 
+  select(indicator, descriptives)
+
+
+#row.names(BCSnew_descriptives_age5) <- c(1:30)
+#row.names(BCSnew_descriptives_age11) <- c(1:30)
+#row.names(BCSnew_descriptives_age14) <- c(1:30)
+
+
+names(BCSnew_descriptives_age5) <- c("Indicator", "Age5")
+names(BCSnew_descriptives_age11) <- c( "Indicator", "Age11")
+names(BCSnew_descriptives_age14) <- c( "Indicator", "Age14")
+
+
+#put this into one dataframe
+
+BCSlang_descriptives1 = data.frame(BCSnew_descriptives_age5, BCSnew_descriptives_age11, BCSnew_descriptives_age14)
+BCSlanguage_descriptives = BCSlang_descriptives1 %>% 
+  select(Indicator, Age5, Age11, Age14) %>% 
+  add_row(Indicator = "Parent Education", .before = 1) %>%  #add in rows to divide table up 
+  add_row(Indicator = "Income", .before = 8) %>% 
+  add_row(Indicator = "Occupational Status", .before = 20) 
+BCSlanguage_descriptives [is.na(BCSlanguage_descriptives )] <- " "
+
+
+
+```
+
+
+Create table with Flextabls
+```{r}
+
+
+#put into table
+#define border
+my_border = border= fp_border(color="black", width=1)
+BCSlanguage_sesDescriptives <- BCSlanguage_descriptives %>% 
+  flextable() %>% 
+  font(fontname = "Times New Roman", part="all") %>% #
+  fontsize(size=10, part = "all") %>% #
+  align(j=1, align="left", part="all") %>% 
+  align(j=1:4, align="center", part="all") %>% 
+  color(j=1:4, color="black", part="all") %>% 
+  width(j=1, width=2) %>% 
+  width(j=2:4, width=1.8) %>% 
+  line_spacing(j=2:4, space=1.5) %>% 
+  line_spacing(j=1, space=1.5) %>% 
+  border_remove() %>% 
+  hline_top(j=1:4, part="all", border=my_border) %>% 
+  hline_bottom(j=1:4,part="body",  border=my_border) %>% 
+  set_header_labels(`Indicator`= "SEC Indicator", `Age3` = "Age 3 Vocabulary", 
+                    `Age5` = "Age 5 Vocabulary", `Age11` = "Age 11 Vocabulary", 
+                    `Age14` = "Age 14 Vocabulary") %>% 
+  add_header_row(values = c(" ", "Proportion (%) or Mean(±SD) [95% CIs]" ), colwidths = c(1,3)) %>% 
+  font(fontname = "Times New Roman", part="header") %>% 
+  align(align="center", part="header") %>% 
+  hline_top(j = 2:4, part = "all", border = my_border)  %>% 
+  font(fontname = "Times New Roman", part = "footer") %>% 
+  fontsize(size = 9, part = "footer") %>% 
+  italic(part = "footer", italic = TRUE) %>% 
+  align(align="left", part="footer") %>% 
+  #add_header_lines(values = c("Table 2: Descriptive Statistics for Analytical Sample (N = 17, 070) and Whole BCS2001 Cohort (N=19,243)")) %>% 
+  font(fontname = "Times New Roman", part = "header") %>% 
+  fontsize(size = 12, part = "header") %>% 
+  italic(part = "header", italic = TRUE)
+
+
+print(BCSlanguage_sesDescriptives, preview = "docx") 
+
+
+```
