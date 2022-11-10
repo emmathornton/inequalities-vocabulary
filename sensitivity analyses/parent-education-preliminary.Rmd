@@ -1,0 +1,145 @@
+Preliminary analysis to determine which parent education variable predicts most variance
+```{r}
+library(mice)
+library(pander)
+library(xtable)
+library(dplyr)
+library(gt)
+library(glue)
+library(tidyverse)
+library(miceadds)
+library(swfscMisc)
+library(imputools)
+library(haven)
+library(sjmisc)
+library(Hmisc)
+library(psych)
+library(lavaan)
+library(ggplot2)
+library(ggpubr)
+library(officer)
+library(flextable)
+library(gtools)
+#this will take a float (e.g. a p value) and return a string with 3 digits and no leading 0
+
+bv <- function(val) {
+  return(sub("^(-?)0.", "\\1.", sprintf("%.2f", val)))
+}
+
+#if the number is less than .001, it will give <.001. 
+pv1 <- function(val) {
+  return(paste("=", sub("^(-?)0.", "\\1.", sprintf("%.3f", val))))
+}
+
+#load in imputed datasets
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-11-08_mcs_ses_preliminaryNVQ/2022-11-08_mcs_ses_preliminaryNVQ.Rdata")
+imputed_mcs2 = mi.res
+
+```
+
+Highest household Regression Models:
+```{r}
+
+age3_household_adjusted <- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ, weights = mcs2_weight))
+#age 5
+age5_household_adjusted <- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ, weights = mcs2_weight))
+#age 11
+age11_household_adjusted <- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ, weights = mcs2_weight))
+#age 14
+age14_household_adjusted <- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ, weights = mcs2_weight))
+
+
+```
+
+Mother NVQ Regression Models
+
+```{r}
+#Age 3
+age3_mum_adjusted <- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + maternal_NVQ, weights = mcs2_weight))
+#age 5
+
+age5_mum_adjusted <- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + maternal_NVQ, weights = mcs2_weight))
+#age 11
+
+age11_mum_adjusted <- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + maternal_NVQ, weights = mcs2_weight))
+#age 14
+
+age14_mum_adjusted <- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + maternal_NVQ, weights = mcs2_weight))
+
+```
+
+
+Father NVQ Regression Models
+```{r}
+#Age 3
+
+age3_dad_adjusted <- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + paternal_NVQ, weights = mcs2_weight))
+#age 5
+
+age5_dad_adjusted <- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + paternal_NVQ, weights = mcs2_weight))
+#age 11
+
+age11_dad_adjusted <- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + paternal_NVQ, weights = mcs2_weight))
+#age 14
+
+age14_dad_adjusted <- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + paternal_NVQ, weights = mcs2_weight))
+
+```
+
+Confounders only (to get partial R2 values)
+```{r}
+age3_confounders <- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+age5_confounders <- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+age11_confounders <- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+age14_confounders <- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home , weights = mcs2_weight))
+```
+
+Partial R2 values
+```{r}
+#Age 3
+age3_confounders_r2 = round(pool.r.squared(age3_confounders),4)*100
+age3_highest_r2 = round(pool.r.squared(age3_household_adjusted),4)*100
+age3_mum_r2 = round(pool.r.squared(age3_mum_adjusted),4)*100
+age3_dad_r2 = round(pool.r.squared(age3_dad_adjusted),4)*100
+
+#partial values
+age3_highest_r2 - age3_confounders_r2
+age3_mum_r2 - age3_confounders_r2
+age3_dad_r2 - age3_confounders_r2
+
+#Age 5
+age5_confounders_r2 = round(pool.r.squared(age5_confounders),4)*100
+age5_highest_r2 = round(pool.r.squared(age5_household_adjusted),4)*100
+age5_mum_r2 = round(pool.r.squared(age5_mum_adjusted),4)*100
+age5_dad_r2 = round(pool.r.squared(age5_dad_adjusted),4)*100
+
+#partial values
+age5_highest_r2 - age5_confounders_r2
+age5_mum_r2 - age5_confounders_r2
+age5_dad_r2 - age5_confounders_r2
+
+#Age 11
+age11_confounders_r2 = round(pool.r.squared(age11_confounders),4)*100
+age11_highest_r2 = round(pool.r.squared(age11_household_adjusted),4)*100
+age11_mum_r2 = round(pool.r.squared(age11_mum_adjusted),4)*100
+age11_dad_r2 = round(pool.r.squared(age11_dad_adjusted),4)*100
+
+#partial values
+age11_highest_r2 - age11_confounders_r2
+age11_mum_r2 - age11_confounders_r2
+age11_dad_r2 - age11_confounders_r2
+
+#Age 14
+age14_confounders_r2 = round(pool.r.squared(age14_confounders),4)*100
+age14_highest_r2 = round(pool.r.squared(age14_household_adjusted),4)*100
+age14_mum_r2 = round(pool.r.squared(age14_mum_adjusted),4)*100
+age14_dad_r2 = round(pool.r.squared(age14_dad_adjusted),4)*100
+
+#partial values
+age14_highest_r2 - age14_confounders_r2
+age14_mum_r2 - age14_confounders_r2
+age14_dad_r2 - age14_confounders_r2
+
+
+```
+
