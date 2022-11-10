@@ -44,7 +44,7 @@ mcs1_cm_parent = read_sav("mcs1_parent_cm_interview.sav")
 mcs2_cm_parent = read_sav("mcs2_parent_cm_interview.sav")
 mcs3_derived_parent = read_sav("mcs3_parent_derived.sav")
 mcs3_derived_family = read_sav("mcs3_family_derived.sav")
-mcs3_derived_7thEd = read_sav("mcs3_derived_variables-7thEd.sav")
+#mcs3_derived_7thEd = read_sav("mcs3_derived_variables-7thEd.sav")
 mcs3_parent <- read_sav("mcs3_parent_interview.sav")
 #### Convert all to lowercase ####
 names(mcs2_child_assessment) <- tolower(names(mcs2_child_assessment))
@@ -76,7 +76,7 @@ names(mcs2_cm_parent) <- tolower(names(mcs2_cm_parent))
 names(mcs5_child_assessment4thEd) <- tolower(names(mcs5_child_assessment4thEd))
 names(mcs3_derived_parent) <- tolower(names(mcs3_derived_parent))
 names(mcs3_derived_family) <- tolower(names(mcs3_derived_family))
-names(mcs3_derived_7thEd) <- tolower(names(mcs3_derived_7thEd))
+#names(mcs3_derived_7thEd) <- tolower(names(mcs3_derived_7thEd))
 names(mcs3_parent) <- tolower(names(mcs3_parent))
 
 #### Create weight variable ####
