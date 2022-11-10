@@ -87,37 +87,37 @@ confounders only models for R2 table later.
 #MCS2001 regressions 
 
 #age 5
-mcs_age5_occupation <- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  occupational_status, weights = weight2)) 
-mcs_age5_education <- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+ highested1, weights = weight2))
-mcs_age5_income <- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+ income_quintiles, weights = weight2))
-mcs_age5_confounders<- with(mcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5, weights = weight2))
+mcs_age5_occupation <- with(mcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5+  occupational_status, weights = weight2)) 
+mcs_age5_education <- with(mcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5+ highested1, weights = weight2))
+mcs_age5_income <- with(mcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5+ income_quintiles, weights = weight2))
+mcs_age5_confounders<- with(mcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5, weights = weight2))
 
 #age 11
-mcs_age11_occupation <- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11+  occupational_status, weights = weight2)) 
-mcs_age11_education <- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11+ highested1, weights = weight2))
-mcs_age11_income<- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11+ income_quintiles, weights = weight2))
-mcs_age11_confounders<- with(mcs_imputation, lm(standardised_vocab11 ~ sex + ethnicity +  EAL + standardised_age11,weights = weight2))
+mcs_age11_occupation <- with(mcs_imputation, lm(standardised_vocab11 ~ sex   +  EAL + standardised_age11+  occupational_status, weights = weight2)) 
+mcs_age11_education <- with(mcs_imputation, lm(standardised_vocab11 ~ sex   +  EAL + standardised_age11+ highested1, weights = weight2))
+mcs_age11_income<- with(mcs_imputation, lm(standardised_vocab11 ~ sex   +  EAL + standardised_age11+ income_quintiles, weights = weight2))
+mcs_age11_confounders<- with(mcs_imputation, lm(standardised_vocab11 ~ sex   +  EAL + standardised_age11,weights = weight2))
 #age 14
-mcs_age14_occupation <- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14+  occupational_status,weights = weight2)) 
-mcs_age14_education <- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14+ highested1,weights = weight2))
-mcs_age14_income <- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14+ income_quintiles ,weights = weight2))
-mcs_age14_confounders<- with(mcs_imputation, lm(standardised_vocab14 ~ sex + ethnicity +  EAL + standardised_age14,weights = weight2))
+mcs_age14_occupation <- with(mcs_imputation, lm(standardised_vocab14 ~ sex   +  EAL + standardised_age14+  occupational_status,weights = weight2)) 
+mcs_age14_education <- with(mcs_imputation, lm(standardised_vocab14 ~ sex   +  EAL + standardised_age14+ highested1,weights = weight2))
+mcs_age14_income <- with(mcs_imputation, lm(standardised_vocab14 ~ sex   +  EAL + standardised_age14+ income_quintiles ,weights = weight2))
+mcs_age14_confounders<- with(mcs_imputation, lm(standardised_vocab14 ~ sex   +  EAL + standardised_age14,weights = weight2))
 
 #BCS1970 regressions 
-bcs_age5_occupation <- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  occupational_status,weights = weight)) 
-bcs_age5_education <- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+  highestEd1,weights = weight))
-bcs_age5_income <- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5+ oecd_quintiles,weights = weight))
-bcs_age5_confounders<- with(bcs_imputation, lm(standardised_vocab5 ~ sex + ethnicity +  EAL + standardised_age5, weights = weight))
+bcs_age5_occupation <- with(bcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5+  occupational_status,weights = weight)) 
+bcs_age5_education <- with(bcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5+  highestEd1,weights = weight))
+bcs_age5_income <- with(bcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5+ oecd_quintiles,weights = weight))
+bcs_age5_confounders<- with(bcs_imputation, lm(standardised_vocab5 ~ sex   +  EAL + standardised_age5, weights = weight))
 #age 10
-bcs_age10_occupation <- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10+  occupational_status, weights = weight)) 
-bcs_age10_education <- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +   EAL + standardised_age10+  highestEd1, weights = weight))
-bcs_age10_income <- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +   EAL + standardised_age10+  oecd_quintiles, weights = weight))
-bcs_age10_confounders<- with(bcs_imputation, lm(standardised_vocab10 ~ sex + ethnicity +  EAL + standardised_age10, weights = weight))
+bcs_age10_occupation <- with(bcs_imputation, lm(standardised_vocab10 ~ sex   +  EAL + standardised_age10+  occupational_status, weights = weight)) 
+bcs_age10_education <- with(bcs_imputation, lm(standardised_vocab10 ~ sex   +   EAL + standardised_age10+  highestEd1, weights = weight))
+bcs_age10_income <- with(bcs_imputation, lm(standardised_vocab10 ~ sex   +   EAL + standardised_age10+  oecd_quintiles, weights = weight))
+bcs_age10_confounders<- with(bcs_imputation, lm(standardised_vocab10 ~ sex   +  EAL + standardised_age10, weights = weight))
 #age 16
-bcs_age16_occupation <- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16+  occupational_status, weights = weight)) 
-bcs_age16_education <- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16+  highestEd1, weights = weight))
-bcs_age16_income <- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16+  oecd_quintiles, weights = weight))
-bcs_age16_confounders<- with(bcs_imputation, lm(standardised_vocab16 ~ sex + ethnicity +  EAL + standardised_age16, weights = weight))
+bcs_age16_occupation <- with(bcs_imputation, lm(standardised_vocab16 ~ sex   +  EAL + standardised_age16+  occupational_status, weights = weight)) 
+bcs_age16_education <- with(bcs_imputation, lm(standardised_vocab16 ~ sex   +  EAL + standardised_age16+  highestEd1, weights = weight))
+bcs_age16_income <- with(bcs_imputation, lm(standardised_vocab16 ~ sex   +  EAL + standardised_age16+  oecd_quintiles, weights = weight))
+bcs_age16_confounders<- with(bcs_imputation, lm(standardised_vocab16 ~ sex   +  EAL + standardised_age16, weights = weight))
 
 ```
 
@@ -148,25 +148,25 @@ bcs_age16_income_results = round(summary(pool(bcs_age16_income), conf.int =TRUE)
 
 #pull out SES coefficients for table
 
-MCS_age5_occupation_results = mcs_age5_occupation_results[6:8,]
-MCS_age5_education_results = mcs_age5_education_results[6:8,]
-MCS_age5_income_results = mcs_age5_income_results[6:9,]
-MCS_age11_occupation_results = mcs_age11_occupation_results[6:8,]
-MCS_age11_education_results = mcs_age11_education_results[6:8,]
-MCS_age11_income_results = mcs_age11_income_results[6:9,]
-MCS_age14_occupation_results = mcs_age14_occupation_results[6:8,]
-MCS_age14_education_results = mcs_age14_education_results[6:8,]
-MCS_age14_income_results = mcs_age14_income_results[6:9,]
+MCS_age5_occupation_results = mcs_age5_occupation_results[5:7,]
+MCS_age5_education_results = mcs_age5_education_results[5:7,]
+MCS_age5_income_results = mcs_age5_income_results[5:8,]
+MCS_age11_occupation_results = mcs_age11_occupation_results[5:7,]
+MCS_age11_education_results = mcs_age11_education_results[5:7,]
+MCS_age11_income_results = mcs_age11_income_results[5:8,]
+MCS_age14_occupation_results = mcs_age14_occupation_results[5:7,]
+MCS_age14_education_results = mcs_age14_education_results[5:7,]
+MCS_age14_income_results = mcs_age14_income_results[5:8,]
 
-BCS_age5_occupation_results = bcs_age5_occupation_results[6:8,]
-BCS_age5_education_results = bcs_age5_education_results[6:8,]
-BCS_age5_income_results = bcs_age5_income_results[6:9,]
-BCS_age10_occupation_results = bcs_age10_occupation_results[6:8,]
-BCS_age10_education_results = bcs_age10_education_results[6:8,]
-BCS_age10_income_results = bcs_age10_income_results[6:9,]
-BCS_age16_occupation_results = bcs_age16_occupation_results[6:8,]
-BCS_age16_education_results = bcs_age16_education_results[6:8,]
-BCS_age16_income_results = bcs_age16_income_results[6:9,]
+BCS_age5_occupation_results = bcs_age5_occupation_results[5:7,]
+BCS_age5_education_results = bcs_age5_education_results[5:7,]
+BCS_age5_income_results = bcs_age5_income_results[5:8,]
+BCS_age10_occupation_results = bcs_age10_occupation_results[5:7,]
+BCS_age10_education_results = bcs_age10_education_results[5:7,]
+BCS_age10_income_results = bcs_age10_income_results[5:8,]
+BCS_age16_occupation_results = bcs_age16_occupation_results[5:7,]
+BCS_age16_education_results = bcs_age16_education_results[5:7,]
+BCS_age16_income_results = bcs_age16_income_results[5:8,]
 
 MCS_age5_results = rbind(MCS_age5_occupation_results, MCS_age5_education_results, MCS_age5_income_results)
 MCS_age11_results = rbind(MCS_age11_occupation_results, MCS_age11_education_results, MCS_age11_income_results)
@@ -357,7 +357,7 @@ library(officer)
 my_border = border= fp_border(color="black", width=1)
 cross_cohort_flex <- cross_cohort_data %>% 
   flextable() %>% 
-  font(fontname = "Times New Roman", part="all") %>% 
+  #font(fontname = "Times New Roman", part="all") %>% 
   fontsize(size=9, part = "all") %>% 
   align(j=2, align="left", part="all") %>% 
   align(j=3:8, align="center", part="all") %>% 
@@ -378,9 +378,9 @@ cross_cohort_flex <- cross_cohort_data %>%
   merge_at(j=1, i = 1:4) %>% 
   merge_at(j=1, i=5:8) %>% 
   merge_at(j=1, i=9:13) %>% 
-  rotate(i=1:4, j=1, rotation="btlr", align="center") %>% 
-  rotate(i=5:8, j=1, rotation="btlr", align="center") %>% 
-  rotate(i=9:13, j=1, rotation="btlr", align="center") %>% 
+ rotate(i=1:4, j=1, rotation="btlr", align="center") %>% 
+ rotate(i=5:8, j=1, rotation="btlr", align="center") %>% 
+ rotate(i=9:13, j=1, rotation="btlr", align="center") %>% 
  print( preview = "docx") 
 
 

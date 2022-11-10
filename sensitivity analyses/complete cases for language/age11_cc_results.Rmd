@@ -895,75 +895,10 @@ ses_table_data[is.na(ses_table_data)] <- "   "
 ```
 
 
-#now make table using gt package!
-
-```{r}
-ses_results_table <- ses_table_data %>% 
-mutate(age3 = str_replace_all(age3, ",", "<br>")) %>% #put p values on second line of cell 
-  mutate(age5 = str_replace_all(age5, ",", "<br>")) %>% 
-mutate(age11 = str_replace_all(age11, ",", "<br>")) %>% 
-  mutate(age14 = str_replace_all(age14, ",", "<br>")) %>% 
-  mutate(Indicator = str_replace_all(Indicator, "\n", "<br>")) %>% #separate variable names across 2 lines
- gt() %>% 
-  tab_header(
-    title="Predicting language at ages 3, 5, 11 and 14 with 5 SEP indicators", 
-    subtitle = "Coef[95% CI]"
-    ) %>% 
-  tab_style(
-    style=list(
-      cell_text(align = "center")
-    ), 
-    locations = cells_body(
-      columns=vars(age3, age5, age11, age14)
-    )
-  ) %>% 
-   tab_style(
-    style=list(
-      cell_text(align = "center")
-    ), 
-    locations = cells_column_labels(
-      columns=vars(age3, age5, age11, age14)
-    )
-  ) %>% 
-  tab_style(style = list(
-    cell_text(size=12)
-  ), locations = cells_body(
-    columns = vars(age3, age5, age11, age14)
-  )
-  ) %>% 
-  tab_style(style = list(
-    cell_text(size=11)
-  ), locations = cells_body(
-    columns = vars(Indicator)
-  )
-  ) %>% 
-  cols_label(age3 = "Age 3", 
-             age5= "Age 5", 
-             age11= "Age 11",
-             age14= "Age 14")%>% 
-  #tab_style(
-   # style=list(
-    #  cell_text(style="italic", font = "Times")
-  #  ), locations = cells_body(
-   #   columns = vars(p)
-  #  )
-  #)  %>% 
-  tab_options(table.font.names = "Times", 
-              table_body.border.top.color = "black", 
-              table_body.hlines.color ="white",
-              table_body.vlines.color = "white",
-              table_body.border.bottom.color = "black") %>% 
-  fmt_markdown(columns=TRUE) 
-  
-      #save
-
-gtsave(mcs_results_table, "practise_results_table.html")
-```
 
 #create table with flextable package, which can be exported to word 
 
 ```{r}
-
 
 #define border
 my_border = border= fp_border(color="black", width=1)
@@ -1599,11 +1534,21 @@ age3_no_income<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +
 age3_no_wealth<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
 age3_no_occupation<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
 age3_no_imd<- with(imputed_mcs2, lm(age3_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
-D1(age3_all_predictors, age3_no_nvq )
-D1(age3_all_predictors, age3_no_income)
-D1(age3_all_predictors, age3_no_wealth)
-D1(age3_all_predictors, age3_no_occupation )
-D1(age3_all_predictors, age3_no_imd )
+#Model comparisons
+education_age3 = D1(age3_all_predictors, age3_no_nvq )
+income_age3 = D1(age3_all_predictors, age3_no_income)
+wealth_age3 = D1(age3_all_predictors, age3_no_wealth)
+occupation_age3 = D1(age3_all_predictors, age3_no_occupation )
+imd_age3 = D1(age3_all_predictors, age3_no_imd )
+
+#Write results sentence 
+#Results
+education_age3 = education_age3$result
+income_age3 = income_age3$result
+wealth_age3 = wealth_age3$result
+occupation_age3 = occupation_age3$result
+imd_age3 = imd_age3$result
+    
 
 #age 5
 #model with all SES predictors included 
@@ -1614,11 +1559,19 @@ age5_no_income<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +
 age5_no_wealth<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
 age5_no_occupation<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
 age5_no_imd<- with(imputed_mcs2, lm(age5_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
-D1(age5_all_predictors, age5_no_nvq )
-D1(age5_all_predictors, age5_no_income )
-D1(age5_all_predictors, age5_no_wealth)
-D1(age5_all_predictors, age5_no_occupation )
-D1(age5_all_predictors, age5_no_imd) 
+education_age5 = D1(age5_all_predictors, age5_no_nvq )
+income_age5 = D1(age5_all_predictors, age5_no_income )
+wealth_age5 = D1(age5_all_predictors, age5_no_wealth)
+occupation_age5 = D1(age5_all_predictors, age5_no_occupation )
+imd_age5 = D1(age5_all_predictors, age5_no_imd) 
+
+#Write results sentence 
+#Results
+education_age5 = education_age5$result
+income_age5 = income_age5$result
+wealth_age5 = wealth_age5$result
+occupation_age5 = occupation_age5$result
+imd_age5 = imd_age5$result
 
 #age 11
 #model with all SES predictors included 
@@ -1629,11 +1582,19 @@ age11_no_income<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity
 age11_no_wealth<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
 age11_no_occupation<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
 age11_no_imd<- with(imputed_mcs2, lm(age11_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
-D1(age11_all_predictors, age11_no_nvq )
-D1(age11_all_predictors, age11_no_income )
-D1(age11_all_predictors, age11_no_wealth)
-D1(age11_all_predictors, age11_no_occupation)
-D1(age11_all_predictors, age11_no_imd )
+education_age11 = D1(age11_all_predictors, age11_no_nvq )
+income_age11 = D1(age11_all_predictors, age11_no_income )
+wealth_age11 = D1(age11_all_predictors, age11_no_wealth)
+occupation_age11 = D1(age11_all_predictors, age11_no_occupation )
+imd_age11 = D1(age11_all_predictors, age11_no_imd) 
+
+#Write results sentence 
+#Results
+education_age11 = education_age11$result
+income_age11 = income_age11$result
+wealth_age11 = wealth_age11$result
+occupation_age11 = occupation_age11$result
+imd_age11 = imd_age11$result
 
 #age 14
 #model with all SES predictors included 
@@ -1644,11 +1605,46 @@ age14_no_income<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity
 age14_no_wealth<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
 age14_no_occupation<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
 age14_no_imd<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
-D1(age14_all_predictors, age14_no_nvq )
-D1(age14_all_predictors, age14_no_income )
-D1(age14_all_predictors, age14_no_wealth)
-D1(age14_all_predictors, age14_no_occupation )
-D1(age14_all_predictors, age14_no_imd)
+education_age14 = D1(age14_all_predictors, age14_no_nvq )
+income_age14 = D1(age14_all_predictors, age14_no_income )
+wealth_age14 = D1(age14_all_predictors, age14_no_wealth)
+occupation_age14 = D1(age14_all_predictors, age14_no_occupation )
+imd_age14 = D1(age14_all_predictors, age14_no_imd) 
+
+#Write results sentence 
+#Results
+education_age14 = education_age14$result
+income_age14 = income_age14$result
+wealth_age14 = wealth_age14$result
+occupation_age14 = occupation_age14$result
+imd_age14 = imd_age14$result
+
+#Write into sentence
+paste0("Parent education (Dm(",education_age3[,2],",",round(education_age3[,3],2),")=", round(education_age3[,1],2), ", p=", round(education_age3[,4],3), "), ", 
+       "income (Dm(",income_age3[,2],",",round(income_age3[,3],2),")=", round(income_age3[,1],2), ", p=", round(income_age3[,4],3), "), ",
+       "wealth (Dm(", wealth_age3[,2],",",round(wealth_age3[,3],2),")=", round(wealth_age3[,1],2), ", p=", round(wealth_age3[,4],3), "), and",
+      "occupational status (Dm(", occupation_age3[,2],",",round(occupation_age3[,3],2),")=", round(occupation_age3[,1],2), ", p=", round(occupation_age3[,4],3), ") all accounted for significant variance in language ability at age 3. Relative neighbourhood deprivation did not account for significant variance (Dm(",imd_age3[,2],",",round(imd_age3[,3],2),")=", round(imd_age3[,1],2), ", p=", round(imd_age3[,4],3), ").")
+
+#Write into sentence
+paste0("Parent education (Dm(",education_age5[,2],",",round(education_age5[,3],2),")=", round(education_age5[,1],2), ", p=", round(education_age5[,4],3), "), ", 
+       "income (Dm(",income_age5[,2],",",round(income_age5[,3],2),")=", round(income_age5[,1],2), ", p=", round(income_age5[,4],3), "), ",
+       "wealth (Dm(", wealth_age5[,2],",",round(wealth_age5[,3],2),")=", round(wealth_age5[,1],2), ", p=", round(wealth_age5[,4],3), "),",
+       "occupational status (Dm(", occupation_age5[,2],",",round(occupation_age5[,3],2),")=", round(occupation_age5[,1],2), ", p=", round(occupation_age5[,4],3), "),",
+       "and relative neighbourhood deprivation (Dm(", imd_age5[,2],",",round(imd_age5[,3],2),")=", round(imd_age5[,1],2), ", p=", round(imd_age5[,4],3), "),",
+       "all accounted for significant variance in language ability at age 5.")
+#Write into sentence
+paste0("Parent education (Dm(",education_age11[,2],",",round(education_age11[,3],2),")=", round(education_age11[,1],2), ", p=", round(education_age11[,4],3), "), ", 
+       "income (Dm(",income_age11[,2],",",round(income_age11[,3],2),")=", round(income_age11[,1],2), ", p=", round(income_age11[,4],3), "), ",
+       "wealth (Dm(", wealth_age11[,2],",",round(wealth_age11[,3],2),")=", round(wealth_age11[,1],2), ", p=", round(wealth_age11[,4],3), "),",
+       "occupational status (Dm(", occupation_age11[,2],",",round(occupation_age11[,3],2),")=", round(occupation_age11[,1],2), ", p=", round(occupation_age11[,4],3), "),",
+       "and relative neighbourhood deprivation (Dm(", imd_age11[,2],",",round(imd_age11[,3],2),")=", round(imd_age11[,1],2), ", p=", round(imd_age11[,4],3), "),",
+       "all accounted for significant variance in language ability at age 11.")
+#Write into sentence
+paste0("Parent education (Dm(",education_age14[,2],",",round(education_age14[,3],2),")=", round(education_age14[,1],2), ", p=", round(education_age14[,4],3), "), ", 
+       "income (Dm(",income_age14[,2],",",round(income_age14[,3],2),")=", round(income_age14[,1],2), ", p=", round(income_age14[,4],3), "), ",
+       "wealth (Dm(", wealth_age14[,2],",",round(wealth_age14[,3],2),")=", round(wealth_age14[,1],2), ", p=", round(wealth_age14[,4],3), "), and ",
+       "occupational status (Dm(", occupation_age14[,2],",",round(occupation_age14[,3],2),")=", round(occupation_age14[,1],2), ", p=", round(occupation_age14[,4],3),") all accounted for significant variance in language ability at age 14. Relative neighbourhood deprivation did not account for significant variance (Dm(", imd_age14[,2],",",round(imd_age14[,3],2),")=", round(imd_age14[,1],2), ", p=", round(imd_age14[,4],3), ").")
+       
 
 ```
 
