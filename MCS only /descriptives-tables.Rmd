@@ -236,7 +236,7 @@ imdCombined = as.data.frame(t(imdCombined)) %>%
 prepare for table.
 will need to paste in 95%CIs with means and SDs and then put everything into one dataframe
 ```{r}
-vocabulary_age3Descriptives = combined_vocab_age3Descriptives %>% add_column(paste0(combined_vocab_age3Descriptives$Mean,"(±",combined_vocab_age3Descriptives$SD,")", "\n", "[", combined_vocab_age3Descriptives$lower, ";", combined_vocab_age3Descriptives$upper,"]")) %>% 
+vocabulary_age3Descriptives = combined_vocab_age3Descriptives  %>% add_column(paste0(combined_vocab_age3Descriptives$Mean,"(±",combined_vocab_age3Descriptives$SD,")", "\n", "[", combined_vocab_age3Descriptives$lower, ";", combined_vocab_age3Descriptives$upper,"]")) %>% 
   rename("cmVocabAge3" = `paste0(...)`) %>% 
   add_column("Variable" = "Cohort Member Vocabulary \n Age 3 (Naming Vocabulary Score)") %>% 
   select(Variable, cmVocabAge3)  %>% 
@@ -445,7 +445,7 @@ fullDescriptives = fullDescriptives %>% select(!Var)
 my_border = border= fp_border(color="black", width=1)
 full_descriptives <- fullDescriptives %>% 
   flextable() %>% 
-  font(fontname = "Times New Roman", part="all") %>% #
+  #font(fontname = "Times New Roman", part="all") %>% #
   fontsize(size=10, part = "all") %>% #
   align(j=1, align="left", part="all") %>% 
   align(j=2:3, align="center", part="all") %>% 
@@ -462,16 +462,16 @@ full_descriptives <- fullDescriptives %>%
   set_header_labels(Variable= "Variable", `Full Cohort` = "Whole Cohort \n (N= 19243)", 
                     `Analytical Sample` = "Analytical Sample (N=17,070)") %>% 
   add_header_row(values = c(" ", "Proportion (%) or \n Mean(±SD) [95% CIs]" ), colwidths = c(1, 2)) %>% 
-  font(fontname = "Times New Roman", part="header") %>% 
-  align(align="center", part="header") %>% 
+  #font(fontname = "Times New Roman", part="header") %>% 
+ # align(align="center", part="header") %>% 
   hline_top(j = 2:3, part = "all", border = my_border)  %>% 
-  font(fontname = "Times New Roman", part = "footer") %>% 
+  #font(fontname = "Times New Roman", part = "footer") %>% 
   fontsize(size = 9, part = "footer") %>% 
   italic(part = "footer", italic = TRUE) %>% 
-  align(align="left", part="footer") %>% 
+  #align(align="left", part="footer") %>% 
   add_header_lines(values = c("Table 2: Descriptive Statistics for Analytical Sample (N = 17, 070) and Whole MCS2001 Cohort (N=19,243)")) %>% 
-  font(fontname = "Times New Roman", part = "header") %>% 
-  fontsize(size = 12, part = "header") %>% 
+  #font(fontname = "Times New Roman", part = "header") %>% 
+  #fontsize(size = 12, part = "header") %>% 
   italic(part = "header", italic = TRUE)
   
 
