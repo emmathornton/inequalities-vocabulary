@@ -49,37 +49,11 @@ pv1 <- function(val) {
 
 
 #load in data and rename to be imputed_mcs2 
-here we have the datasets for each age sensitivity and wealth sensitivity - load in one at a time and run code to get tables and then repeat 
+
 ```{r}
 
 #main analysis
 load("~/Documents/updated MCS datasets/inequalities datasets /2022-10-26_mcs_ses_imputedRQ1/2022-10-26_mcs_ses_imputedRQ1.Rdata")
-imputed_mcs2=mi.res
-
-#complete cases age 3
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/age3_MCS_SES_complete-cases_imputed/age3_MCS_SES_complete-cases_imputed.Rdata")
-imputed_mcs2=mi.res
-
-
-#complete cases age 5 
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/age5_MCS_SES_complete-cases_imputed/age5_MCS_SES_complete-cases_imputed.Rdata")
-imputed_mcs2=mi.res
-
-
-#complete cases age 11
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/age11_MCS_SES_complete-cases_imputed/age11_MCS_SES_complete-cases_imputed.Rdata")
-imputed_mcs2=mi.res
-
-#complete cases age 14
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/age14_MCS_SES_complete-cases_imputed/age14_MCS_SES_complete-cases_imputed.Rdata")
-imputed_mcs2=mi.res
-
-#at least 1 wealth variable
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/MCS_SES_wealth_sensitivity1_imputed/MCS_SES_wealth_sensitivity1_imputed.Rdata")
-imputed_mcs2=mi.res
-
-#at least 2 wealth variables 
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/MCS_SES_wealth_sensitivity2_imputed/MCS_SES_wealth_sensitivity2_imputed.Rdata")
 imputed_mcs2=mi.res
 
 
