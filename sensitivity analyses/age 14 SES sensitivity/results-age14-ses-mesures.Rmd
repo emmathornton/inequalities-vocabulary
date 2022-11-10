@@ -48,7 +48,7 @@ pv1 <- function(val) {
 load in data 
 
 ```{r}
-load("~/Documents/PhD/MCS DATASETS/SES_inequalities_language/inequalities-language-ability/Datasets/2021-03-02_mcs-age14-sesVariables/2021-03-02_mcs-age14-sesVariables.Rdata")
+load("~/Documents/updated MCS datasets/inequalities datasets /2022-11-07_mcs-age14-sesVariables/2022-11-07_mcs-age14-sesVariables.Rdata")
 imputed_mcs2 = mi.res
 ```
 
@@ -616,4 +616,21 @@ partial_r2_flex<- age14_partialr2 %>%
 ```
 
 
+model comparisons 
+```{r}
+#age 14
+#model with all SES predictors included 
+age14_all_predictors<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+#model removing each predictor in turn 
+age14_no_nvq<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + income_quintiles+wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age14_no_income<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +wealth_quintiles+occupational_status+imd, weights = mcs2_weight))
+age14_no_wealth<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+occupational_status+imd, weights = mcs2_weight))
+age14_no_occupation<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+imd, weights = mcs2_weight))
+age14_no_imd<- with(imputed_mcs2, lm(age14_standardised ~   gender +ethnicity +language_used_at_home + highest_NVQ +income_quintiles+wealth_quintiles+occupational_status, weights = mcs2_weight))
+D1(age14_all_predictors, age14_no_nvq )
+D1(age14_all_predictors, age14_no_income )
+D1(age14_all_predictors, age14_no_wealth)
+D1(age14_all_predictors, age14_no_occupation )
+D1(age14_all_predictors, age14_no_imd)
+```
 
