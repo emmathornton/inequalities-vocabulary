@@ -17,7 +17,7 @@ One of the imputools package dependencies is the Dummies package, which is not a
 
 - download the most uptodate version from https://cran.r-project.org/src/contrib/Archive/dummies/ 
 - decompress the zip file 
-Open the terminal window and type: 
+- Open the terminal window and type: 
 - cd ~/Downloads
 - R CMD INSTALL dummies_1.5.6
 - open R studio and call the package library(dummies)
