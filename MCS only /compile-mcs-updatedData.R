@@ -96,6 +96,20 @@ sweep_entry <- c("mcsid", "sentry")
 sweep_entry <- mcs_family[sweep_entry]
 sweep_entry$sentry = as.character(sweep_entry$sentry)
 
+#Cohort member number - will select CM number = 1 when they joined the study for analytical sample. 
+mcs1 = mcs1_cm_derived %>% select(mcsid, acnum00)
+mcs2 = mcs2_child_assessment %>% select(mcsid, bcnum00)  %>% 
+  full_join(sweep_entry) %>% 
+  filter(sentry == 2)
+
+mcs_cm1 = mcs1 %>% 
+  full_join(mcs2) %>% 
+  #filter(acnum00 == 1 | bcnum00 == 1) %>% 
+  mutate(cm_number = case_when(
+    !is.na(acnum00) ~ acnum00, 
+    is.na(acnum00) ~ bcnum00
+  )) 
+
 #### Vocabulary variables ####
 
 #Age 3 - Naming Vocabulary T-Scores
@@ -935,6 +949,7 @@ analysis_data = merge(all=TRUE, analysis_data, age14_vocab, by = "mcsid")
 nrow(analysis_data)
 analysis_data = merge(all=TRUE, analysis_data, mcs_weight, by = "mcsid")
 nrow(analysis_data)
+
 
 # Select anyone who has a response on at least one Vocabulary measure
 mcs_analysis = analysis_data[!is.na(analysis_data$age3_vocab) | 
