@@ -879,6 +879,7 @@ imputed_mcs2_1$income_ridit[imputed_mcs2_1$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_1$income_ridit[imputed_mcs2_1$income_ridit == 2] <- mcs_income_ridit1[2,]
 imputed_mcs2_1$income_ridit[imputed_mcs2_1$income_ridit == 3] <- mcs_income_ridit1[3,]
 imputed_mcs2_1$income_ridit[imputed_mcs2_1$income_ridit == 4] <- mcs_income_ridit1[4,]
+imputed_mcs2_1$income_ridit[imputed_mcs2_1$income_ridit == 5] <- mcs_income_ridit1[5,]
 
 #imputed dataset 2
 #get count data 
@@ -892,6 +893,7 @@ imputed_mcs2_2$income_ridit[imputed_mcs2_2$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_2$income_ridit[imputed_mcs2_2$income_ridit == 2] <- mcs_income_ridit2[2,]
 imputed_mcs2_2$income_ridit[imputed_mcs2_2$income_ridit == 3] <- mcs_income_ridit2[3,]
 imputed_mcs2_2$income_ridit[imputed_mcs2_2$income_ridit == 4] <- mcs_income_ridit2[4,]
+imputed_mcs2_2$income_ridit[imputed_mcs2_2$income_ridit == 5] <- mcs_income_ridit2[5,]
 
 #imputed dataset 3
 #get count data 
@@ -905,7 +907,7 @@ imputed_mcs2_3$income_ridit[imputed_mcs2_3$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_3$income_ridit[imputed_mcs2_3$income_ridit == 2] <- mcs_income_ridit3[2,]
 imputed_mcs2_3$income_ridit[imputed_mcs2_3$income_ridit == 3] <- mcs_income_ridit3[3,]
 imputed_mcs2_3$income_ridit[imputed_mcs2_3$income_ridit == 4] <- mcs_income_ridit3[4,]
-
+imputed_mcs2_3$income_ridit[imputed_mcs2_3$income_ridit == 5] <- mcs_income_ridit3[5,]
 
 #imputed dataset 4
 #get count data 
@@ -919,6 +921,7 @@ imputed_mcs2_4$income_ridit[imputed_mcs2_4$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_4$income_ridit[imputed_mcs2_4$income_ridit == 2] <- mcs_income_ridit4[2,]
 imputed_mcs2_4$income_ridit[imputed_mcs2_4$income_ridit == 3] <- mcs_income_ridit4[3,]
 imputed_mcs2_4$income_ridit[imputed_mcs2_4$income_ridit == 4] <- mcs_income_ridit4[4,]
+imputed_mcs2_4$income_ridit[imputed_mcs2_4$income_ridit == 5] <- mcs_income_ridit4[5,]
 
 #imputed dataset 5
 #get count data 
@@ -932,6 +935,7 @@ imputed_mcs2_5$income_ridit[imputed_mcs2_5$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_5$income_ridit[imputed_mcs2_5$income_ridit == 2] <- mcs_income_ridit5[2,]
 imputed_mcs2_5$income_ridit[imputed_mcs2_5$income_ridit == 3] <- mcs_income_ridit5[3,]
 imputed_mcs2_5$income_ridit[imputed_mcs2_5$income_ridit == 4] <- mcs_income_ridit5[4,]
+imputed_mcs2_5$income_ridit[imputed_mcs2_5$income_ridit == 5] <- mcs_income_ridit5[5,]
 
 #imputed dataset 6
 #get count data 
@@ -945,6 +949,7 @@ imputed_mcs2_6$income_ridit[imputed_mcs2_6$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_6$income_ridit[imputed_mcs2_6$income_ridit == 2] <- mcs_income_ridit6[2,]
 imputed_mcs2_6$income_ridit[imputed_mcs2_6$income_ridit == 3] <- mcs_income_ridit6[3,]
 imputed_mcs2_6$income_ridit[imputed_mcs2_6$income_ridit == 4] <- mcs_income_ridit6[4,]
+imputed_mcs2_6$income_ridit[imputed_mcs2_6$income_ridit == 5] <- mcs_income_ridit6[5,]
 
 #imputed dataset 7
 #get count data 
@@ -958,7 +963,7 @@ imputed_mcs2_7$income_ridit[imputed_mcs2_7$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_7$income_ridit[imputed_mcs2_7$income_ridit == 2] <- mcs_income_ridit7[2,]
 imputed_mcs2_7$income_ridit[imputed_mcs2_7$income_ridit == 3] <- mcs_income_ridit7[3,]
 imputed_mcs2_7$income_ridit[imputed_mcs2_7$income_ridit == 4] <- mcs_income_ridit7[4,]
-
+imputed_mcs2_7$income_ridit[imputed_mcs2_7$income_ridit == 5] <- mcs_income_ridit7[5,]
 
 #imputed dataset 8
 #get count data 
@@ -972,6 +977,7 @@ imputed_mcs2_8$income_ridit[imputed_mcs2_8$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_8$income_ridit[imputed_mcs2_8$income_ridit == 2] <- mcs_income_ridit8[2,]
 imputed_mcs2_8$income_ridit[imputed_mcs2_8$income_ridit == 3] <- mcs_income_ridit8[3,]
 imputed_mcs2_8$income_ridit[imputed_mcs2_8$income_ridit == 4] <- mcs_income_ridit8[4,]
+imputed_mcs2_8$income_ridit[imputed_mcs2_8$income_ridit == 5] <- mcs_income_ridit8[5,]
 
 #imputed dataset 9
 #get count data 
@@ -985,6 +991,8 @@ imputed_mcs2_9$income_ridit[imputed_mcs2_9$income_ridit == 1] <- mcs_income_ridi
 imputed_mcs2_9$income_ridit[imputed_mcs2_9$income_ridit == 2] <- mcs_income_ridit9[2,]
 imputed_mcs2_9$income_ridit[imputed_mcs2_9$income_ridit == 3] <- mcs_income_ridit9[3,]
 imputed_mcs2_9$income_ridit[imputed_mcs2_9$income_ridit == 4] <- mcs_income_ridit9[4,]
+imputed_mcs2_9$income_ridit[imputed_mcs2_9$income_ridit == 5] <- mcs_income_ridit9[5,]
+
 
 #imputed dataset 10
 #get count data 
@@ -998,6 +1006,8 @@ imputed_mcs2_10$income_ridit[imputed_mcs2_10$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_10$income_ridit[imputed_mcs2_10$income_ridit == 2] <- mcs_income_ridit10[2,]
 imputed_mcs2_10$income_ridit[imputed_mcs2_10$income_ridit == 3] <- mcs_income_ridit10[3,]
 imputed_mcs2_10$income_ridit[imputed_mcs2_10$income_ridit == 4] <- mcs_income_ridit10[4,]
+imputed_mcs2_10$income_ridit[imputed_mcs2_10$income_ridit == 5] <- mcs_income_ridit10[5,]
+
 
 #imputed dataset 11
 #get count data 
@@ -1011,7 +1021,7 @@ imputed_mcs2_11$income_ridit[imputed_mcs2_11$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_11$income_ridit[imputed_mcs2_11$income_ridit == 2] <- mcs_income_ridit11[2,]
 imputed_mcs2_11$income_ridit[imputed_mcs2_11$income_ridit == 3] <- mcs_income_ridit11[3,]
 imputed_mcs2_11$income_ridit[imputed_mcs2_11$income_ridit == 4] <- mcs_income_ridit11[4,]
-
+imputed_mcs2_11$income_ridit[imputed_mcs2_11$income_ridit == 5] <- mcs_income_ridit11[5,]
 
 #imputed dataset 12
 #get count data 
@@ -1025,6 +1035,7 @@ imputed_mcs2_12$income_ridit[imputed_mcs2_12$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_12$income_ridit[imputed_mcs2_12$income_ridit == 2] <- mcs_income_ridit12[2,]
 imputed_mcs2_12$income_ridit[imputed_mcs2_12$income_ridit == 3] <- mcs_income_ridit12[3,]
 imputed_mcs2_12$income_ridit[imputed_mcs2_12$income_ridit == 4] <- mcs_income_ridit12[4,]
+imputed_mcs2_12$income_ridit[imputed_mcs2_12$income_ridit == 5] <- mcs_income_ridit12[5,]
 
 #imputed dataset 13
 #get count data 
@@ -1038,6 +1049,7 @@ imputed_mcs2_13$income_ridit[imputed_mcs2_13$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_13$income_ridit[imputed_mcs2_13$income_ridit == 2] <- mcs_income_ridit13[2,]
 imputed_mcs2_13$income_ridit[imputed_mcs2_13$income_ridit == 3] <- mcs_income_ridit13[3,]
 imputed_mcs2_13$income_ridit[imputed_mcs2_13$income_ridit == 4] <- mcs_income_ridit13[4,]
+imputed_mcs2_13$income_ridit[imputed_mcs2_13$income_ridit == 5] <- mcs_income_ridit13[5,]
 
 #imputed dataset 14
 #get count data 
@@ -1051,6 +1063,7 @@ imputed_mcs2_14$income_ridit[imputed_mcs2_14$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_14$income_ridit[imputed_mcs2_14$income_ridit == 2] <- mcs_income_ridit14[2,]
 imputed_mcs2_14$income_ridit[imputed_mcs2_14$income_ridit == 3] <- mcs_income_ridit14[3,]
 imputed_mcs2_14$income_ridit[imputed_mcs2_14$income_ridit == 4] <- mcs_income_ridit14[4,]
+imputed_mcs2_14$income_ridit[imputed_mcs2_14$income_ridit == 5] <- mcs_income_ridit14[5,]
 
 #imputed dataset 15
 #get count data 
@@ -1064,6 +1077,7 @@ imputed_mcs2_15$income_ridit[imputed_mcs2_15$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_15$income_ridit[imputed_mcs2_15$income_ridit == 2] <- mcs_income_ridit15[2,]
 imputed_mcs2_15$income_ridit[imputed_mcs2_15$income_ridit == 3] <- mcs_income_ridit15[3,]
 imputed_mcs2_15$income_ridit[imputed_mcs2_15$income_ridit == 4] <- mcs_income_ridit15[4,]
+imputed_mcs2_15$income_ridit[imputed_mcs2_15$income_ridit == 5] <- mcs_income_ridit15[5,]
 
 #imputed dataset 16
 #get count data 
@@ -1077,6 +1091,7 @@ imputed_mcs2_16$income_ridit[imputed_mcs2_16$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_16$income_ridit[imputed_mcs2_16$income_ridit == 2] <- mcs_income_ridit16[2,]
 imputed_mcs2_16$income_ridit[imputed_mcs2_16$income_ridit == 3] <- mcs_income_ridit16[3,]
 imputed_mcs2_16$income_ridit[imputed_mcs2_16$income_ridit == 4] <- mcs_income_ridit16[4,]
+imputed_mcs2_16$income_ridit[imputed_mcs2_16$income_ridit == 5] <- mcs_income_ridit16[5,]
 
 #imputed dataset 17
 #get count data 
@@ -1090,6 +1105,8 @@ imputed_mcs2_17$income_ridit[imputed_mcs2_17$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_17$income_ridit[imputed_mcs2_17$income_ridit == 2] <- mcs_income_ridit17[2,]
 imputed_mcs2_17$income_ridit[imputed_mcs2_17$income_ridit == 3] <- mcs_income_ridit17[3,]
 imputed_mcs2_17$income_ridit[imputed_mcs2_17$income_ridit == 4] <- mcs_income_ridit17[4,]
+imputed_mcs2_17$income_ridit[imputed_mcs2_17$income_ridit == 5] <- mcs_income_ridit17[5,]
+
 
 #imputed dataset 18
 #get count data 
@@ -1103,6 +1120,7 @@ imputed_mcs2_18$income_ridit[imputed_mcs2_18$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_18$income_ridit[imputed_mcs2_18$income_ridit == 2] <- mcs_income_ridit18[2,]
 imputed_mcs2_18$income_ridit[imputed_mcs2_18$income_ridit == 3] <- mcs_income_ridit18[3,]
 imputed_mcs2_18$income_ridit[imputed_mcs2_18$income_ridit == 4] <- mcs_income_ridit18[4,]
+imputed_mcs2_18$income_ridit[imputed_mcs2_18$income_ridit == 5] <- mcs_income_ridit18[5,]
 
 #imputed dataset 19
 #get count data 
@@ -1116,6 +1134,7 @@ imputed_mcs2_19$income_ridit[imputed_mcs2_19$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_19$income_ridit[imputed_mcs2_19$income_ridit == 2] <- mcs_income_ridit19[2,]
 imputed_mcs2_19$income_ridit[imputed_mcs2_19$income_ridit == 3] <- mcs_income_ridit19[3,]
 imputed_mcs2_19$income_ridit[imputed_mcs2_19$income_ridit == 4] <- mcs_income_ridit19[4,]
+imputed_mcs2_19$income_ridit[imputed_mcs2_19$income_ridit == 5] <- mcs_income_ridit19[5,]
 
 #imputed dataset 20
 #get count data 
@@ -1129,6 +1148,7 @@ imputed_mcs2_20$income_ridit[imputed_mcs2_20$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_20$income_ridit[imputed_mcs2_20$income_ridit == 2] <- mcs_income_ridit20[2,]
 imputed_mcs2_20$income_ridit[imputed_mcs2_20$income_ridit == 3] <- mcs_income_ridit20[3,]
 imputed_mcs2_20$income_ridit[imputed_mcs2_20$income_ridit == 4] <- mcs_income_ridit20[4,]
+imputed_mcs2_20$income_ridit[imputed_mcs2_20$income_ridit == 5] <- mcs_income_ridit20[5,]
 
 #imputed dataset 21
 #get count data 
@@ -1142,6 +1162,8 @@ imputed_mcs2_21$income_ridit[imputed_mcs2_21$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_21$income_ridit[imputed_mcs2_21$income_ridit == 2] <- mcs_income_ridit21[2,]
 imputed_mcs2_21$income_ridit[imputed_mcs2_21$income_ridit == 3] <- mcs_income_ridit21[3,]
 imputed_mcs2_21$income_ridit[imputed_mcs2_21$income_ridit == 4] <- mcs_income_ridit21[4,]
+imputed_mcs2_21$income_ridit[imputed_mcs2_21$income_ridit == 5] <- mcs_income_ridit21[5,]
+
 
 #imputed dataset 22
 #get count data 
@@ -1155,6 +1177,7 @@ imputed_mcs2_22$income_ridit[imputed_mcs2_22$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_22$income_ridit[imputed_mcs2_22$income_ridit == 2] <- mcs_income_ridit22[2,]
 imputed_mcs2_22$income_ridit[imputed_mcs2_22$income_ridit == 3] <- mcs_income_ridit22[3,]
 imputed_mcs2_22$income_ridit[imputed_mcs2_22$income_ridit == 4] <- mcs_income_ridit22[4,]
+imputed_mcs2_22$income_ridit[imputed_mcs2_22$income_ridit == 5] <- mcs_income_ridit22[5,]
 
 #imputed dataset 23
 #get count data 
@@ -1168,6 +1191,7 @@ imputed_mcs2_23$income_ridit[imputed_mcs2_23$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_23$income_ridit[imputed_mcs2_23$income_ridit == 2] <- mcs_income_ridit23[2,]
 imputed_mcs2_23$income_ridit[imputed_mcs2_23$income_ridit == 3] <- mcs_income_ridit23[3,]
 imputed_mcs2_23$income_ridit[imputed_mcs2_23$income_ridit == 4] <- mcs_income_ridit23[4,]
+imputed_mcs2_23$income_ridit[imputed_mcs2_23$income_ridit == 5] <- mcs_income_ridit23[5,]
 
 #imputed dataset 24
 #get count data 
@@ -1181,6 +1205,7 @@ imputed_mcs2_24$income_ridit[imputed_mcs2_24$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_24$income_ridit[imputed_mcs2_24$income_ridit == 2] <- mcs_income_ridit24[2,]
 imputed_mcs2_24$income_ridit[imputed_mcs2_24$income_ridit == 3] <- mcs_income_ridit24[3,]
 imputed_mcs2_24$income_ridit[imputed_mcs2_24$income_ridit == 4] <- mcs_income_ridit24[4,]
+imputed_mcs2_24$income_ridit[imputed_mcs2_24$income_ridit == 5] <- mcs_income_ridit24[5,]
 
 #imputed dataset 25
 #get count data 
@@ -1194,7 +1219,7 @@ imputed_mcs2_25$income_ridit[imputed_mcs2_25$income_ridit == 1] <- mcs_income_ri
 imputed_mcs2_25$income_ridit[imputed_mcs2_25$income_ridit == 2] <- mcs_income_ridit25[2,]
 imputed_mcs2_25$income_ridit[imputed_mcs2_25$income_ridit == 3] <- mcs_income_ridit25[3,]
 imputed_mcs2_25$income_ridit[imputed_mcs2_25$income_ridit == 4] <- mcs_income_ridit25[4,]
-
+imputed_mcs2_25$income_ridit[imputed_mcs2_25$income_ridit == 5] <- mcs_income_ridit25[5,]
 
 #income regression models with income ridit as predictor variable.
 #Regression models over each imputed dataset 
