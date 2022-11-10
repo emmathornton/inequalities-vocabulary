@@ -65,8 +65,8 @@ meth[c("highest_NVQ")]="polyreg"
 meth[c("income_quintiles")]="polyreg"
 meth[c("imd")]="polyreg"
 meth[c("occupational_status")]="polyreg"
-#meth[c("mothers_education")]="polyreg"
-#meth[c("fathers_education")]="polyreg"
+#meth[c("maternal_NVQ")]="polyreg"
+#meth[c("paternal_NVQ")]="polyreg"
 #meth[c("mother_NVQ_level")]="polyreg"
 #meth[c("father_NVQ_level")]="polyreg"
 meth[c("housing_tenure")]="polyreg"
@@ -88,6 +88,10 @@ blocksvec=names(meth)
 # predM=0 --> variable not used to form imputation (i think - check)
 predM = predM[blocksvec,]
 predM[,c("mcsid")]=0
+#predM[c("maternal_NVQ", "paternal_NVQ"),
+ #     c("highest_NVQ")]  = 0 
+#predM[c("highest_NVQ"),
+ #     c("maternal_NVQ", "paternal_NVQ")]  = 0 
 #predM[,c("mcs2_weight")]=0
 #set.seed(103)
 imputed_mcs2 = mice(mcs_ses, blocks=blocksvec, method=meth, 
