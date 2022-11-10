@@ -13,6 +13,7 @@ library(lubridate)
 mcs_ses<-read.csv("age14_SES_data.csv")
 mcs_ses[,1]<- NULL
 
+names(mcs_ses) <- c("mcsid", "gender", "ethnicity", "language_used_at_home", "mothers_age", "housing_tenure", "accommodation_type", "highest_NVQ", "cm_breastfed", "parents_in_house",  "income_quintiles" ,"imd", "occupational_status",   "mortgage", "house_value",  "savings" ,"total_debt",  "vocabulary_age14", "mcs2_weight")
 
 
 library(mice)
@@ -90,7 +91,8 @@ predM = predM[blocksvec,]
 predM[,c("mcsid")]=0
 #predM[,c("mcs2_weight")]=0
 #set.seed(103)
-imputed_mcs2 = mice(mcs_ses, blocks=blocksvec, method=meth, seed = 1895, predictorMatrix=predM, m=25) #can change this to a smaller numebr so runs quicker when figuring out. 
+imputed_mcs2 = mice(mcs_ses, blocks=blocksvec, method=meth, 
+                    seed = 1895, predictorMatrix=predM, m=25) #can change this to a smaller numebr so runs quicker when figuring out. 
 
 long_format_mcs <- mice::complete(imputed_mcs2, "long", include=TRUE)
 #long_format_mcs$age3_standardised <- with(long_format_mcs, scale(vocabulary_age3, center=TRUE, scale=TRUE))
@@ -127,7 +129,10 @@ imputed_mcs2<-as.mids(long_format_mcs)
 
 #save mids object
 library(miceadds)
-write.mice.imputation(mi.res=imputed_mcs2, name = glue("{today()}_mcs-age14-sesVariables"), long=TRUE,dattype = "csv")
+write.mice.imputation(mi.res=imputed_mcs2, 
+                      name = glue("{today()}_mcs-age14-sesVariables"), 
+                      mids2spss=FALSE,
+                      long=TRUE,dattype = "csv")
 
 imputed_mcs2_0 <- complete(imputed_mcs2)
 imputed_mcs2_1 <- complete(imputed_mcs2,1)
